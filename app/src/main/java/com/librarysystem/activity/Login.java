@@ -28,6 +28,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,14 +37,20 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         initOnclick();
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isRemember = pref.getBoolean("remember_password", false);
-        if (isRemember) {
-            String user = pref.getString("user", "");
-            String password = pref.getString("password", "");
-            userEdit.setText(user);
-            passwordEdit.setText(password);
-            rememberPassword.setChecked(true);
-        }
+        boolean change_user=getIntent().getBooleanExtra("change",false);
 
+            if (isRemember) {
+
+                String user = pref.getString("user", "");
+                String password = pref.getString("password", "");
+                userEdit.setText(user);
+                passwordEdit.setText(password);
+                rememberPassword.setChecked(true);
+                if(!change_user) {
+                startActivity(new Intent(this, MainPage.class));
+
+            }
+        }
     }
 
     public void initOnclick() {
@@ -70,6 +77,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 if (userLogin()) {
                     Intent loginIntent = new Intent(this, MainPage.class);
                     startActivity(loginIntent);
+                    finish();
                 } else {
                     Toast.makeText(Login.this, "用户名或密码错误！", Toast.LENGTH_SHORT).show();
                 }
@@ -88,8 +96,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     public boolean userLogin() {
         String user = userEdit.getText().toString();
         String password = passwordEdit.getText().toString();
-        if (user.equals("201330310124") && password.equals("19940616")) {
+        if (user.equals("20130124") && password.equals("19940616")) {
+
             editor = pref.edit();
+            editor.putInt("userId",20130124);
             if (rememberPassword.isChecked()) {
                 editor.putBoolean("remember_password", true);
                 editor.putString("user", user);

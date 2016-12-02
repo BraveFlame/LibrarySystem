@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="arrays">
+        <item>个人资料</item>
+        <item>当前借阅</item>
+        <item>历史借阅</item>
+        <item>我的账户</item>
+        <item>切换账号</item>
+        <item>更多</item>
+    </string-array>
+
+
+</resources>
