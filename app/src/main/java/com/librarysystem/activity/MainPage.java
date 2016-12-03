@@ -50,6 +50,8 @@ public class MainPage extends Activity implements View.OnClickListener{
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
                             case 0:
+                                String data="personSet";
+                                intent0.putExtra("activity",data);
                                 startActivity(intent0);
                                 break;
                             case 4:

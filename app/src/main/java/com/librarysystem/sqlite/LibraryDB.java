@@ -42,15 +42,30 @@ public class LibraryDB {
     /*
     将PersonalMessage存入数据库
      */
-    public void savePersonalMeassage(PersonMessage personMessage){
-        if(personMessage!=null){
-            ContentValues values=new ContentValues();
-            values.put("user_id",personMessage.getUserId());
-            values.put("user_name",personMessage.getUserName());
-            values.put("user_sex",personMessage.getUserSex());
-            values.put("user_profession",personMessage.getUserProfession());
-            values.put("user_description",personMessage.getUserDescription());
-            db.insert("PersonalMessages",null,values);
+    public boolean savePersonalMeassage(PersonMessage personMessage){
+        int id=-1;
+        Cursor cursor=db.rawQuery("select * from PersonalMessages where user_id="+personMessage.getUserId(),null);
+        if(cursor.moveToFirst()){
+            do{
+                id=cursor.getInt(cursor.getColumnIndex("user_id"));
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
+        if(id==personMessage.getUserId())
+            return false;
+        else {
+            if (personMessage != null) {
+                ContentValues values = new ContentValues();
+                values.put("user_id", personMessage.getUserId());
+                values.put("user_password", personMessage.getUserPassword());
+                values.put("user_name", personMessage.getUserName());
+                values.put("user_sex", personMessage.getUserSex());
+                values.put("user_profession", personMessage.getUserProfession());
+                values.put("user_description", personMessage.getUserDescription());
+                db.insert("PersonalMessages", null, values);
+
+            }
+            return true;
         }
     }
     /*
@@ -76,6 +91,7 @@ public class LibraryDB {
             if(cursor.moveToFirst()){
                 do{
                     personMessage.setUserId(cursor.getInt(cursor.getColumnIndex("user_id")));
+                    personMessage.setUserPassword(cursor.getString(cursor.getColumnIndex("user_password")));
                     personMessage.setUserName(cursor.getString(cursor.getColumnIndex("user_name")));
                     personMessage.setUserSex(cursor.getString(cursor.getColumnIndex("user_sex")));
                     personMessage.setUserProfession(cursor.getString(cursor.getColumnIndex("user_profession")));

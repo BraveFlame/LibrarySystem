@@ -15,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.librarysystem.R;
+import com.librarysystem.model.PersonMessage;
+import com.librarysystem.sqlite.LibraryDB;
 
 /**
  * Created by g on 2016/10/15.
@@ -27,6 +29,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private TextView forgetPassword;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
+    private LibraryDB libraryDB;
+    private PersonMessage personMessage=new PersonMessage();
 
 
     @Override
@@ -35,15 +39,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.login_main);
         initOnclick();
+        libraryDB=LibraryDB.getInstance(this);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isRemember = pref.getBoolean("remember_password", false);
         boolean change_user=getIntent().getBooleanExtra("change",false);
 
             if (isRemember) {
 
-                String user = pref.getString("user", "");
+                int user = pref.getInt("user", 0);
                 String password = pref.getString("password", "");
-                userEdit.setText(user);
+                userEdit.setText(""+user);
                 passwordEdit.setText(password);
                 rememberPassword.setChecked(true);
                 if(!change_user) {
@@ -72,6 +77,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.register_button:
+                String data="register";
+                Intent registerIntent=new Intent(this,PersonalSet.class);
+                registerIntent.putExtra("activity",data);
+                startActivity(registerIntent);
                 break;
             case R.id.login_button:
                 if (userLogin()) {
@@ -94,16 +103,22 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     }
 
     public boolean userLogin() {
-        String user = userEdit.getText().toString();
-        String password = passwordEdit.getText().toString();
-        if (user.equals("20130124") && password.equals("19940616")) {
+
+
+
+        int userInput =Integer.valueOf(userEdit.getText().toString());
+        String passwordInput = passwordEdit.getText().toString();
+        libraryDB.getPersonalMeassage(personMessage,userInput);
+        int userId=personMessage.getUserId();
+        String password=personMessage.getUserPassword();
+        if ((userInput==userId) && passwordInput.equals(password)) {
 
             editor = pref.edit();
-            editor.putInt("userId",20130124);
+            editor.putInt("userId",userInput);
             if (rememberPassword.isChecked()) {
                 editor.putBoolean("remember_password", true);
-                editor.putString("user", user);
-                editor.putString("password", password);
+                editor.putInt("user", userInput);
+                editor.putString("password", passwordInput);
 
             } else {
                 editor.clear();

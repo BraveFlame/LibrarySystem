@@ -10,22 +10,23 @@ public class MySqliteManager extends SQLiteOpenHelper {
     PersonalMessage建表语句
      */
     private static final String CREATE_PERSONALMES="create table PersonalMessages(user_id integer primary" +
-            "key ,user_name text,user_sex text,user_profession text,user_description text)";
+            "key ,user_password text,user_name text,user_sex text,user_profession text,user_description text)";
     /*
     account建表语句
      */
-    private static final String CREATE_ACCOUNT="";
+   // private static final String CREATE_ACCOUNT="user_id integer primary key,user_password text";
     /*
    repertory建表语句
      */
-    private static final String CREATE_REPERTORY="";
+    private static final String CREATE_REPERTORY="create table BookRepertory(book_id integer primary" +
+            "key ,book_name text,user_name text,user_sex text,user_profession text,user_description text)";
     /*
     percent建表语句
      */
     private static final String CREATE_PERCENT="";
 
     /*
-    passed见表语句
+    passed建表语句
      */
     private static final String CREATE_PASSED="";
 

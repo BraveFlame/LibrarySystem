@@ -10,6 +10,16 @@ public class PersonMessage {
     private String userSex;
     private String userProfession;
     private String userDescription;
+
+    public String getUserPassword() {
+        return userPassword;
+    }
+
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
+    }
+
+    private  String userPassword;
     public String getUserProfession() {
         return userProfession;
     }
