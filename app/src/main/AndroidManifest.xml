@@ -19,6 +19,7 @@
             android:launchMode="singleTask"/>
         <activity android:name=".activity.PersonalSet"/>
         <activity android:name=".activity.Register"/>
+        <activity android:name=".activity.ChangeBooks"/>
 
     </application>
 

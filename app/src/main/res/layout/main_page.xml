@@ -14,15 +14,30 @@
         android:text="选择"
         android:textSize="18sp" />
     <EditText
+        android:id="@+id/book_search_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:hint="搜索图书"/>
     <Button
+        android:id="@+id/search_book"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:text="搜索"/>
 </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/list_search_book"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </ListView>
+
+
+
+    </LinearLayout>
 
 </LinearLayout>

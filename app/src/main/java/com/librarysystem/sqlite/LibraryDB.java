@@ -5,7 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.librarysystem.model.Books;
 import com.librarysystem.model.PersonMessage;
+
+import java.util.List;
 
 /**
  * Created by g on 2016/12/2.
@@ -102,6 +105,50 @@ public class LibraryDB {
         }
 
     }
+    /*
+      用户搜索从数据库读取书本的信息
+      */
+    public List<Books> getBookMeassage(String bookName, List<Books> booksList){
+        booksList.clear();
+        Books book=new Books();
+            Cursor cursor=db.rawQuery("select * from BookRepertory where book_name like '%"+bookName+"%'",null);
+            if(cursor.moveToFirst()){
+                do{
+                    book.setBookId((cursor.getInt(cursor.getColumnIndex("book_id"))));
+                    book.setBookName(cursor.getString(cursor.getColumnIndex("book_name")));
+                    book.setBookAuthor(cursor.getString(cursor.getColumnIndex("book_author")));
+                    booksList.add(book);
+                }while(cursor.moveToNext());
+            }
+            cursor.close();
+        return booksList;
+        }
 
-
+/*
+管理员保存图书
+ */
+    public boolean saveBookMeassage(Books books){
+        int id=-1;
+        Cursor cursor=db.rawQuery("select * from BookRepertory where book_id="+books.getBookId(),null);
+        if(cursor.moveToFirst()){
+            do{
+                id=cursor.getInt(cursor.getColumnIndex("book_id"));
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
+        //如果原来存在则不保存
+        if(id==books.getBookId())
+            return false;
+        else {
+            if (books != null) {
+                ContentValues values = new ContentValues();
+                values.put("book_id", books.getBookId());
+                values.put("book_name", books.getBookName());
+                values.put("book_author", books.getBookAuthor());
+                values.put("book_description", books.getUserDescription());
+                db.insert("BookRepertory", null, values);
+            }
+            return true;
+        }
+    }
 }

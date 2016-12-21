@@ -19,7 +19,7 @@ public class MySqliteManager extends SQLiteOpenHelper {
    repertory建表语句
      */
     private static final String CREATE_REPERTORY="create table BookRepertory(book_id integer primary" +
-            "key ,book_name text,user_name text,user_sex text,user_profession text,user_description text)";
+            "key ,book_name text,book_author text, text,book_rest integer,book_status blob,book_description text)";
     /*
     percent建表语句
      */
@@ -38,6 +38,7 @@ public class MySqliteManager extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_PERSONALMES);
+        db.execSQL(CREATE_REPERTORY);
     }
 
     @Override
