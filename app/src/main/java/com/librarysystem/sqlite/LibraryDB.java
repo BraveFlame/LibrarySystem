@@ -110,20 +110,41 @@ public class LibraryDB {
       */
     public List<Books> getBookMeassage(String bookName, List<Books> booksList){
         booksList.clear();
-        Books book=new Books();
+
             Cursor cursor=db.rawQuery("select * from BookRepertory where book_name like '%"+bookName+"%'",null);
             if(cursor.moveToFirst()){
                 do{
+                    Books book=new Books();
                     book.setBookId((cursor.getInt(cursor.getColumnIndex("book_id"))));
                     book.setBookName(cursor.getString(cursor.getColumnIndex("book_name")));
                     book.setBookAuthor(cursor.getString(cursor.getColumnIndex("book_author")));
+                    book.setUserDescription(cursor.getString(cursor.getColumnIndex("book_description")));
+                    book.setIsLent(cursor.getString(cursor.getColumnIndex("book_status")));
                     booksList.add(book);
                 }while(cursor.moveToNext());
             }
             cursor.close();
         return booksList;
         }
-
+/*
+当前借阅
+ */
+public List<Books> getPresentBooks(List<Books> booksList){
+    booksList.clear();
+    Cursor cursor=db.rawQuery("select * from PresentBooks ",null);
+    if(cursor.moveToFirst()){
+        do{
+            Books book=new Books();
+            book.setBookId((cursor.getInt(cursor.getColumnIndex("book_id"))));
+            book.setBookName(cursor.getString(cursor.getColumnIndex("book_name")));
+            book.setBookAuthor(cursor.getString(cursor.getColumnIndex("book_author")));
+            book.setUserDescription(cursor.getString(cursor.getColumnIndex("book_description")));
+            booksList.add(book);
+        }while(cursor.moveToNext());
+    }
+    cursor.close();
+    return booksList;
+}
 /*
 管理员保存图书
  */
@@ -146,9 +167,30 @@ public class LibraryDB {
                 values.put("book_name", books.getBookName());
                 values.put("book_author", books.getBookAuthor());
                 values.put("book_description", books.getUserDescription());
+                values.put("book_status","可借");
                 db.insert("BookRepertory", null, values);
             }
             return true;
         }
+    }
+    /*
+    借书
+     */
+    public boolean borrowBook(Books book){
+        if (book != null) {
+            ContentValues values = new ContentValues();
+            values.put("book_id", book.getBookId());
+            values.put("book_name", book.getBookName());
+            values.put("book_author", book.getBookAuthor());
+            values.put("book_description", book.getUserDescription());
+            db.insert("PresentBooks", null, values);
+
+            ContentValues value = new ContentValues();
+            value.put("book_status","借出");
+            db.update("BookRepertory",value,"book_id=?",new String[]{""+book.getBookId()});
+            return true;
+        }
+
+        else return false;
     }
 }

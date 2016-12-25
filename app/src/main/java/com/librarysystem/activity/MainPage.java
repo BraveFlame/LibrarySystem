@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -60,11 +61,12 @@ public class MainPage extends Activity implements View.OnClickListener{
 
         switch (id){
             case LISTSELECT:
-                AlertDialog.Builder builder=new AlertDialog.Builder(this);
+                final AlertDialog.Builder builder=new AlertDialog.Builder(this);
                 builder.setTitle("选择");
                 final  Intent intent4=new Intent(this,Login.class);
                 final  Intent intent0=new Intent(this,PersonalSet.class);
                 final Intent intent5=new Intent(this,ChangeBooks.class);
+                final Intent intent1=new Intent(this,PresentBorrow.class);
                 DialogInterface.OnClickListener listener=new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -73,6 +75,9 @@ public class MainPage extends Activity implements View.OnClickListener{
                                 String data="personSet";
                                 intent0.putExtra("activity",data);
                                 startActivity(intent0);
+                                break;
+                            case 1:
+                                startActivity(intent1);
                                 break;
                             case 4:
                                 startActivity(intent4);
@@ -103,10 +108,25 @@ public class MainPage extends Activity implements View.OnClickListener{
                 BookAdapter adapter=new BookAdapter(MainPage.this,R.layout.book_item,booksList);
                 bookList=(ListView)findViewById(R.id.list_search_book);
                 bookList.setAdapter(adapter);
+                final Intent bookIntent=new Intent(this,DetailedBook.class);
+                /*
+                点击查看每本书的信息
+                 */
+                bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Books book=booksList.get(position);
+                        bookIntent.putExtra("bookmessage",book);
+                        startActivity(bookIntent);
+
+
+                    }
+                });
                 break;
             default:break;
         }
     }
+
 
 
 }

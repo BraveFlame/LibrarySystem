@@ -19,16 +19,18 @@ public class MySqliteManager extends SQLiteOpenHelper {
    repertory建表语句
      */
     private static final String CREATE_REPERTORY="create table BookRepertory(book_id integer primary" +
-            "key ,book_name text,book_author text, text,book_rest integer,book_status blob,book_description text)";
+            "key ,book_name text,book_author text,book_rest integer,book_status text,book_description text)";
     /*
-    percent建表语句
+    present建表语句
      */
-    private static final String CREATE_PERCENT="";
+    private static final String CREATE_PRESENT="create table PresentBooks(book_id integer primary" +
+            "key ,book_name text,book_author text,book_description text)";
 
     /*
     passed建表语句
      */
-    private static final String CREATE_PASSED="";
+    private static final String CREATE_PAST="create table PastBooks(book_id integer primary" +
+            "key ,book_name text,book_author text,book_description text)";
 
     public MySqliteManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
             super(context, name, factory, version);
@@ -39,6 +41,8 @@ public class MySqliteManager extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_PERSONALMES);
         db.execSQL(CREATE_REPERTORY);
+        db.execSQL(CREATE_PRESENT);
+        db.execSQL(CREATE_PAST);
     }
 
     @Override

@@ -35,11 +35,14 @@ public class BookAdapter extends ArrayAdapter<Books> {
         TextView bookName=(TextView) view.findViewById(R.id.book_name);
         TextView bookAuthor=(TextView) view.findViewById(R.id.book_author);
         TextView bookId=(TextView) view.findViewById(R.id.book_id);
+        //TextView bookDate=(TextView)view.findViewById(R.id.book_date);
         bookName.setText(books.getBookName());
         bookAuthor.setText(books.getBookAuthor());
         bookId.setText(String.valueOf(books.getBookId()));
+       // bookDate.setText(books.getLentTime().toString());
 
 
         return view;
     }
+
 }

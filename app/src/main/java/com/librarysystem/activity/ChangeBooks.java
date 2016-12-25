@@ -40,6 +40,8 @@ public class ChangeBooks extends Activity {
                 books.setBookName(bName.getText().toString());
                 books.setBookAuthor(bAuthor.getText().toString());
                 books.setUserDescription(bDes.getText().toString());
+                books.setIsLent("可借");
+
                 //如果原来没有则添加成功
                 if(libraryDB.saveBookMeassage(books)) {
                     Toast.makeText(ChangeBooks.this, "successful", Toast.LENGTH_SHORT);

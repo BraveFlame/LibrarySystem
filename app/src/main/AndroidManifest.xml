@@ -18,8 +18,12 @@
         <activity android:name=".activity.MainPage"
             android:launchMode="singleTask"/>
         <activity android:name=".activity.PersonalSet"/>
-        <activity android:name=".activity.Register"/>
+        <activity android:name=".activity.PresentBorrow"/>
         <activity android:name=".activity.ChangeBooks"/>
+        <activity android:name=".activity.MyAccount"/>
+        <activity android:name=".activity.PassBorrow"/>
+        <activity android:name=".activity.DetailedBook"/>
+
 
     </application>
 

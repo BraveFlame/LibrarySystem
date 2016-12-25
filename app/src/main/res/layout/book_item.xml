@@ -23,4 +23,12 @@
         android:layout_marginLeft="1dip"
         android:textSize="15sp"
         />
+    <TextView
+        android:id="@+id/book_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="1dip"
+        android:textSize="15sp"
+        />
 </LinearLayout>

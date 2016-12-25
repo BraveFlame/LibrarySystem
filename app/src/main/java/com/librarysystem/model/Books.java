@@ -1,21 +1,25 @@
 package com.librarysystem.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.sql.Date;
 
 /**
  * Created by g on 2016/11/30.
  */
 
-public class Books {
-private int bookId;
+public class Books implements Parcelable {
+    private int bookId;
 
     private String bookName;
     private String bookAuthor;
-    private boolean isLent;
+    private String isLent;
     private String userDescription;
     private Date LentTime;
     private Date backTime;
-    private int mount,rest;
+    private int mount, rest;
+
 
     public int getBookId() {
         return bookId;
@@ -41,11 +45,11 @@ private int bookId;
         this.bookAuthor = bookAuthor;
     }
 
-    public boolean isLent() {
+    public String getIsLent() {
         return isLent;
     }
 
-    public void setLent(boolean lent) {
+    public void setIsLent(String lent) {
         isLent = lent;
     }
 
@@ -88,4 +92,39 @@ private int bookId;
     public void setRest(int rest) {
         this.rest = rest;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(bookId);
+        dest.writeString(bookName);
+        dest.writeString(bookAuthor);
+        dest.writeString(userDescription);
+        dest.writeString(isLent);
+
+    }
+
+    public static final Parcelable.Creator<Books> CREATOR = new Parcelable.Creator<Books>() {
+        @Override
+        public Books createFromParcel(Parcel source) {
+            Books book = new Books();
+            book.bookId = source.readInt();
+            book.bookName = source.readString();
+            book.bookAuthor = source.readString();
+            book.userDescription=source.readString();
+            book.isLent=source.readString();
+            return book;
+        }
+
+        @Override
+        public Books[] newArray(int size) {
+            return new Books[size];
+        }
+    };
+
+
 }
