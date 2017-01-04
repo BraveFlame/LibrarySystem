@@ -53,7 +53,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 rememberPassword.setChecked(true);
                 if(!change_user) {
                 startActivity(new Intent(this, MainPage.class));
-
+               finish();
 
             }
         }

@@ -33,6 +33,7 @@ public class MainPage extends Activity implements View.OnClickListener{
     private ListView bookList;
     private List<Books>booksList=new ArrayList<Books>();
     private LibraryDB libraryDB;
+    private boolean isSearch;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,9 +65,11 @@ public class MainPage extends Activity implements View.OnClickListener{
                 final AlertDialog.Builder builder=new AlertDialog.Builder(this);
                 builder.setTitle("选择");
                 final  Intent intent4=new Intent(this,Login.class);
+                intent4.putExtra("change",true);
                 final  Intent intent0=new Intent(this,PersonalSet.class);
                 final Intent intent5=new Intent(this,ChangeBooks.class);
                 final Intent intent1=new Intent(this,PresentBorrow.class);
+                final Intent intent2=new Intent(this,PassBorrow.class);
                 DialogInterface.OnClickListener listener=new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -78,6 +81,9 @@ public class MainPage extends Activity implements View.OnClickListener{
                                 break;
                             case 1:
                                 startActivity(intent1);
+                                break;
+                            case 2:
+                                startActivity(intent2);
                                 break;
                             case 4:
                                 startActivity(intent4);
@@ -102,6 +108,7 @@ public class MainPage extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.search_book:
+                isSearch=true;
                 bookName=inputSearchBook.getText().toString();
                 libraryDB.getBookMeassage(bookName,booksList);
                 //将搜索结果显示出来
@@ -127,6 +134,30 @@ public class MainPage extends Activity implements View.OnClickListener{
         }
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if(isSearch){
+        bookName=inputSearchBook.getText().toString();
+        libraryDB.getBookMeassage(bookName,booksList);
+        //将搜索结果显示出来
+        BookAdapter adapter=new BookAdapter(MainPage.this,R.layout.book_item,booksList);
+        bookList=(ListView)findViewById(R.id.list_search_book);
+        bookList.setAdapter(adapter);
+        final Intent bookIntent=new Intent(this,DetailedBook.class);
+                /*
+                点击查看每本书的信息
+                 */
+        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Books book = booksList.get(position);
+                bookIntent.putExtra("bookmessage", book);
+                startActivity(bookIntent);
 
 
+            }
+        });
+    }
+    }
 }

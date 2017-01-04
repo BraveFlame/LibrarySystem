@@ -16,7 +16,7 @@ public class Books implements Parcelable {
     private String bookAuthor;
     private String isLent;
     private String userDescription;
-    private Date LentTime;
+    private String LentTime;
     private Date backTime;
     private int mount, rest;
 
@@ -61,11 +61,11 @@ public class Books implements Parcelable {
         this.userDescription = userDescription;
     }
 
-    public Date getLentTime() {
+    public String getLentTime() {
         return LentTime;
     }
 
-    public void setLentTime(Date lentTime) {
+    public void setLentTime(String lentTime) {
         LentTime = lentTime;
     }
 
@@ -105,6 +105,7 @@ public class Books implements Parcelable {
         dest.writeString(bookAuthor);
         dest.writeString(userDescription);
         dest.writeString(isLent);
+        dest.writeString(LentTime);
 
     }
 
@@ -117,6 +118,7 @@ public class Books implements Parcelable {
             book.bookAuthor = source.readString();
             book.userDescription=source.readString();
             book.isLent=source.readString();
+            book.LentTime=source.readString();
             return book;
         }
 

@@ -1,8 +1,11 @@
 package com.librarysystem.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.librarysystem.R;
@@ -29,12 +32,49 @@ public class PresentBorrow extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.main_page);
+        setContentView(R.layout.present_book);
         libraryDB=LibraryDB.getInstance(this);
         libraryDB.getPresentBooks(booksList);
         //将搜索结果显示出来
         BookAdapter adapter=new BookAdapter(this,R.layout.book_item,booksList);
-        bookList=(ListView)findViewById(R.id.list_search_book);
+        bookList=(ListView)findViewById(R.id.list_present_book);
         bookList.setAdapter(adapter);
+        final Intent bookIntent=new Intent(this,BackBook.class);
+                /*
+                点击查看每本书的信息
+                 */
+        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Books book=booksList.get(position);
+                bookIntent.putExtra("bookmessage",book);
+                startActivity(bookIntent);
+
+
+            }
+        });
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        libraryDB.getPresentBooks(booksList);
+        //将搜索结果显示出来
+        BookAdapter adapter=new BookAdapter(this,R.layout.book_item,booksList);
+        bookList=(ListView)findViewById(R.id.list_present_book);
+        bookList.setAdapter(adapter);
+        final Intent bookIntent=new Intent(this,BackBook.class);
+                /*
+                点击查看每本书的信息
+                 */
+        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Books book=booksList.get(position);
+                bookIntent.putExtra("bookmessage",book);
+                startActivity(bookIntent);
+
+            }
+        });
     }
 }

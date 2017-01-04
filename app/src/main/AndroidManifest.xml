@@ -23,6 +23,7 @@
         <activity android:name=".activity.MyAccount"/>
         <activity android:name=".activity.PassBorrow"/>
         <activity android:name=".activity.DetailedBook"/>
+        <activity android:name=".activity.BackBook"/>
 
 
     </application>

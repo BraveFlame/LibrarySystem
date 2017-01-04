@@ -43,13 +43,13 @@ public class DetailedBook extends Activity {
         detailed_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
              if(book.getIsLent().equals("可借")){
                  book.setIsLent("借出");
                if( libraryDB.borrowBook(book));
                  {
                      detailed_status.setText("状态：借出");
                     detailed_button.setEnabled(false);
+
                  }
 
 
