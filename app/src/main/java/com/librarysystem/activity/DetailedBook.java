@@ -1,7 +1,9 @@
 package com.librarysystem.activity;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,10 +22,12 @@ public class DetailedBook extends Activity {
     private TextView detailed_name,detailed_author,detailed_id,detailed_message,detailed_status;
     private Button detailed_button;
     private LibraryDB libraryDB;
+    private SharedPreferences pref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detailedbook);
+        pref= PreferenceManager.getDefaultSharedPreferences(this);
         final Books book=(Books)getIntent().getParcelableExtra("bookmessage");
         detailed_id=(TextView)findViewById(R.id.detailed_id);
         detailed_name=(TextView)findViewById(R.id.detailed_name);
@@ -45,7 +49,7 @@ public class DetailedBook extends Activity {
             public void onClick(View v) {
              if(book.getIsLent().equals("可借")){
                  book.setIsLent("借出");
-               if( libraryDB.borrowBook(book));
+               if( libraryDB.borrowBook(pref.getInt("userId",0),book));
                  {
                      detailed_status.setText("状态：借出");
                     detailed_button.setEnabled(false);

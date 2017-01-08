@@ -24,13 +24,19 @@ public class MySqliteManager extends SQLiteOpenHelper {
     present建表语句
      */
     private static final String CREATE_PRESENT="create table PresentBooks(book_id integer primary" +
-            "key ,book_name text,book_author text,book_description text,borrow_start text,back_time text)";
+            "key ,reader_id integer ,book_name text,book_author text,book_description text,borrow_start text,back_time text)";
 
     /*
     passed建表语句
      */
     private static final String CREATE_PAST="create table PastBooks(book_id integer primary" +
-            "key ,book_name text,book_author text,book_description text,borrow_start text,back_time text)";
+            "key ,reader_id integer ,book_name text,book_author text,book_description text,borrow_start text,back_time text)";
+
+
+
+
+
+
 
     public MySqliteManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
             super(context, name, factory, version);

@@ -89,19 +89,23 @@ public class PersonalSet extends Activity implements View.OnClickListener{
                 userprofession.setEnabled(false);
                     userDescription.setEnabled(false);
                 }else if(whereActivity.equals("register")){
-                    personMessage.setUserId(Integer.valueOf(userId.getText().toString()));
-                    personMessage.setUserPassword(userPassword.getText().toString());
-                    personMessage.setUserName(userName.getText().toString());
-                    personMessage.setUserSex(userSex.getText().toString());
-                    personMessage.setUserProfession(userprofession.getText().toString());
-                    personMessage.setUserDescription(userDescription.getText().toString());
+                    try {
+                        personMessage.setUserId(Integer.valueOf(userId.getText().toString()));
+                        personMessage.setUserPassword(userPassword.getText().toString());
+                        personMessage.setUserName(userName.getText().toString());
+                        personMessage.setUserSex(userSex.getText().toString());
+                        personMessage.setUserProfession(userprofession.getText().toString());
+                        personMessage.setUserDescription(userDescription.getText().toString());
+                    }catch (Exception e){
+                        Toast.makeText(this,"账号格式错误！",Toast.LENGTH_SHORT).show();
+                    }
                     if(libraryDB.savePersonalMeassage(personMessage))
-                    { Toast.makeText(this,"注册成功",Toast.LENGTH_LONG);
+                    { Toast.makeText(this,"注册成功",Toast.LENGTH_LONG).show();
 
                     startActivity(intentLogin);
                     finish();}
                     else
-                    Toast.makeText(PersonalSet.this,"该账户已存在！",Toast.LENGTH_SHORT);
+                    Toast.makeText(PersonalSet.this,"该账户已存在！",Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.personset:
@@ -112,7 +116,7 @@ public class PersonalSet extends Activity implements View.OnClickListener{
                     userDescription.setEnabled(true);
                 }else if(whereActivity.equals("register")){
                     startActivity(intentLogin);
-                    Toast.makeText(PersonalSet.this,"已取消注册！",Toast.LENGTH_SHORT);
+                    Toast.makeText(PersonalSet.this,"已取消注册！",Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 break;

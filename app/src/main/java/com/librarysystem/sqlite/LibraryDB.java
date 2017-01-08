@@ -136,9 +136,9 @@ public class LibraryDB {
     /*
     当前借阅
      */
-    public List<Books> getPresentBooks(List<Books> booksList) {
+    public List<Books> getPresentBooks(int readerId,List<Books> booksList) {
         booksList.clear();
-        Cursor cursor = db.rawQuery("select * from PresentBooks ", null);
+        Cursor cursor = db.rawQuery("select * from PresentBooks where reader_id="+readerId, null);
         if (cursor.moveToFirst()) {
             do {
                 Books book = new Books();
@@ -156,9 +156,9 @@ public class LibraryDB {
 /*
 过去借阅
  */
-    public List<Books> getPastBooks(List<Books> booksList) {
+    public List<Books> getPastBooks(int readerId,List<Books> booksList) {
         booksList.clear();
-        Cursor cursor = db.rawQuery("select * from PastBooks ", null);
+        Cursor cursor = db.rawQuery("select * from PastBooks where reader_id="+readerId, null);
         if (cursor.moveToFirst()) {
             do {
                 Books book = new Books();
@@ -207,10 +207,11 @@ public class LibraryDB {
     /*
     借书
      */
-    public boolean borrowBook(Books book) {
+    public boolean borrowBook(int readerId,Books book) {
         if (book != null) {
             ContentValues values = new ContentValues();
             values.put("book_id", book.getBookId());
+            values.put("reader_id",readerId);
             values.put("book_name", book.getBookName());
             values.put("book_author", book.getBookAuthor());
             values.put("book_description", book.getUserDescription());
@@ -228,11 +229,12 @@ public class LibraryDB {
     /*
 还书
  */
-    public boolean backBook(Books book) {
+    public boolean backBook(int readerId,Books book) {
         if (book != null) {
             db.execSQL("delete from PresentBooks where book_id=?", new String[]{"" + book.getBookId()});
             ContentValues values = new ContentValues();
             values.put("book_id", book.getBookId());
+            values.put("reader_id",readerId);
             values.put("book_name", book.getBookName());
             values.put("book_author", book.getBookAuthor());
             values.put("book_description", book.getUserDescription());
