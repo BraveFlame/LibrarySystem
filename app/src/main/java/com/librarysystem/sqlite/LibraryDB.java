@@ -9,6 +9,9 @@ import com.librarysystem.model.Books;
 import com.librarysystem.model.PersonMessage;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -126,6 +129,7 @@ public class LibraryDB {
                 book.setBookAuthor(cursor.getString(cursor.getColumnIndex("book_author")));
                 book.setUserDescription(cursor.getString(cursor.getColumnIndex("book_description")));
                 book.setIsLent(cursor.getString(cursor.getColumnIndex("book_status")));
+                book.setBackTime(cursor.getString(cursor.getColumnIndex("back_time")));
                 booksList.add(book);
             } while (cursor.moveToNext());
         }
@@ -147,6 +151,7 @@ public class LibraryDB {
                 book.setBookAuthor(cursor.getString(cursor.getColumnIndex("book_author")));
                 book.setUserDescription(cursor.getString(cursor.getColumnIndex("book_description")));
                 book.setLentTime(cursor.getString(cursor.getColumnIndex("borrow_start")));
+                book.setBackTime(cursor.getString(cursor.getColumnIndex("back_time")));
                 booksList.add(book);
             } while (cursor.moveToNext());
         }
@@ -167,6 +172,7 @@ public class LibraryDB {
                 book.setBookAuthor(cursor.getString(cursor.getColumnIndex("book_author")));
                 book.setUserDescription(cursor.getString(cursor.getColumnIndex("book_description")));
                 book.setLentTime(cursor.getString(cursor.getColumnIndex("borrow_start")));
+                book.setBackTime(cursor.getString(cursor.getColumnIndex("back_time")));
                 booksList.add(book);
             } while (cursor.moveToNext());
         }
@@ -203,6 +209,33 @@ public class LibraryDB {
             return true;
         }
     }
+/*
+管理员删除图书
+ */
+
+    public boolean deleteBooks(Books book) {
+        if (book != null) {
+            db.execSQL("delete from BookRepertory where book_id=?", new String[]{"" + book.getBookId()});
+            return true;
+        } else return false;
+    }
+
+
+    /*
+    管理员修改图书
+     */
+
+    public void alterBooks(Books book, int bookId) {
+        ContentValues values = new ContentValues();
+        values.put("book_id", Integer.valueOf(book.getBookId()));
+        values.put("book_name",book.getBookName().toString());
+        values.put("book_author",book.getBookAuthor().toString());
+        values.put("book_description", book.getUserDescription().toString());
+        db.update("BookRepertory", values, "book_id=?", new String[]{"" + bookId});
+    }
+
+
+
 
     /*
     借书
@@ -215,13 +248,25 @@ public class LibraryDB {
             values.put("book_name", book.getBookName());
             values.put("book_author", book.getBookAuthor());
             values.put("book_description", book.getUserDescription());
+
+            Date date1=new Date();
+            Date date2=new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String date = sdf.format(new java.util.Date());
-            values.put("borrow_start", date);
+            String borrowdate=sdf.format(date1);
+            Calendar calendar   =   new GregorianCalendar();
+            calendar.setTime(date2);
+            calendar.add(calendar.DATE,60);//把日期往后增加一天.整数往后推,负数往前移动
+            date2=calendar.getTime();   //这个时间就是日期往后推一天的结果
+            String backdate = sdf.format(date2);
+            values.put("borrow_start", borrowdate);
+            values.put("back_time",backdate);
             db.insert("PresentBooks", null, values);
             ContentValues value = new ContentValues();
+
             value.put("book_status", "借出");
+            value.put("back_time",backdate);
             db.update("BookRepertory", value, "book_id=?", new String[]{"" + book.getBookId()});
+            book.setBackTime(backdate);
             return true;
         } else return false;
     }
@@ -238,12 +283,15 @@ public class LibraryDB {
             values.put("book_name", book.getBookName());
             values.put("book_author", book.getBookAuthor());
             values.put("book_description", book.getUserDescription());
-//            SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-//            String date=sdf.format(new java.util.Date());
-//            values.put("borrow_start",date);
+            values.put("borrow_start",book.getLentTime());
+            Date date=new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String backdate=sdf.format(date);
+            values.put("back_time",backdate);
             db.insert("PastBooks", null, values);
             ContentValues value = new ContentValues();
             value.put("book_status", "可借");
+            value.put("back_time"," ");
             db.update("BookRepertory", value, "book_id=?", new String[]{"" + book.getBookId()});
             return true;
         } else return false;

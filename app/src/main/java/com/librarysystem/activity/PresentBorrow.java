@@ -35,7 +35,7 @@ public class PresentBorrow extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.present_book);
+        setContentView(R.layout.listview_book);
         pref= PreferenceManager.getDefaultSharedPreferences(this);
         libraryDB=LibraryDB.getInstance(this);
         libraryDB.getPresentBooks(pref.getInt("userId",0),booksList);

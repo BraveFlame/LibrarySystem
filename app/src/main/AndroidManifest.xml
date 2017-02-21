@@ -8,23 +8,27 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.Login"
+        <activity
+            android:name=".activity.Login"
             android:launchMode="singleTask">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainPage"
-            android:launchMode="singleTask"/>
-        <activity android:name=".activity.PersonalSet"/>
-        <activity android:name=".activity.PresentBorrow"/>
-        <activity android:name=".activity.ChangeBooks"/>
-        <activity android:name=".activity.MyAccount"/>
-        <activity android:name=".activity.PassBorrow"/>
-        <activity android:name=".activity.DetailedBook"/>
-        <activity android:name=".activity.BackBook"/>
-
+        <activity
+            android:name=".activity.MainPage"
+            android:launchMode="singleTask" />
+        <activity android:name=".activity.PersonalSet" />
+        <activity android:name=".activity.PresentBorrow" />
+        <activity android:name=".activity.ChangeBooks" />
+        <activity android:name=".activity.MyAccount" />
+        <activity android:name=".activity.PassBorrow" />
+        <activity android:name=".activity.DetailedBook" />
+        <activity android:name=".activity.BackBook" />
+        <activity android:name=".activity.UpdateBook" />
+        <activity android:name=".activity.ManagerRoot" />
+        <activity android:name=".activity.ManagerUsers" />
 
     </application>
 

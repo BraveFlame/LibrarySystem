@@ -3,8 +3,6 @@ package com.librarysystem.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.sql.Date;
-
 /**
  * Created by g on 2016/11/30.
  */
@@ -17,7 +15,17 @@ public class Books implements Parcelable {
     private String isLent;
     private String userDescription;
     private String LentTime;
-    private Date backTime;
+    private String backTime;
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    private String version;
     private int mount, rest;
 
 
@@ -69,11 +77,11 @@ public class Books implements Parcelable {
         LentTime = lentTime;
     }
 
-    public Date getBackTime() {
+    public String getBackTime() {
         return backTime;
     }
 
-    public void setBackTime(Date backTime) {
+    public void setBackTime(String backTime) {
         this.backTime = backTime;
     }
 
@@ -106,6 +114,7 @@ public class Books implements Parcelable {
         dest.writeString(userDescription);
         dest.writeString(isLent);
         dest.writeString(LentTime);
+        dest.writeString(backTime);
 
     }
 
@@ -119,6 +128,7 @@ public class Books implements Parcelable {
             book.userDescription=source.readString();
             book.isLent=source.readString();
             book.LentTime=source.readString();
+            book.backTime=source.readString();
             return book;
         }
 

@@ -8,7 +8,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.librarysystem.R;
-import com.librarysystem.model.BookAdapter;
+import com.librarysystem.model.BookPastAdapter;
 import com.librarysystem.model.Books;
 import com.librarysystem.sqlite.LibraryDB;
 
@@ -21,22 +21,21 @@ import java.util.List;
 
 public class PassBorrow extends Activity {
     private LibraryDB libraryDB;
-    private String bookName;
     private ListView bookList;
-    private TextView btitle;
+    private TextView title;
     private List<Books> booksList=new ArrayList<Books>();
     private SharedPreferences pref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.present_book);
+        setContentView(R.layout.listview_book);
+        title=(TextView)findViewById(R.id.title) ;
+        title.setText("历史借阅");
         libraryDB= LibraryDB.getInstance(this);
         pref= PreferenceManager.getDefaultSharedPreferences(this);
-        btitle=(TextView)findViewById(R.id.btitle);
-        btitle.setText("历史借阅");
         libraryDB.getPastBooks(pref.getInt("userId",0),booksList);
         //将搜索结果显示出来
-        BookAdapter adapter=new BookAdapter(this,R.layout.book_item,booksList);
+        BookPastAdapter adapter=new BookPastAdapter(this,R.layout.past_book_item,booksList);
         bookList=(ListView)findViewById(R.id.list_present_book);
         bookList.setAdapter(adapter);
 

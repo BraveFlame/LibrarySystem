@@ -19,7 +19,7 @@ import com.librarysystem.sqlite.LibraryDB;
 书的主要信息
  */
 public class DetailedBook extends Activity {
-    private TextView detailed_name,detailed_author,detailed_id,detailed_message,detailed_status;
+    private TextView detailed_name,detailed_author,detailed_id,detailed_message,detailed_status,detailed_date;
     private Button detailed_button;
     private LibraryDB libraryDB;
     private SharedPreferences pref;
@@ -34,6 +34,7 @@ public class DetailedBook extends Activity {
         detailed_author=(TextView)findViewById(R.id.detailed_author);
         detailed_message=(TextView)findViewById(R.id.detailed_message);
         detailed_status=(TextView)findViewById(R.id.detailed_status);
+        detailed_date=(TextView)findViewById(R.id.detailed_date);
         detailed_id.setText("编号："+book.getBookId());
         detailed_name.setText("书名："+book.getBookName());
         detailed_author.setText("作者："+book.getBookAuthor());
@@ -43,6 +44,8 @@ public class DetailedBook extends Activity {
         libraryDB=LibraryDB.getInstance(this);
         if((book.getIsLent().equals("借出"))){
             detailed_button.setEnabled(false);
+            detailed_date.setText("应还日期："+book.getBackTime());
+
         }
         detailed_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,6 +56,7 @@ public class DetailedBook extends Activity {
                  {
                      detailed_status.setText("状态：借出");
                     detailed_button.setEnabled(false);
+                     detailed_date.setText("应还日期："+book.getBackTime());
 
                  }
 

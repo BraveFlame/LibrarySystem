@@ -19,7 +19,7 @@ import com.librarysystem.sqlite.LibraryDB;
  */
 
 public class BackBook extends Activity {
-    private TextView detailed_name, detailed_author, detailed_id, detailed_message, borrow_date;
+    private TextView detailed_name, detailed_author, detailed_id, detailed_message, borrow_date,back_date;
     private Button detailed_button;
     private LibraryDB libraryDB;
     private SharedPreferences pref;
@@ -34,11 +34,13 @@ public class BackBook extends Activity {
         detailed_author = (TextView) findViewById(R.id.present_author);
         detailed_message = (TextView) findViewById(R.id.present_message);
         borrow_date=(TextView)findViewById(R.id.start_date);
+        back_date=(TextView)findViewById(R.id.back_date);
         detailed_id.setText("编号：" + book.getBookId());
         detailed_name.setText("书名：" + book.getBookName());
         detailed_author.setText("作者：" + book.getBookAuthor());
         detailed_message.setText("主要信息：" + book.getUserDescription());
         borrow_date.setText("借阅日期："+book.getLentTime());
+        back_date.setText("应还日期:"+book.getBackTime());
         detailed_button = (Button) findViewById(R.id.back_button);
         libraryDB = LibraryDB.getInstance(this);
 

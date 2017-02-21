@@ -19,7 +19,7 @@ public class MySqliteManager extends SQLiteOpenHelper {
    repertory建表语句
      */
     private static final String CREATE_REPERTORY="create table BookRepertory(book_id integer primary" +
-            "key ,book_name text,book_author text,book_rest integer,book_status text,book_description text)";
+            "key ,book_name text,book_author text,book_status text,back_time text,book_description text)";
     /*
     present建表语句
      */
@@ -50,6 +50,7 @@ public class MySqliteManager extends SQLiteOpenHelper {
         db.execSQL(CREATE_REPERTORY);
         db.execSQL(CREATE_PRESENT);
         db.execSQL(CREATE_PAST);
+
     }
 
     @Override
