@@ -10,6 +10,44 @@ public class PersonMessage {
     private String userSex;
     private String userProfession;
     private String userDescription;
+    private  String userPassword;
+
+    public String getUserLevel() {
+        return userLevel;
+    }
+
+    public void setUserLevel(String userLevel) {
+        this.userLevel = userLevel;
+    }
+
+    public String getPastBooks() {
+        return pastBooks;
+    }
+
+    public void setPastBooks(String pastBooks) {
+        this.pastBooks = pastBooks;
+    }
+
+    public String getWpastBooks() {
+        return wpastBooks;
+    }
+
+    public void setWpastBooks(String wpastBooks) {
+        this.wpastBooks = wpastBooks;
+    }
+
+    public String getUserTel() {
+        return userTel;
+    }
+
+    public void setUserTel(String userTel) {
+        this.userTel = userTel;
+    }
+
+    private String userLevel;
+    private String pastBooks;
+    private String wpastBooks;
+    private String userTel;
 
     public String getUserPassword() {
         return userPassword;
@@ -19,7 +57,7 @@ public class PersonMessage {
         this.userPassword = userPassword;
     }
 
-    private  String userPassword;
+
     public String getUserProfession() {
         return userProfession;
     }

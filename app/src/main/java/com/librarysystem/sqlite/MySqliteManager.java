@@ -10,7 +10,8 @@ public class MySqliteManager extends SQLiteOpenHelper {
     PersonalMessage建表语句
      */
     private static final String CREATE_PERSONALMES="create table PersonalMessages(user_id integer primary" +
-            "key ,user_password text,user_name text,user_sex text,user_profession text,user_description text)";
+            "key ,user_password text,user_name text,user_sex text,user_profession text,user_description text," +
+            "user_tel text,user_level text,user_pastbooks text,user_wpastbooks text)";
     /*
     account建表语句
      */

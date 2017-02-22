@@ -72,6 +72,10 @@ public class LibraryDB {
                 values.put("user_sex", personMessage.getUserSex());
                 values.put("user_profession", personMessage.getUserProfession());
                 values.put("user_description", personMessage.getUserDescription());
+                values.put("user_tel",personMessage.getUserTel());
+                values.put("user_level",personMessage.getUserLevel());
+                values.put("user_pastbooks",personMessage.getPastBooks());
+                values.put("user_wpastbooks",personMessage.getWpastBooks());
                 db.insert("PersonalMessages", null, values);
 
             }
@@ -108,6 +112,13 @@ public class LibraryDB {
                     personMessage.setUserSex(cursor.getString(cursor.getColumnIndex("user_sex")));
                     personMessage.setUserProfession(cursor.getString(cursor.getColumnIndex("user_profession")));
                     personMessage.setUserDescription(cursor.getString(cursor.getColumnIndex("user_description")));
+                    personMessage.setUserTel(cursor.getString(cursor.getColumnIndex("user_tel")));
+                    personMessage.setUserLevel(cursor.getString(cursor.getColumnIndex("user_level")));
+                    personMessage.setPastBooks(cursor.getString(cursor.getColumnIndex("user_pastbooks")));
+                    personMessage.setWpastBooks(cursor.getString(cursor.getColumnIndex("user_wpastbooks")));
+
+
+
                 } while (cursor.moveToNext());
             }
             cursor.close();

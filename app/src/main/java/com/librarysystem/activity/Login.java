@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.librarysystem.R;
+import com.librarysystem.model.LoginView;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.sqlite.LibraryDB;
 
@@ -33,12 +35,22 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private PersonMessage personMessage=new PersonMessage();
 
 
+    public static float ScreenW,ScreenH;
+    public static Login instans;
+    private LoginView lv;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.login_main);
         initOnclick();
+        instans=this;
+        DisplayMetrics metrics=new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        ScreenH=metrics.heightPixels;
+        ScreenW=metrics.widthPixels;
+
         libraryDB=LibraryDB.getInstance(this);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isRemember = pref.getBoolean("remember_password", false);
@@ -52,8 +64,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 passwordEdit.setText(password);
                 rememberPassword.setChecked(true);
                 if(!change_user) {
-                startActivity(new Intent(this, MainPage.class));
-               finish();
+                    lv=new LoginView(this);
+                   setContentView(lv);
 
             }
         }
@@ -66,9 +78,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         register = (Button) findViewById(R.id.register_button);
         login = (Button) findViewById(R.id.login_button);
         forgetPassword = (TextView) findViewById(R.id.forget_password);
-        // user.setOnClickListener(this);
-        //password.setOnClickListener(this);
-        // rememberPassword.setOnClickListener(this);
+
         register.setOnClickListener(this);
         login.setOnClickListener(this);
         forgetPassword.setOnClickListener(this);
@@ -85,28 +95,30 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 break;
             case R.id.login_button:
                 if (userLogin()) {
-                    Intent loginIntent = new Intent(this, MainPage.class);
-                    startActivity(loginIntent);
-                    finish();
+                    lv=new LoginView(this);
+                    setContentView(lv);
                 } else {
                     Toast.makeText(Login.this, "用户名或密码错误！", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.forget_password:
+                 Intent alterpassword = new Intent(this, AlterPassword.class);
+                startActivity(alterpassword);
                 break;
             default:
                 break;
         }
     }
-
-    public boolean userRegister() {
-        return true;
-    }
+public void gotoMain(){
+    Intent loginIntent = new Intent(this, MainPage.class);
+    startActivity(loginIntent);
+    finish();
+}
 
     public boolean userLogin() {
-
-
-
+        if(userEdit.getText().toString().equals("")){
+            return false;
+        }
         int userInput =Integer.valueOf(userEdit.getText().toString());
         String passwordInput = passwordEdit.getText().toString();
         libraryDB.getPersonalMeassage(personMessage,userInput);
@@ -129,7 +141,5 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         } else return false;
     }
 
-    public boolean isForgetPassword() {
-        return true;
-    }
+
 }

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#ab2224">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="我的账户"
+            android:textSize="25sp" />
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/usercId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="账号："
+        android:textSize="25sp" />
+
+
+    <TextView
+        android:id="@+id/usercname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="姓名："
+        android:textSize="25sp" />
+
+
+    <TextView
+        android:id="@+id/usercsex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="性别："
+        android:textSize="25sp" />
+
+
+    <TextView
+        android:id="@+id/usercprofession"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="专业："
+        android:textSize="25sp" />
+
+
+    <TextView
+        android:id="@+id/userchobby"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="兴趣书籍："
+        android:textSize="25sp" />
+
+
+    <TextView
+        android:id="@+id/userctel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="联系方式："
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/userclevel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="借阅等级："
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/userclate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="逾期书本："
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/usercwpastbook"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="即将到期："
+        android:textSize="25sp" />
+
+
+
+        <Button
+            android:id="@+id/usercpassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="修改密码"
+            android:textSize="25sp" />
+
+</LinearLayout>

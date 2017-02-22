@@ -66,7 +66,7 @@ public class MainPage extends Activity implements View.OnClickListener{
                 builder.setTitle("选择");
                 final  Intent intent4=new Intent(this,Login.class);
                 intent4.putExtra("change",true);
-                final  Intent intent0=new Intent(this,PersonalSet.class);
+                final  Intent intent0=new Intent(this,UserCcount.class);
                 final Intent intent5=new Intent(this,ChangeBooks.class);
                 final Intent intent1=new Intent(this,PresentBorrow.class);
                 final Intent intent2=new Intent(this,PassBorrow.class);

@@ -22,14 +22,14 @@
         <activity android:name=".activity.PersonalSet" />
         <activity android:name=".activity.PresentBorrow" />
         <activity android:name=".activity.ChangeBooks" />
-        <activity android:name=".activity.MyAccount" />
         <activity android:name=".activity.PassBorrow" />
         <activity android:name=".activity.DetailedBook" />
         <activity android:name=".activity.BackBook" />
         <activity android:name=".activity.UpdateBook" />
         <activity android:name=".activity.ManagerRoot" />
         <activity android:name=".activity.ManagerUsers" />
-
+        <activity android:name=".activity.UserCcount"/>
+        <activity android:name=".activity.AlterPassword"/>
     </application>
 
 </manifest>
