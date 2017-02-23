@@ -30,6 +30,7 @@
         <activity android:name=".activity.ManagerUsers" />
         <activity android:name=".activity.UserCcount"/>
         <activity android:name=".activity.AlterPassword"/>
+        <activity android:name=".activity.ForgetPassword"/>
     </application>
 
 </manifest>

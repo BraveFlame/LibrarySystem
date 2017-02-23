@@ -61,7 +61,7 @@ public class UserCcount extends Activity {
         accountId.setText("账户："+String.valueOf(personMessage.getUserId()));
         accounthobby.setText("书籍爱好："+personMessage.getUserDescription().toString());
         accountpro.setText("专业："+personMessage.getUserProfession().toString());
-        accountlevel.setText("借阅等级："+personMessage.getUserLevel().toString());
+        accountlevel.setText(R.string.level+personMessage.getUserLevel().toString());
         accountpast.setText("逾期书本："+personMessage.getPastBooks().toString());
         accountlevel.setText("即将到期："+personMessage.getWpastBooks().toString());
         accounttel.setText("联系方式："+personMessage.getUserTel().toString());

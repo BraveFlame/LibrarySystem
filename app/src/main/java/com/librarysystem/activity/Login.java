@@ -63,10 +63,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 userEdit.setText(""+user);
                 passwordEdit.setText(password);
                 rememberPassword.setChecked(true);
+                libraryDB.getPersonalMeassage(personMessage,user);
+                int userId=personMessage.getUserId();
+                String passwords=personMessage.getUserPassword();
+                if(passwords.equals(password)){
                 if(!change_user) {
-                    lv=new LoginView(this);
-                   setContentView(lv);
-
+                    lv = new LoginView(this);
+                    setContentView(lv);
+                }
             }
         }
     }
@@ -102,7 +106,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 }
                 break;
             case R.id.forget_password:
-                 Intent alterpassword = new Intent(this, AlterPassword.class);
+                 Intent alterpassword = new Intent(this, ForgetPassword.class);
                 startActivity(alterpassword);
                 break;
             default:

@@ -89,6 +89,7 @@ public class LibraryDB {
     public void alterPersonalMessage(PersonMessage personMessage, int userId) {
         ContentValues values = new ContentValues();
         values.put("user_name", personMessage.getUserName().toString());
+        values.put("user_password",personMessage.getUserPassword().toString());
         values.put("user_sex", personMessage.getUserSex().toString());
         values.put("user_profession", personMessage.getUserProfession().toString());
         values.put("user_description", personMessage.getUserDescription().toString());

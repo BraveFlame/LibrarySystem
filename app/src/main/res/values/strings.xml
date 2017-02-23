@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">图书馆</string>
+    <string name="level">借阅等级</string>
 </resources>
