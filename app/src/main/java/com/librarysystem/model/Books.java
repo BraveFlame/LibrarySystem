@@ -16,7 +16,17 @@ public class Books implements Parcelable {
     private String userDescription;
     private String LentTime;
     private String backTime;
+    private String version;
 
+    public String getPress() {
+        return press;
+    }
+
+    public void setPress(String press) {
+        this.press = press;
+    }
+
+    private String press;
     public String getVersion() {
         return version;
     }
@@ -25,8 +35,7 @@ public class Books implements Parcelable {
         this.version = version;
     }
 
-    private String version;
-    private int mount, rest;
+
 
 
     public int getBookId() {
@@ -85,21 +94,6 @@ public class Books implements Parcelable {
         this.backTime = backTime;
     }
 
-    public int getMount() {
-        return mount;
-    }
-
-    public void setMount(int mount) {
-        this.mount = mount;
-    }
-
-    public int getRest() {
-        return rest;
-    }
-
-    public void setRest(int rest) {
-        this.rest = rest;
-    }
 
     @Override
     public int describeContents() {
@@ -111,6 +105,8 @@ public class Books implements Parcelable {
         dest.writeInt(bookId);
         dest.writeString(bookName);
         dest.writeString(bookAuthor);
+        dest.writeString(version);
+        dest.writeString(press);
         dest.writeString(userDescription);
         dest.writeString(isLent);
         dest.writeString(LentTime);
@@ -125,6 +121,8 @@ public class Books implements Parcelable {
             book.bookId = source.readInt();
             book.bookName = source.readString();
             book.bookAuthor = source.readString();
+            book.version=source.readString();
+            book.press=source.readString();
             book.userDescription=source.readString();
             book.isLent=source.readString();
             book.LentTime=source.readString();

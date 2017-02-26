@@ -19,7 +19,6 @@ import com.librarysystem.sqlite.LibraryDB;
 
 public class UserCcount extends Activity {
     private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
     private LibraryDB libraryDB;
     private PersonMessage personMessage = new PersonMessage();
     private TextView accountId, accountName, accountSex, accountpro, accounthobby, accounttel,
@@ -56,14 +55,15 @@ public class UserCcount extends Activity {
         accountpast = (TextView) findViewById(R.id.userclate);
         accountwpast = (TextView) findViewById(R.id.usercwpastbook);
         alterPassword = (Button) findViewById(R.id.usercpassword);
+
         accountName.setText("姓名："+personMessage.getUserName().toString());
         accountSex.setText("性别："+personMessage.getUserSex().toString());
         accountId.setText("账户："+String.valueOf(personMessage.getUserId()));
         accounthobby.setText("书籍爱好："+personMessage.getUserDescription().toString());
         accountpro.setText("专业："+personMessage.getUserProfession().toString());
-        accountlevel.setText(R.string.level+personMessage.getUserLevel().toString());
+        accountlevel.setText("借阅等级："+personMessage.getUserLevel().toString());
         accountpast.setText("逾期书本："+personMessage.getPastBooks().toString());
-        accountlevel.setText("即将到期："+personMessage.getWpastBooks().toString());
+        accountwpast.setText("即将到期："+personMessage.getWpastBooks().toString());
         accounttel.setText("联系方式："+personMessage.getUserTel().toString());
 
     }

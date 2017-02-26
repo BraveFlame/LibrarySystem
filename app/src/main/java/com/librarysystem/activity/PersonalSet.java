@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.librarysystem.R;
@@ -29,10 +31,11 @@ public class PersonalSet extends Activity implements View.OnClickListener {
     private SharedPreferences.Editor editor;
     private LibraryDB libraryDB;
     private PersonMessage personMessage = new PersonMessage();
-    private EditText userId, userPassword, userName, userSex, userprofession;
+    private EditText userId, userPassword, userName, userprofession;
     private EditText userDescription, userTel;
     private Button personSave, personSet;
-    private String whereActivity;
+    private RadioGroup groupSex;
+    private String whereActivity, userSex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +46,17 @@ public class PersonalSet extends Activity implements View.OnClickListener {
         whereActivity = intent.getStringExtra("activity");
         personSave = (Button) findViewById(R.id.personsave);
         personSet = (Button) findViewById(R.id.personset);
-
+        groupSex = (RadioGroup) findViewById(R.id.radioGroup);
+        groupSex.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                int radioButtonId = group.getCheckedRadioButtonId();
+                //根据ID获取RadioButton的实例
+                RadioButton rb = (RadioButton) findViewById(radioButtonId);
+                //更新文本内容，以符合选中项
+                userSex = rb.getText().toString();
+            }
+        });
         personSet.setOnClickListener(this);
         personSave.setOnClickListener(this);
 
@@ -54,7 +67,7 @@ public class PersonalSet extends Activity implements View.OnClickListener {
         userId = (EditText) findViewById(R.id.userId);
         userPassword = (EditText) findViewById(R.id.userPassword);
         userName = (EditText) findViewById(R.id.userName);
-        userSex = (EditText) findViewById(R.id.userSex);
+       // userSex = (EditText) findViewById(R.id.userSex);
         userprofession = (EditText) findViewById(R.id.userProfession);
         userDescription = (EditText) findViewById(R.id.userDescription);
         userTel = (EditText) findViewById(R.id.user_tel);
@@ -66,8 +79,8 @@ public class PersonalSet extends Activity implements View.OnClickListener {
             userPassword.setEnabled(false);
             userId.setText(String.valueOf(personMessage.getUserId()));
             userId.setEnabled(false);
-            userSex.setText(personMessage.getUserSex());
-            userSex.setEnabled(false);
+            //userSex.setText(personMessage.getUserSex());
+            //userSex.setEnabled(false);
             userprofession.setText(personMessage.getUserProfession());
             userprofession.setEnabled(false);
             userDescription.setText(personMessage.getUserDescription());
@@ -88,13 +101,13 @@ public class PersonalSet extends Activity implements View.OnClickListener {
             case R.id.personsave:
                 if (whereActivity.equals("personSet")) {
                     personMessage.setUserName(userName.getText().toString());
-                    personMessage.setUserSex(userSex.getText().toString());
+                    personMessage.setUserSex(userSex);
                     personMessage.setUserProfession(userprofession.getText().toString());
                     personMessage.setUserDescription(userDescription.getText().toString());
                     libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
                     userId.setEnabled(false);
                     userName.setEnabled(false);
-                    userSex.setEnabled(false);
+                   // userSex.setEnabled(false);
                     userprofession.setEnabled(false);
                     userDescription.setEnabled(false);
                 } else if (whereActivity.equals("register")) {
@@ -102,13 +115,13 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                         personMessage.setUserId(Integer.valueOf(userId.getText().toString()));
                         if (checkMobileNumber(userTel.getText().toString())) {
                             if (!userName.getText().toString().equals("") && !userPassword.getText().toString().equals("") &&
-                                    !userSex.getText().toString().equals("") && !userprofession.getText().toString().equals("")
+                                    !userSex.equals("") && !userprofession.getText().toString().equals("")
                                     ) {
 
 
                                 personMessage.setUserPassword(userPassword.getText().toString());
                                 personMessage.setUserName(userName.getText().toString());
-                                personMessage.setUserSex(userSex.getText().toString());
+                                personMessage.setUserSex(userSex);
                                 personMessage.setUserProfession(userprofession.getText().toString());
                                 personMessage.setUserDescription(userDescription.getText().toString());
                                 personMessage.setUserLevel("0");
@@ -151,7 +164,7 @@ public class PersonalSet extends Activity implements View.OnClickListener {
             case R.id.personset:
                 if (whereActivity.equals("personSet")) {
                     userName.setEnabled(true);
-                    userSex.setEnabled(true);
+                   // userSex.setEnabled(true);
                     userprofession.setEnabled(true);
                     userDescription.setEnabled(true);
                 } else if (whereActivity.equals("register")) {

@@ -93,6 +93,9 @@ public class LibraryDB {
         values.put("user_sex", personMessage.getUserSex().toString());
         values.put("user_profession", personMessage.getUserProfession().toString());
         values.put("user_description", personMessage.getUserDescription().toString());
+        values.put("user_pastbooks",personMessage.getPastBooks().toString());
+        values.put("user_wpastbooks",personMessage.getWpastBooks().toString());
+        values.put("user_level",personMessage.getUserLevel().toString());
         db.update("PersonalMessages", values, "user_id=?", new String[]{"" + userId});
     }
 
@@ -139,6 +142,8 @@ public class LibraryDB {
                 book.setBookId((cursor.getInt(cursor.getColumnIndex("book_id"))));
                 book.setBookName(cursor.getString(cursor.getColumnIndex("book_name")));
                 book.setBookAuthor(cursor.getString(cursor.getColumnIndex("book_author")));
+                book.setVersion(cursor.getString(cursor.getColumnIndex("book_version")));
+                book.setPress(cursor.getString(cursor.getColumnIndex("book_press")));
                 book.setUserDescription(cursor.getString(cursor.getColumnIndex("book_description")));
                 book.setIsLent(cursor.getString(cursor.getColumnIndex("book_status")));
                 book.setBackTime(cursor.getString(cursor.getColumnIndex("back_time")));
@@ -242,6 +247,8 @@ public class LibraryDB {
         values.put("book_id", Integer.valueOf(book.getBookId()));
         values.put("book_name",book.getBookName().toString());
         values.put("book_author",book.getBookAuthor().toString());
+        values.put("book_version",book.getVersion().toString());
+        values.put("book_press",book.getPress().toString());
         values.put("book_description", book.getUserDescription().toString());
         db.update("BookRepertory", values, "book_id=?", new String[]{"" + bookId});
     }
@@ -254,6 +261,17 @@ public class LibraryDB {
      */
     public boolean borrowBook(int readerId,Books book) {
         if (book != null) {
+            try {
+                PersonMessage personMessage = new PersonMessage();
+                libraryDB.getPersonalMeassage(personMessage, readerId);
+               int i= Integer.valueOf(personMessage.getPastBooks());
+                if(i>0){
+
+                    return false;
+                }
+            }catch (Exception e){
+
+            }
             ContentValues values = new ContentValues();
             values.put("book_id", book.getBookId());
             values.put("reader_id",readerId);
@@ -267,8 +285,8 @@ public class LibraryDB {
             String borrowdate=sdf.format(date1);
             Calendar calendar   =   new GregorianCalendar();
             calendar.setTime(date2);
-            calendar.add(calendar.DATE,60);//把日期往后增加一天.整数往后推,负数往前移动
-            date2=calendar.getTime();   //这个时间就是日期往后推一天的结果
+            calendar.add(calendar.DATE,1);//把日期往后增加60天整数往后推,负数往前移动
+            date2=calendar.getTime();   //这个时间就是日期往后推60天的结果
             String backdate = sdf.format(date2);
             values.put("borrow_start", borrowdate);
             values.put("back_time",backdate);

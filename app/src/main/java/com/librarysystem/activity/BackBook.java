@@ -12,7 +12,11 @@ import android.widget.TextView;
 
 import com.librarysystem.R;
 import com.librarysystem.model.Books;
+import com.librarysystem.model.PersonMessage;
 import com.librarysystem.sqlite.LibraryDB;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by g on 2016/12/25.
@@ -54,6 +58,15 @@ public class BackBook extends Activity {
                     public void onClick(DialogInterface dialog, int which) {
                         if (libraryDB.backBook(pref.getInt("userId",0),book)) ;
                         {
+                            List<Books>books=new ArrayList<Books>();
+                            libraryDB.getPastBooks(pref.getInt("userId",0),books);
+                            if(books.size()>2){
+
+                                PersonMessage personMessage=new PersonMessage();
+                                libraryDB.getPersonalMeassage(personMessage,pref.getInt("userId",0));
+                                personMessage.setUserLevel(""+books.size()/2);
+                                libraryDB.alterPersonalMessage(personMessage,pref.getInt("userId",0));
+                            };
                             finish();
                         }
                     }

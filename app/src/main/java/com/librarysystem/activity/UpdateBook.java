@@ -19,7 +19,7 @@ import com.librarysystem.sqlite.LibraryDB;
  */
 
 public class UpdateBook extends Activity implements View.OnClickListener {
-    private EditText update_name, update_author, update_id, update_message, update_version, update_status, update_date;
+    private EditText update_name, update_author, update_id, update_message,update_press, update_version, update_status, update_date;
     private Button balter, bdelete, bupdate;
     private LibraryDB libraryDB;
     private SharedPreferences pref;
@@ -44,6 +44,7 @@ public class UpdateBook extends Activity implements View.OnClickListener {
         update_message = (EditText) findViewById(R.id.update_message);
         update_status = (EditText) findViewById(R.id.update_status);
         update_date = (EditText) findViewById(R.id.update_date);
+        update_press=(EditText)findViewById(R.id.update_press);
 
         update_id.setText(String.valueOf(book.getBookId()));
         update_id.setEnabled(false);
@@ -55,10 +56,14 @@ public class UpdateBook extends Activity implements View.OnClickListener {
         update_message.setText(book.getUserDescription());
         update_status.setText(book.getIsLent());
         update_date.setText(book.getBackTime());
+        update_press.setText(book.getPress());
+        update_version.setText(book.getVersion());
 
         update_message.setEnabled(false);
         update_status.setEnabled(false);
         update_date.setEnabled(false);
+        update_version.setEnabled(false);
+        update_press.setEnabled(false);
 
     }
 
@@ -97,27 +102,40 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                 if (book.getIsLent().equals("借出")) {
                     Toast.makeText(UpdateBook.this, "借出无法更新！", Toast.LENGTH_SHORT).show();
                 } else {
-                    book.setBookId(Integer.valueOf(update_id.getText().toString()));
-                    book.setBookAuthor(update_author.getText().toString());
-                    book.setBookName(update_name.getText().toString());
-                    book.setUserDescription(update_message.getText().toString());
+                    try {
+                        book.setBookId(Integer.valueOf(update_id.getText().toString()));
+                        if(update_author.getText().toString().equals("")|update_name.getText().toString().equals("")) {
+                            book.setBookAuthor(update_author.getText().toString());
+                            book.setBookName(update_name.getText().toString());
+                            book.setUserDescription(update_message.getText().toString());
+                            book.setVersion(update_version.getText().toString());
+                            book.setPress(update_press.getText().toString());
 
-                    libraryDB.alterBooks(book, id);
-                    update_id.setEnabled(false);
-                    update_name.setEnabled(false);
-                    update_author.setEnabled(false);
-                    update_message.setEnabled(false);
-                    Toast.makeText(UpdateBook.this, "更新成功！", Toast.LENGTH_SHORT).show();
+                            libraryDB.alterBooks(book, id);
+                            update_id.setEnabled(false);
+                            update_name.setEnabled(false);
+                            update_author.setEnabled(false);
+                            update_message.setEnabled(false);
+                            update_version.setEnabled(false);
+                            update_press.setEnabled(false);
+                            Toast.makeText(UpdateBook.this, "更新成功！", Toast.LENGTH_SHORT).show();
+                        }else  Toast.makeText(UpdateBook.this, "请完善信息！", Toast.LENGTH_SHORT).show();
+                    }catch (Exception e){
+                        Toast.makeText(UpdateBook.this, "编号格式错误！", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
             case R.id.balter:
                 if (book.getIsLent().equals("借出")) {
                     Toast.makeText(UpdateBook.this, "借出无法更改！", Toast.LENGTH_SHORT).show();
                 } else {
+
                     update_id.setEnabled(true);
                     update_name.setEnabled(true);
                     update_author.setEnabled(true);
                     update_message.setEnabled(true);
+                    update_press.setEnabled(true);
+                    update_version.setEnabled(true);
                     break;}
                     default:
                         break;
