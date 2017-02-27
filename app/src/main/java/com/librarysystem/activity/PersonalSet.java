@@ -128,6 +128,7 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                                 personMessage.setPastBooks("0");
                                 personMessage.setWpastBooks("0");
                                 personMessage.setUserTel(userTel.getText().toString());
+                                personMessage.setIsRootManager("普通用户");
                                 AlertDialog.Builder dialog = new AlertDialog.Builder(PersonalSet.this);
                                 dialog.setTitle("用户注册").setMessage("是否确定注册？").setCancelable(false);
                                 dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {

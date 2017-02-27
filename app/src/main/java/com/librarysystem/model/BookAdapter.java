@@ -32,6 +32,7 @@ public class BookAdapter extends ArrayAdapter<Books> {
     public View getView(int position, View convertView, ViewGroup parent) {
         Books books=getItem(position);
         View view= LayoutInflater.from(getContext()).inflate(resourceId,null);
+
         TextView bookName=(TextView) view.findViewById(R.id.book_name);
         TextView bookAuthor=(TextView) view.findViewById(R.id.book_author);
         TextView bookId=(TextView) view.findViewById(R.id.book_id);

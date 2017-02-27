@@ -56,8 +56,14 @@ public class ForgetPassword extends Activity implements View.OnClickListener {
                 try {
                     int id = Integer.valueOf(inputId.getText().toString());
                     libraryDB.getPersonalMeassage(personMessage, id);
+                    if (personMessage.getUserName() == null) {
+                        inputId.setText("");
+                        Toast.makeText(ForgetPassword.this, "账号不存在或已被注销！", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
                 } catch (Exception e) {
                     Toast.makeText(ForgetPassword.this, "账号格式错误！", Toast.LENGTH_SHORT).show();
+                    break;
                 }
                 manager.cancel(2);
                 i++;
@@ -76,7 +82,7 @@ public class ForgetPassword extends Activity implements View.OnClickListener {
                     libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
                     Toast.makeText(ForgetPassword.this, "密码修改成功！", Toast.LENGTH_SHORT).show();
                     finish();
-                    i=0;
+                    i = 0;
                 } else {
                     i = 0;
                 }
@@ -94,7 +100,7 @@ public class ForgetPassword extends Activity implements View.OnClickListener {
 
                 break;
             default:
-               break;
+                break;
         }
     }
 }

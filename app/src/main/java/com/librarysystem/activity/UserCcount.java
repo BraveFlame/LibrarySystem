@@ -22,7 +22,7 @@ public class UserCcount extends Activity {
     private LibraryDB libraryDB;
     private PersonMessage personMessage = new PersonMessage();
     private TextView accountId, accountName, accountSex, accountpro, accounthobby, accounttel,
-            accountlevel, accountpast, accountwpast;
+            accountlevel, accountpast, accountwpast,userProperty;
     private Button  alterPassword;
 
     @Override
@@ -54,7 +54,9 @@ public class UserCcount extends Activity {
         accountlevel = (TextView) findViewById(R.id.userclevel);
         accountpast = (TextView) findViewById(R.id.userclate);
         accountwpast = (TextView) findViewById(R.id.usercwpastbook);
+        userProperty=(TextView)findViewById(R.id.user_property);
         alterPassword = (Button) findViewById(R.id.usercpassword);
+
 
         accountName.setText("姓名："+personMessage.getUserName().toString());
         accountSex.setText("性别："+personMessage.getUserSex().toString());
@@ -65,6 +67,7 @@ public class UserCcount extends Activity {
         accountpast.setText("逾期书本："+personMessage.getPastBooks().toString());
         accountwpast.setText("即将到期："+personMessage.getWpastBooks().toString());
         accounttel.setText("联系方式："+personMessage.getUserTel().toString());
+        userProperty.setText("属性："+personMessage.getIsRootManager().toString());
 
     }
 }

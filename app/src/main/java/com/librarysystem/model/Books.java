@@ -18,6 +18,17 @@ public class Books implements Parcelable {
     private String backTime;
     private String version;
 
+    public String getIsSubscribe() {
+        return isSubscribe;
+    }
+
+    public void setIsSubscribe(String isSubscribe) {
+        this.isSubscribe = isSubscribe;
+    }
+
+    private String isSubscribe;
+
+
     public String getPress() {
         return press;
     }

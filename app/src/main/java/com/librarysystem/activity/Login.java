@@ -52,6 +52,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         ScreenW = metrics.widthPixels;
 
         libraryDB = LibraryDB.getInstance(this);
+
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isRemember = pref.getBoolean("remember_password", false);
         boolean change_user = getIntent().getBooleanExtra("change", false);
@@ -116,6 +117,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
     public void gotoMain() {
         Intent loginIntent = new Intent(this, MainPage.class);
+        int p=pref.getInt("userId",0);
+        loginIntent.putExtra("userId",pref.getInt("userId",0));
         startActivity(loginIntent);
         finish();
     }
@@ -135,7 +138,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             if ((userInput == userId) && passwordInput.equals(password)) {
 
                 editor = pref.edit();
-                editor.putInt("userId", userInput);
+
                 if (rememberPassword.isChecked()) {
                     editor.putBoolean("remember_password", true);
                     editor.putInt("user", userInput);
@@ -143,7 +146,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
                 } else {
                     editor.clear();
+
                 }
+                editor.commit();
+                editor.putInt("userId", userInput);
                 editor.commit();
                 return true;
             } else return false;

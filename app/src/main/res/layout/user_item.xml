@@ -3,27 +3,20 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
-        android:id="@+id/manager_user"
-        android:background="#ff2525"
+       android:id="@+id/user_item_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="50sp"
-        android:text="用户管理"/>
+        android:textSize="25sp"/>
     <TextView
-        android:id="@+id/manager_book"
+        android:id="@+id/user_item_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:textSize="50sp"
-        android:background="#Ebb833"
-        android:text="图书管理"/>
+        android:textSize="15sp"
+        />
     <TextView
-        android:id="@+id/manager_bookroot"
+        android:id="@+id/user_item_property"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:textSize="50sp"
-        android:background="#19a2fa"
-        android:text="借阅管理"/>
-
+        android:textSize="15sp"
+        />
 </LinearLayout>

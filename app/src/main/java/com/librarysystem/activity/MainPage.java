@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.BookAdapter;
@@ -41,6 +42,7 @@ public class MainPage extends Activity implements View.OnClickListener {
     private List<Books> booksList = new ArrayList<Books>();
     private LibraryDB libraryDB;
     private boolean isSearch;
+    private SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +101,13 @@ public class MainPage extends Activity implements View.OnClickListener {
                                 startActivity(intentChang);
                                 break;
                             case 4:
-                                startActivity(intentRoot);
+                                pref = PreferenceManager.getDefaultSharedPreferences(MainPage.this);
+                                if( pref.getInt("userId",0)==12345){
+                                    startActivity(intentRoot);
+                                }else {
+                                    Toast.makeText(MainPage.this,"您不是管理员！",Toast.LENGTH_SHORT).show();
+                                }
+
                                 break;
                             case 5:
                                 AlertDialog.Builder dialog2 = new AlertDialog.Builder(MainPage.this);

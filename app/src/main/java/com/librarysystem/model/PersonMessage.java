@@ -11,7 +11,19 @@ public class PersonMessage {
     private String userProfession;
     private String userDescription;
     private  String userPassword;
+    private String userLevel;
+    private String pastBooks;
+    private String wpastBooks;
+    private String userTel;
+    private String isRootManager;
 
+    public String getIsRootManager() {
+        return isRootManager;
+    }
+
+    public void setIsRootManager(String isRootManager) {
+        this.isRootManager = isRootManager;
+    }
     public String getUserLevel() {
         return userLevel;
     }
@@ -44,10 +56,7 @@ public class PersonMessage {
         this.userTel = userTel;
     }
 
-    private String userLevel;
-    private String pastBooks;
-    private String wpastBooks;
-    private String userTel;
+
 
     public String getUserPassword() {
         return userPassword;

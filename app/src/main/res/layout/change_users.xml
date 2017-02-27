@@ -14,19 +14,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="我的账户"
+            android:text="管理用户"
             android:textSize="25sp" />
     </RelativeLayout>
 
 
     <TextView
-        android:id="@+id/usercId"
+        android:id="@+id/userchId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="账号："
         android:textSize="25sp" />
     <TextView
-        android:id="@+id/user_property"
+        android:id="@+id/user_chproperty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="25sp"
@@ -34,7 +34,7 @@
 
 
     <TextView
-        android:id="@+id/usercname"
+        android:id="@+id/userchname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="姓名："
@@ -42,7 +42,7 @@
 
 
     <TextView
-        android:id="@+id/usercsex"
+        android:id="@+id/userchsex"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="性别："
@@ -50,7 +50,7 @@
 
 
     <TextView
-        android:id="@+id/usercprofession"
+        android:id="@+id/userchprofession"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="专业："
@@ -58,7 +58,7 @@
 
 
     <TextView
-        android:id="@+id/userchobby"
+        android:id="@+id/userchhobby"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="兴趣书籍："
@@ -66,7 +66,7 @@
 
 
     <TextView
-        android:id="@+id/userctel"
+        android:id="@+id/userchtel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="联系方式："
@@ -74,14 +74,14 @@
 
 
     <TextView
-        android:id="@+id/userclate"
+        android:id="@+id/userchlate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="逾期书本："
         android:textSize="25sp" />
 
     <TextView
-        android:id="@+id/usercwpastbook"
+        android:id="@+id/userchwpastbook"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="即将到期："
@@ -89,17 +89,17 @@
 
 
     <TextView
-        android:id="@+id/userclevel"
+        android:id="@+id/userchlevel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="借阅等级："
         android:textSize="25sp" />
 
-        <Button
-            android:id="@+id/usercpassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="修改密码"
-            android:textSize="25sp" />
+    <Button
+        android:id="@+id/user_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="注销"
+        android:textSize="25sp" />
 
 </LinearLayout>

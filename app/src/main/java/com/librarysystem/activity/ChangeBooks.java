@@ -36,7 +36,7 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.changebooks);
+        setContentView(R.layout.change_books);
         libraryDB = LibraryDB.getInstance(this);
 
         bName = (EditText) findViewById(R.id.bName);
@@ -56,7 +56,6 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
         Books books = new Books();
         switch (v.getId()) {
             case R.id.bsave:
-
                 try {
                     books.setBookId(Integer.valueOf(bId.getText().toString()));
                 } catch (Exception e) {
@@ -66,7 +65,6 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                 books.setBookAuthor(bAuthor.getText().toString());
                 books.setUserDescription(bDes.getText().toString());
                 books.setIsLent("可借");
-
                 //如果原来没有则添加成功
                 if (libraryDB.saveBookMeassage(books)) {
                     Toast.makeText(ChangeBooks.this, "successful", Toast.LENGTH_SHORT).show();
