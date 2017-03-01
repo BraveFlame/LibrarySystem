@@ -38,7 +38,8 @@ public class ManagerRoot extends Activity {
         bookRoot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+              Intent bookRootIntent=new Intent(ManagerRoot.this,BookRoot.class);
+                startActivity(bookRootIntent);
             }
         });
     }

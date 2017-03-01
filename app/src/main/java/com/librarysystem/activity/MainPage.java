@@ -43,6 +43,7 @@ public class MainPage extends Activity implements View.OnClickListener {
     private LibraryDB libraryDB;
     private boolean isSearch;
     private SharedPreferences pref;
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +106,7 @@ public class MainPage extends Activity implements View.OnClickListener {
                                 if( pref.getInt("userId",0)==12345){
                                     startActivity(intentRoot);
                                 }else {
-                                    Toast.makeText(MainPage.this,"您不是管理员！",Toast.LENGTH_SHORT).show();
+                                   useToast("您不是管理员！");
                                 }
 
                                 break;
@@ -148,6 +149,9 @@ public class MainPage extends Activity implements View.OnClickListener {
                 isSearch = true;
                 bookName = inputSearchBook.getText().toString();
                 libraryDB.getBookMeassage(bookName, booksList);
+                if(booksList.size()==0){
+                    useToast("没有符合搜索要求的图书！");
+                }
                 //将搜索结果显示出来
                 BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
                 bookList = (ListView) findViewById(R.id.list_search_book);
@@ -175,9 +179,11 @@ public class MainPage extends Activity implements View.OnClickListener {
     @Override
     protected void onRestart() {
         super.onRestart();
+        impart();
         if (isSearch) {
             bookName = inputSearchBook.getText().toString();
             libraryDB.getBookMeassage(bookName, booksList);
+
             //将搜索结果显示出来
             BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
             bookList = (ListView) findViewById(R.id.list_search_book);
@@ -201,11 +207,12 @@ public class MainPage extends Activity implements View.OnClickListener {
 
     public void impart() {
         SharedPreferences pref;
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
         int j = 0, k = 0;
         PersonMessage personMessage = new PersonMessage();
         Books book = new Books();
         List<Books> books = new ArrayList<Books>();
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
+
         libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
         libraryDB.getPresentBooks(pref.getInt("userId", 200000), books);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -217,7 +224,7 @@ public class MainPage extends Activity implements View.OnClickListener {
                 Date nowDate = new Date();
                 long distance = date1.getTime() - nowDate.getTime();
                 long days = distance / (1000 * 60 * 60 * 24) + 1;
-                if (days <= 3 && days > 1) {
+                if (days <= pref.getInt("remain",7) && days > 1) {
                     j++;
                 } else if (days <= 1) {
                     k++;
@@ -250,5 +257,24 @@ public class MainPage extends Activity implements View.OnClickListener {
             personMessage.setPastBooks("0");
             libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
         }
+    }
+    public void useToast(String text){
+        if(mToast == null) {
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+            mToast.setDuration(Toast.LENGTH_SHORT);
+        }
+        mToast.show();
+    }
+    public void cancelToast(){
+        if(mToast!=null){
+            mToast.cancel();
+        }
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        cancelToast();
     }
 }

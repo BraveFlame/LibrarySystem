@@ -24,6 +24,7 @@ public class UpdateBook extends Activity implements View.OnClickListener {
     private LibraryDB libraryDB;
     private SharedPreferences pref;
     private Books book;
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +75,7 @@ public class UpdateBook extends Activity implements View.OnClickListener {
 
             case R.id.bdelete:
                 if (book.getIsLent().equals("借出")) {
-                    Toast.makeText(UpdateBook.this, "书已借出！", Toast.LENGTH_SHORT).show();
+                    useToast("书已借出,无法删除！");
                 } else {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(UpdateBook.this);
                     dialog.setTitle("删除图书！").setMessage("是否确定删除？").setCancelable(false);
@@ -83,7 +84,7 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                         public void onClick(DialogInterface dialog, int which) {
                             if (libraryDB.deleteBooks(book.getBookId())) {
 
-                                Toast.makeText(UpdateBook.this, "删除成功！", Toast.LENGTH_SHORT).show();
+                                useToast("删除成功！");
                                 finish();
                             }
                         }
@@ -100,11 +101,11 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                 break;
             case R.id.bupdate:
                 if (book.getIsLent().equals("借出")) {
-                    Toast.makeText(UpdateBook.this, "借出无法更新！", Toast.LENGTH_SHORT).show();
+                   useToast("借出无法更新！");
                 } else {
                     try {
                         book.setBookId(Integer.valueOf(update_id.getText().toString()));
-                        if(update_author.getText().toString().equals("")|update_name.getText().toString().equals("")) {
+                        if(!update_author.getText().toString().equals("")&!update_name.getText().toString().equals("")) {
                             book.setBookAuthor(update_author.getText().toString());
                             book.setBookName(update_name.getText().toString());
                             book.setUserDescription(update_message.getText().toString());
@@ -118,16 +119,18 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                             update_message.setEnabled(false);
                             update_version.setEnabled(false);
                             update_press.setEnabled(false);
-                            Toast.makeText(UpdateBook.this, "更新成功！", Toast.LENGTH_SHORT).show();
-                        }else  Toast.makeText(UpdateBook.this, "请完善信息！", Toast.LENGTH_SHORT).show();
+                            useToast("更新成功！");
+                        }else  {
+                            useToast( "请完善信息！");
+                        }
                     }catch (Exception e){
-                        Toast.makeText(UpdateBook.this, "编号格式错误！", Toast.LENGTH_SHORT).show();
+                        useToast("编号格式错误！");
                     }
                 }
                 break;
             case R.id.balter:
                 if (book.getIsLent().equals("借出")) {
-                    Toast.makeText(UpdateBook.this, "借出无法更改！", Toast.LENGTH_SHORT).show();
+                  useToast( "借出无法更改！");
                 } else {
 
                     update_id.setEnabled(true);
@@ -141,5 +144,24 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                         break;
 
         }
+    }
+    public void useToast(String text){
+        if(mToast == null) {
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+            mToast.setDuration(Toast.LENGTH_SHORT);
+        }
+        mToast.show();
+    }
+    public void cancelToast(){
+        if(mToast!=null){
+            mToast.cancel();
+        }
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        cancelToast();
     }
 }

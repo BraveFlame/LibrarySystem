@@ -51,7 +51,7 @@ public class LoginView extends View implements Runnable {
                 Login.instans.gotoMain();
             }
             try {
-                Thread.sleep(120);
+                Thread.sleep(60);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

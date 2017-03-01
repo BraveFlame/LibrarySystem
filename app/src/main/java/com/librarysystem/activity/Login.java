@@ -38,6 +38,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     public static float ScreenW, ScreenH;
     public static Login instans;
     private LoginView lv;
+    private Toast mToast;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,7 +104,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     lv = new LoginView(this);
                     setContentView(lv);
                 } else {
-                    Toast.makeText(Login.this, "用户名或密码错误！", Toast.LENGTH_SHORT).show();
+                    useToast("用户名或密码错误！");
                 }
                 break;
             case R.id.forget_password:
@@ -116,9 +117,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     }
 
     public void gotoMain() {
+
         Intent loginIntent = new Intent(this, MainPage.class);
-        int p=pref.getInt("userId",0);
-        loginIntent.putExtra("userId",pref.getInt("userId",0));
         startActivity(loginIntent);
         finish();
     }
@@ -148,15 +148,44 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     editor.clear();
 
                 }
+
                 editor.commit();
                 editor.putInt("userId", userInput);
+//                if (pref.getInt("userId", 1) == 0) {
+//                    editor.putInt("firstborrow", 30);
+//                    editor.putInt("thanborrow", 30);
+//                    editor.putInt("maxnumbook", 30);
+//                    editor.putInt("remain", 7);
+//
+//                }
                 editor.commit();
                 return true;
             } else return false;
         } catch (Exception e) {
-return false;
+            return false;
         }
     }
 
+    public void useToast(String text) {
+        if (mToast == null) {
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+            mToast.setDuration(Toast.LENGTH_SHORT);
+        }
+        mToast.show();
+    }
+
+    public void cancelToast() {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        cancelToast();
+    }
 
 }

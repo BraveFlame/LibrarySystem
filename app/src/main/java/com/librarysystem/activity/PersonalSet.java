@@ -36,6 +36,7 @@ public class PersonalSet extends Activity implements View.OnClickListener {
     private Button personSave, personSet;
     private RadioGroup groupSex;
     private String whereActivity, userSex;
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +140,7 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                                             startActivity(intentLogin);
                                             finish();
                                         } else
-                                            Toast.makeText(PersonalSet.this, "该账户已存在！", Toast.LENGTH_SHORT).show();
+                                            useToast("该账户已存在！");
                                     }
 
                                 });
@@ -152,12 +153,12 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                                 dialog.show();
                             }
                         } else {
-                            Toast.makeText(PersonalSet.this, "手机格式错误！", Toast.LENGTH_SHORT).show();
+                            useToast("手机格式错误！");
 
                         }
 
                     } catch (Exception e) {
-                        Toast.makeText(this, "账号格式错误！", Toast.LENGTH_SHORT).show();
+                        useToast( "账号格式错误！");
                     }
 
                 }
@@ -170,7 +171,7 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                     userDescription.setEnabled(true);
                 } else if (whereActivity.equals("register")) {
                     startActivity(intentLogin);
-                    Toast.makeText(PersonalSet.this, "已取消注册！", Toast.LENGTH_SHORT).show();
+                    useToast("已取消注册！");
                     finish();
                 }
                 break;
@@ -187,10 +188,29 @@ public class PersonalSet extends Activity implements View.OnClickListener {
             Matcher matcher = regex.matcher(mobileNumber);
             flag = matcher.matches();
         } catch (Exception e) {
-            Toast.makeText(PersonalSet.this, "手机格式错误！", Toast.LENGTH_SHORT).show();
+            useToast("手机格式错误！");
             flag = false;
 
         }
         return flag;
+    }
+    public void useToast(String text){
+        if(mToast == null) {
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+            mToast.setDuration(Toast.LENGTH_SHORT);
+        }
+        mToast.show();
+    }
+    public void cancelToast(){
+        if(mToast!=null){
+            mToast.cancel();
+        }
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        cancelToast();
     }
 }

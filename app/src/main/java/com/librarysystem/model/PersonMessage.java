@@ -17,6 +17,16 @@ public class PersonMessage {
     private String userTel;
     private String isRootManager;
 
+    public int getNowBorrow() {
+        return nowBorrow;
+    }
+
+    public void setNowBorrow(int nowBorrow) {
+        this.nowBorrow = nowBorrow;
+    }
+
+    private int nowBorrow;
+
     public String getIsRootManager() {
         return isRootManager;
     }

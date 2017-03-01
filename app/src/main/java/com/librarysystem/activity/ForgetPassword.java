@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,13 +21,32 @@ import java.util.Random;
  * Created by g on 2017/2/23.
  */
 
-public class ForgetPassword extends Activity implements View.OnClickListener {
+public class ForgetPassword extends Activity implements View.OnClickListener,Runnable{
     private LibraryDB libraryDB;
     private PersonMessage personMessage = new PersonMessage();
     private Button rePassword, getCode;
     private EditText inputId, intoCode;
     private int i = 0, randomcode = 0;
+    private Toast mToast;
+    private static final int CODE1 = 1,CODE2=2;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case CODE1:
+                    getCode.setText(msg.arg1 + "秒后重获");
+                    break;
+                case CODE2:
+                    getCode.setText("获取验证码");
+                    getCode.setEnabled(true);
+                    break;
+                default:
+                    break;
+            }
 
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,11 +79,11 @@ public class ForgetPassword extends Activity implements View.OnClickListener {
                     libraryDB.getPersonalMeassage(personMessage, id);
                     if (personMessage.getUserName() == null) {
                         inputId.setText("");
-                        Toast.makeText(ForgetPassword.this, "账号不存在或已被注销！", Toast.LENGTH_SHORT).show();
+                        useToast("账号不存在或已被注销！");
                         break;
                     }
                 } catch (Exception e) {
-                    Toast.makeText(ForgetPassword.this, "账号格式错误！", Toast.LENGTH_SHORT).show();
+                   useToast("账号格式错误！");
                     break;
                 }
                 manager.cancel(2);
@@ -74,13 +95,14 @@ public class ForgetPassword extends Activity implements View.OnClickListener {
                         intoCode.setText("");
                     } else {
                         i--;
-                        Toast.makeText(ForgetPassword.this, "验证码错误！", Toast.LENGTH_SHORT).show();
+                       useToast("验证码错误！");
                     }
 
                 } else if (i == 2) {
                     personMessage.setUserPassword(code);
                     libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
-                    Toast.makeText(ForgetPassword.this, "密码修改成功！", Toast.LENGTH_SHORT).show();
+                    useToast("密码修改成功！");
+                    manager.cancel(2);
                     finish();
                     i = 0;
                 } else {
@@ -90,17 +112,64 @@ public class ForgetPassword extends Activity implements View.OnClickListener {
 
                 break;
             case R.id.forgetgetcode:
-                Random random = new Random();
-                randomcode = random.nextInt(9000) + 1000;
 
-                Notification.Builder notification = new Notification.Builder(this).setTicker("收到验证码").setContentTitle("验证码")
-                        .setContentText("" + randomcode).setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
-                manager.notify(2, notification.build());
+                getCode.setEnabled(false);
+                new Thread(ForgetPassword.this).start();
 
 
                 break;
             default:
                 break;
+        }
+    }
+    public void useToast(String text){
+        if(mToast == null) {
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+            mToast.setDuration(Toast.LENGTH_SHORT);
+        }
+        mToast.show();
+    }
+    public void cancelToast(){
+        if(mToast!=null){
+            mToast.cancel();
+        }
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        cancelToast();
+    }
+
+    @Override
+    public void run() {
+        int a = 11;
+        Random random = new Random();
+        randomcode = random.nextInt(9000) + 1000;
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        Notification.Builder notification = new Notification.Builder(ForgetPassword.this).setTicker("收到验证码").setContentTitle("验证码")
+                .setContentText("" + randomcode).setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
+        manager.notify(2, notification.build());
+        while (true) {
+            a--;
+            Message message = new Message();
+            if (a <= 0) {
+                message.what=CODE2;
+                handler.sendMessage(message);
+                break;
+            } else {
+                message.arg1=a;
+                message.what=CODE1;
+                handler.sendMessage(message);
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+
+            }
+
+
         }
     }
 }

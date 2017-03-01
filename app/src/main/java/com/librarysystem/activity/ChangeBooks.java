@@ -32,7 +32,7 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
     private List<Books> booksList = new ArrayList<Books>();
     private LibraryDB libraryDB;
     private boolean isQuery;
-
+private Toast mToast;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +59,7 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                 try {
                     books.setBookId(Integer.valueOf(bId.getText().toString()));
                 } catch (Exception e) {
-                    Toast.makeText(ChangeBooks.this, "编号格式错误！", Toast.LENGTH_SHORT).show();
+                    useToast("编号格式错误！");
                 }
                 books.setBookName(bName.getText().toString());
                 books.setBookAuthor(bAuthor.getText().toString());
@@ -67,10 +67,10 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                 books.setIsLent("可借");
                 //如果原来没有则添加成功
                 if (libraryDB.saveBookMeassage(books)) {
-                    Toast.makeText(ChangeBooks.this, "successful", Toast.LENGTH_SHORT).show();
+                    useToast("successful");
                     finish();
                 } else {
-                    Toast.makeText(ChangeBooks.this, "已存在！", Toast.LENGTH_SHORT).show();
+                    useToast("已存在！");
                 }
                 break;
 
@@ -81,6 +81,9 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                     isQuery = true;
                     bookName = queryName.getText().toString();
                     libraryDB.getBookMeassage(bookName, booksList);
+                    if(booksList.size()==0){
+                        useToast("没有符合搜索要求的图书！");
+                    }
                     //将搜索结果显示出来
                     BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, booksList);
                     bookList = (ListView) findViewById(R.id.list_query_book);
@@ -100,7 +103,7 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                         }
                     });
                 } catch (Exception e) {
-                    Toast.makeText(ChangeBooks.this, "编号格式错误！", Toast.LENGTH_SHORT).show();
+                    useToast("编号格式错误！");
                 }
                 break;
 
@@ -135,8 +138,27 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                     }
                 });
             } catch (Exception e) {
-                Toast.makeText(ChangeBooks.this, "编号格式错误！", Toast.LENGTH_SHORT).show();
+               useToast("编号格式错误！");
             }
         }
+    }
+    public void useToast(String text){
+        if(mToast == null) {
+            mToast = Toast.makeText(ChangeBooks.this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+            mToast.setDuration(Toast.LENGTH_SHORT);
+        }
+        mToast.show();
+    }
+public void cancelToast(){
+    if(mToast!=null){
+        mToast.cancel();
+    }
+}
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        cancelToast();
     }
 }

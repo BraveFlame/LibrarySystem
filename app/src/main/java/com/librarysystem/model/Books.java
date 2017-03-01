@@ -17,6 +17,19 @@ public class Books implements Parcelable {
     private String LentTime;
     private String backTime;
     private String version;
+    private String isSubscribe;
+    private String isContinue;
+
+
+
+    public String getIsContinue() {
+        return isContinue;
+    }
+
+    public void setIsContinue(String isContinue) {
+        this.isContinue = isContinue;
+    }
+
 
     public String getIsSubscribe() {
         return isSubscribe;
@@ -26,7 +39,6 @@ public class Books implements Parcelable {
         this.isSubscribe = isSubscribe;
     }
 
-    private String isSubscribe;
 
 
     public String getPress() {
@@ -122,6 +134,8 @@ public class Books implements Parcelable {
         dest.writeString(isLent);
         dest.writeString(LentTime);
         dest.writeString(backTime);
+        dest.writeString(isContinue);
+        dest.writeString(isSubscribe);
 
     }
 
@@ -138,6 +152,8 @@ public class Books implements Parcelable {
             book.isLent=source.readString();
             book.LentTime=source.readString();
             book.backTime=source.readString();
+            book.isContinue=source.readString();
+            book.isSubscribe=source.readString();
             return book;
         }
 
