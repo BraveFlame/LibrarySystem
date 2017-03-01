@@ -9,6 +9,7 @@ import com.librarysystem.model.Books;
 import com.librarysystem.model.PersonMessage;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -178,6 +179,53 @@ public class LibraryDB {
     }
 
     /*
+    将用户的当前借阅归还
+     */
+    public boolean forceBackBooks(int userId, int days, int max) {
+
+        List<Books> booksList = new ArrayList<Books>();
+        Cursor cursor = db.rawQuery("select * from PresentBooks where reader_id=" + userId, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Books book = new Books();
+                book.setBookId((cursor.getInt(cursor.getColumnIndex("book_id"))));
+                book.setBookName(cursor.getString(cursor.getColumnIndex("book_name")));
+                book.setBookAuthor(cursor.getString(cursor.getColumnIndex("book_author")));
+                book.setUserDescription(cursor.getString(cursor.getColumnIndex("book_description")));
+                book.setLentTime(cursor.getString(cursor.getColumnIndex("borrow_start")));
+                book.setVersion(cursor.getString(cursor.getColumnIndex("book_version")));
+                book.setPress(cursor.getString(cursor.getColumnIndex("book_press")));
+                book.setBackTime(cursor.getString(cursor.getColumnIndex("back_time")));
+                book.setIsContinue(cursor.getString(cursor.getColumnIndex("book_continue")));
+                book.setIsSubscribe(cursor.getString(cursor.getColumnIndex("book_subscribe")));
+                booksList.add(book);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        //解除自己预约
+        ContentValues value = new ContentValues();
+        value.put("book_subscribe", "无");
+        db.update("BookRepertory", value, "book_subscribe=?", new String[]{userId + "预约"});
+       //归还已借
+        for (int i = 0; i < booksList.size(); i++)
+            backBook(userId, booksList.get(i), days, max);
+        return true;
+    }
+
+    /*
+    将用户的过去借阅删除
+     */
+    public boolean deletePast(int userId) {
+        try {
+            db.execSQL("delete from PastBooks where reader_id=?", new String[]{"" + userId});
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /*
     从数据库读取个人PersonalMeassage
      */
     public void getPersonalMeassage(PersonMessage personMessage, int userId) {
@@ -232,6 +280,23 @@ public class LibraryDB {
         }
         cursor.close();
         return booksList;
+    }
+
+    /*
+    判断当前被借书是不是自己借的，是则无法预约
+     */
+    public boolean isBelong(int bookId, int userId) {
+        Cursor cursor = db.rawQuery("select * from PresentBooks where reader_id=" + userId, null);
+        if (cursor.moveToFirst()) {
+            do {
+                Books book = new Books();
+                if ((cursor.getInt(cursor.getColumnIndex("book_id"))) == bookId)
+                    return true;
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return false;
     }
 
     /*
@@ -396,7 +461,7 @@ public class LibraryDB {
                 if (i > 0) {
                     return false;
                 }
-                if (j >=max) {
+                if (j >= max) {
                     return true;
                 } else {
                     personMessage.setNowBorrow(personMessage.getNowBorrow() + 1);
@@ -428,6 +493,7 @@ public class LibraryDB {
                 ContentValues value = new ContentValues();
                 value.put("book_status", "借出");
                 value.put("back_time", backdate);
+                value.put("book_subscribe", "无");
                 db.update("BookRepertory", value, "book_id=?", new String[]{"" + book.getBookId()});
                 book.setBackTime(backdate);
                 libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());

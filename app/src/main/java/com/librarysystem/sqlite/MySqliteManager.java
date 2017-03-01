@@ -62,6 +62,7 @@ private static final String CREATE_USER="insert into PersonalMessages(user_id,us
         db.execSQL(CREATE_BOOKS, new String[]{"1007", "赵孟頫行书教程", "罗培源", "第1版", "长江出版社", "可借", "中国书法培训教程", "无", "无"});
         db.execSQL(CREATE_USER, new String[]{"12345", "12345", "老宋", "男", "电子信息", "心理学，刑侦学，科普，书画，文学等", "18814126594", "5", "0", "0", "管理员", "0"});
         db.execSQL(CREATE_USER, new String[]{"123", "123", "老钟", "男", "电子信息", "心理学，刑侦学，科普，书画，文学等", "13670485601", "1", "0", "0", "普通用户", "0"});
+        db.execSQL(CREATE_USER, new String[]{"1234", "1234", "老浩", "男", "电子信息", "心理学，刑侦学，科普，书画，文学等", "13670485601", "1", "0", "0", "普通用户", "0"});
 
     }
     @Override

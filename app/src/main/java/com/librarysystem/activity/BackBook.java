@@ -29,7 +29,7 @@ import java.util.List;
 
 public class BackBook extends Activity {
     private TextView detailed_name, detailed_author, detailed_id, detailed_message, borrow_date,back_date;
-    private Button detailed_button,back_subscribe,back_continue;
+    private Button detailed_button,back_continue;
     private LibraryDB libraryDB;
     private SharedPreferences pref;
     private Toast mToast;
@@ -53,7 +53,7 @@ public class BackBook extends Activity {
         back_date.setText("应还日期："+book.getBackTime());
         detailed_button = (Button) findViewById(R.id.back_button);
         back_continue=(Button)findViewById(R.id.back_continue);
-        back_subscribe=(Button)findViewById(R.id.back_subscribe);
+
         libraryDB = LibraryDB.getInstance(this);
 
         detailed_button.setOnClickListener(new View.OnClickListener() {
@@ -64,7 +64,7 @@ public class BackBook extends Activity {
                 dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (libraryDB.backBook(pref.getInt("userId",0),book,pref.getInt("firstborrow",0),pref.getInt("maxnumbook",0))) ;
+                        if (libraryDB.backBook(pref.getInt("userId",0),book,pref.getInt("firstborrow",30),pref.getInt("maxnumbook",30))) ;
                         {
                             List<Books>books=new ArrayList<Books>();
                             libraryDB.getPastBooks(pref.getInt("userId",0),books);
@@ -122,12 +122,6 @@ public class BackBook extends Activity {
         });
 
 
-        back_subscribe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
     }
 
 

@@ -50,6 +50,9 @@ public class DetailedBook extends Activity {
         detailed_message.setText("主要信息：" + book.getUserDescription());
         detailed_status.setText("状态：" + book.getIsLent());
         detailed_subscribe = (Button) findViewById(R.id.book_subscribe);
+        if(book.getIsLent().equals("可借")){
+            detailed_subscribe.setEnabled(false);
+        }
         if(book.getIsSubscribe().length()>2) {
             String userSub = book.getIsSubscribe().substring(book.getIsSubscribe().length() - 2);
             if (userSub.equals("预约")) {
@@ -64,6 +67,10 @@ public class DetailedBook extends Activity {
         if ((book.getIsLent().equals("借出"))) {
             detailed_button.setEnabled(false);
             detailed_date.setText("应还日期：" + book.getBackTime());
+        }
+        if(libraryDB.isBelong(book.getBookId(),pref.getInt("userId",0))){
+            detailed_subscribe.setEnabled(false);
+            detailed_subscribe.setText("自己无法预约");
         }
         detailed_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,9 +101,7 @@ public class DetailedBook extends Activity {
         detailed_subscribe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(book.getIsLent().equals("可借")){
-                    useToast("可直接借书！");
-                }else if(book.getIsLent().equals("借出")) {
+
                     PersonMessage personMessage=new PersonMessage();
                     libraryDB.getPersonalMeassage(personMessage,pref.getInt("userId",0));
                     if(Integer.valueOf(personMessage.getPastBooks())>0){
@@ -107,7 +112,7 @@ public class DetailedBook extends Activity {
                         libraryDB.bookSubscribe(book);
                         detailed_subscribe.setEnabled(false);
                         detailed_subscribe.setText("已预约");
-                    }
+
                 }
             }
         });
