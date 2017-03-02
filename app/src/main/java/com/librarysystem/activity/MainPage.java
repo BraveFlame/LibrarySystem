@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.librarysystem.R;
+import com.librarysystem.model.ActivityCollector;
 import com.librarysystem.model.BookAdapter;
 import com.librarysystem.model.Books;
 import com.librarysystem.model.PersonMessage;
@@ -50,6 +51,7 @@ public class MainPage extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main_page);
+        ActivityCollector.addActivity(this);
         libraryDB = LibraryDB.getInstance(this);
         selectButton = (Button) findViewById(R.id.select_button);
         searchButton = (Button) findViewById(R.id.search_book);
@@ -64,6 +66,7 @@ public class MainPage extends Activity implements View.OnClickListener {
             }
         };
         selectButton.setOnClickListener(listener);
+
 
 
     }
@@ -222,11 +225,12 @@ public class MainPage extends Activity implements View.OnClickListener {
             try {
                 date1 = sdf.parse(books.get(i).getBackTime());
                 Date nowDate = new Date();
-                long distance = date1.getTime() - nowDate.getTime();
-                long days = distance / (1000 * 60 * 60 * 24) + 1;
-                if (days <= pref.getInt("remain",7) && days > 1) {
+                Date date2=sdf.parse(sdf.format(nowDate));
+                long distance = date1.getTime() - date2.getTime();
+                long days = distance / (1000 * 60 * 60 * 24);
+                if (days <= pref.getInt("remain",7) && days >= 1) {
                     j++;
-                } else if (days <= 1) {
+                } else if (days < 1) {
                     k++;
                 }
 
@@ -235,18 +239,23 @@ public class MainPage extends Activity implements View.OnClickListener {
             }
 
         }
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (j > 0) {
             personMessage.setWpastBooks("" + j);
-            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
             Notification.Builder notification = new Notification.Builder(this).setTicker("图书通知！").setContentTitle("图书通知")
                     .setContentText("您有" + j + "本书将要过期！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
             manager.notify(3, notification.build());
             personMessage.setWpastBooks("" + j);
             libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
+        }else {
+            personMessage.setWpastBooks("0");
+            libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
+            manager.cancel(3);
         }
         if (k > 0) {
             personMessage.setPastBooks("" + k);
-            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
             Notification.Builder notification = new Notification.Builder(this).setTicker("图书通知！").setContentTitle("图书通知")
                     .setContentText("您有" + k + "本书已过期，请尽快归还！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
             manager.notify(4, notification.build());
@@ -254,6 +263,7 @@ public class MainPage extends Activity implements View.OnClickListener {
             libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
 
         } else {
+            manager.cancel(4);
             personMessage.setPastBooks("0");
             libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
         }

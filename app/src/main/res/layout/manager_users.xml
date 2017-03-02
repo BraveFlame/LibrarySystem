@@ -3,9 +3,13 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#9a958f">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 <EditText
     android:id="@+id/manager_search_user"
-    android:layout_width="wrap_content"
+    android:layout_width="260dp"
     android:layout_height="wrap_content"
     android:textSize="25sp"
     android:hint="查找联系人"/>
@@ -18,7 +22,7 @@
         android:background="#d18a35"
         android:text="查找"
         />
-
+    </LinearLayout>
 <ListView
     android:id="@+id/manager_user_list"
     android:layout_width="match_parent"

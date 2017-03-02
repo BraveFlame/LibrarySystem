@@ -59,6 +59,7 @@ public class PresentBorrow extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Books book=booksList.get(position);
+
                 bookIntent.putExtra("bookmessage",book);
                 startActivity(bookIntent);
 
@@ -73,7 +74,7 @@ public class PresentBorrow extends Activity {
         libraryDB.getPresentBooks(pref.getInt("userId",0),booksList);
 
         impart();
-        //将搜索结果显示出来
+      //  将搜索结果显示出来
         BookAdapter adapter=new BookAdapter(this,R.layout.book_item,booksList);
         bookList=(ListView)findViewById(R.id.list_present_book);
         bookList.setAdapter(adapter);
@@ -81,17 +82,20 @@ public class PresentBorrow extends Activity {
                 /*
                 点击查看每本书的信息
                  */
-        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Books book=booksList.get(position);
-                bookIntent.putExtra("bookmessage",book);
-                startActivity(bookIntent);
-
-            }
-        });
+//        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                view.setBackgroundColor(Color.parseColor("#FF4081"));
+//                Books book=booksList.get(position);
+//                bookIntent.putExtra("bookmessage",book);
+//                startActivity(bookIntent);
+//
+//            }
+//        });
     }
-
+/*
+过期时，还完可以预约
+ */
     private void impart() {
         SharedPreferences pref;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -108,10 +112,13 @@ public class PresentBorrow extends Activity {
 
             try {
                 date1 = sdf.parse(books.get(i).getBackTime());
+
                 Date nowDate = new Date();
-                long distance = date1.getTime() - nowDate.getTime();
-                long days = distance / (1000 * 60 * 60 * 24) + 1;
-               if (days <= 1) {
+                Date date2=sdf.parse(sdf.format(nowDate));
+                long distance = date1.getTime() - date2.getTime();
+                long days = distance / (1000 * 60 * 60 * 24);
+
+               if (days <1) {
                     k++;
                 }
 

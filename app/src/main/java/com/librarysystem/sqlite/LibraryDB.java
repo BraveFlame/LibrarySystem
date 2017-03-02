@@ -470,6 +470,8 @@ public class LibraryDB {
                 ContentValues values = new ContentValues();
                 values.put("book_id", book.getBookId());
                 values.put("reader_id", readerId);
+                values.put("book_press",book.getPress());
+                values.put("book_version",book.getVersion());
                 values.put("book_name", book.getBookName());
                 values.put("book_author", book.getBookAuthor());
                 values.put("book_description", book.getUserDescription());

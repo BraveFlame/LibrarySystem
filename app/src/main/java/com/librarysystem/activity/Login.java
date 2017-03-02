@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.librarysystem.R;
+import com.librarysystem.model.ActivityCollector;
 import com.librarysystem.model.LoginView;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.sqlite.LibraryDB;
@@ -103,6 +104,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 if (userLogin()) {
                     lv = new LoginView(this);
                     setContentView(lv);
+                    ActivityCollector.finishAll();
                 } else {
                     useToast("用户名或密码错误！");
                 }

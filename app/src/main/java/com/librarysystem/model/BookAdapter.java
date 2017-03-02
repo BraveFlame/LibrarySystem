@@ -30,6 +30,25 @@ public class BookAdapter extends ArrayAdapter<Books> {
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
+ //           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//
+//
+//                try {
+//                    Date  date1 = sdf.parse(getItem(position).getBackTime());
+//
+//                    Date nowDate = new Date();
+//                    Date date2=sdf.parse(sdf.format(nowDate));
+//                    long distance = date1.getTime() - date2.getTime();
+//                    long days = distance / (1000 * 60 * 60 * 24);
+//                  if (days <1) {
+//                      convertView.setBackgroundColor(Color.parseColor("#FF4081"));
+//                    }
+//
+//                } catch (Exception e) {
+//
+
+      //  convertView.setBackgroundColor(Color.parseColor("#FF4081"));
         Books books=getItem(position);
         View view= LayoutInflater.from(getContext()).inflate(resourceId,null);
 
