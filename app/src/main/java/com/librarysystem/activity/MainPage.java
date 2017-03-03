@@ -169,7 +169,7 @@ public class MainPage extends Activity implements View.OnClickListener {
 
 
                 }else {
-                    searchButton.setVisibility(View.GONE);
+                    searchNet.setVisibility(View.GONE);
                 }
                 //将搜索结果显示出来
                 BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
