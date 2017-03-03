@@ -30,6 +30,8 @@ private int resourceId;
 
         PersonMessage personMessage=getItem(position);
         View view= LayoutInflater.from(getContext()).inflate(resourceId,null);
+        if(!personMessage.getPastBooks().equals("0"))
+            view.setBackgroundResource(R.drawable.selector);
         TextView userName=(TextView) view.findViewById(R.id.user_item_name);
         TextView userId=(TextView) view.findViewById(R.id.user_item_id);
         TextView userProprety=(TextView) view.findViewById(R.id.user_item_property);

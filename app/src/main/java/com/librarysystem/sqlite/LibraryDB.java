@@ -111,7 +111,7 @@ public class LibraryDB {
         usersList.clear();
         try {
             int userId = Integer.valueOf(input);
-            Cursor cursor = db.rawQuery("select * from PersonalMessages where user_id!=12345 and user_id like '%" + userId + "%'", null);
+            Cursor cursor = db.rawQuery("select * from PersonalMessages where user_id!=12345 and user_id like '%" + userId + "%' order by user_id", null);
 
             if (cursor.moveToFirst()) {
                 do {
@@ -136,7 +136,7 @@ public class LibraryDB {
         } catch (Exception e) {
             try {
                 usersList.clear();
-                Cursor cursor = db.rawQuery("select * from PersonalMessages where user_id!=12345 and user_name like '%" + input + "%' COLLATE NOCASE", null);
+                Cursor cursor = db.rawQuery("select * from PersonalMessages where user_id!=12345 and user_name like '%" + input + "%' COLLATE NOCASE order by user_id", null);
 
                 if (cursor.moveToFirst()) {
                     do {
@@ -261,7 +261,7 @@ public class LibraryDB {
       */
     public List<Books> getBookMeassage(String bookName, List<Books> booksList) {
         booksList.clear();
-        Cursor cursor = db.rawQuery("select * from BookRepertory where book_name like '%" + bookName + "%'  COLLATE NOCASE", null);
+        Cursor cursor = db.rawQuery("select * from BookRepertory where book_name like '%" + bookName + "%'  COLLATE NOCASE order by book_id", null);
         if (cursor.moveToFirst()) {
             do {
                 Books book = new Books();
@@ -276,6 +276,7 @@ public class LibraryDB {
                 book.setIsContinue(cursor.getString(cursor.getColumnIndex("book_continue")));
                 book.setIsSubscribe(cursor.getString(cursor.getColumnIndex("book_subscribe")));
                 booksList.add(book);
+
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -403,7 +404,12 @@ public class LibraryDB {
                 values.put("book_name", books.getBookName());
                 values.put("book_author", books.getBookAuthor());
                 values.put("book_description", books.getUserDescription());
-                values.put("book_status", "可借");
+                values.put("book_status", books.getIsLent());
+                values.put("back_time",books.getBackTime());
+                values.put("book_version",books.getVersion());
+                values.put("book_press",books.getPress());
+                values.put("book_subscribe",books.getIsSubscribe());
+                values.put("book_continue",books.getIsContinue());
                 db.insert("BookRepertory", null, values);
 
             }
@@ -449,6 +455,17 @@ public class LibraryDB {
 
     /*
     借书
+    http://202.116.174.108:8080
+    /opac/openlink.php?strSearchType=title&historyCount=1&strText=English&doctype=ALL
+
+    http://202.116.174.108:8080
+    /opac/openlink.php?strSearchType=title&historyCount=1&strText=java&doctype=ALL
+
+    http://202.116.174.108:8080
+    /opac/openlink.php?strSearchType=title&historyCount=1&strText=%E8%A5%BF%E6%B8%B8%E8%AE%B0&doctype=ALL
+
+    http://202.116.174.108:8080
+    /opac/openlink.php?strSearchType=title&historyCount=1&strText=%E4%B8%89%E5%9B%BD%E6%BC%94%E4%B9%89&doctype=ALL
      */
     public boolean borrowBook(int readerId, Books book, int days, int max) {
 

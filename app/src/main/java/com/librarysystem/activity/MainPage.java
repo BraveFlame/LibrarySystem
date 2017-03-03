@@ -45,6 +45,7 @@ public class MainPage extends Activity implements View.OnClickListener {
     private boolean isSearch;
     private SharedPreferences pref;
     private Toast mToast;
+    private Button searchNet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,7 @@ public class MainPage extends Activity implements View.OnClickListener {
         libraryDB = LibraryDB.getInstance(this);
         selectButton = (Button) findViewById(R.id.select_button);
         searchButton = (Button) findViewById(R.id.search_book);
+        searchNet=(Button)findViewById(R.id.search_net);
         inputSearchBook = (EditText) findViewById(R.id.book_search_name);
         impart();
         selectButton.setOnClickListener(this);
@@ -154,6 +156,20 @@ public class MainPage extends Activity implements View.OnClickListener {
                 libraryDB.getBookMeassage(bookName, booksList);
                 if(booksList.size()==0){
                     useToast("没有符合搜索要求的图书！");
+                    searchNet.setVisibility(View.VISIBLE);
+                    searchNet.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                          Intent net=new Intent(MainPage.this,NetBook.class);
+                            net.putExtra("search",bookName);
+                            startActivity(net);
+                        }
+                    });
+
+
+
+                }else {
+                    searchButton.setVisibility(View.GONE);
                 }
                 //将搜索结果显示出来
                 BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);

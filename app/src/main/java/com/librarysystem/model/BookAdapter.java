@@ -1,6 +1,7 @@
 package com.librarysystem.model;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.widget.TextView;
 
 import com.librarysystem.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,48 +24,56 @@ import java.util.List;
  */
 public class BookAdapter extends ArrayAdapter<Books> {
     private int resourceId;
-    public BookAdapter(Context context, int textViewResourceId, List<Books>objects){
-        super(context,textViewResourceId,objects);
-        resourceId=textViewResourceId;
+    private Context contextThe;
 
+    public BookAdapter(Context context, int textViewResourceId, List<Books> objects) {
+        super(context, textViewResourceId, objects);
+        resourceId = textViewResourceId;
+        contextThe = context;
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Books books = getItem(position);
+        View view = LayoutInflater.from(getContext()).inflate(resourceId, null);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
- //           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//
-//
-//                try {
-//                    Date  date1 = sdf.parse(getItem(position).getBackTime());
-//
-//                    Date nowDate = new Date();
-//                    Date date2=sdf.parse(sdf.format(nowDate));
-//                    long distance = date1.getTime() - date2.getTime();
-//                    long days = distance / (1000 * 60 * 60 * 24);
-//                  if (days <1) {
-//                      convertView.setBackgroundColor(Color.parseColor("#FF4081"));
-//                    }
-//
-//                } catch (Exception e) {
-//
+//        if(books.getIsLent().equals("借出")){
+//          //  view.setBackgroundColor(Color.parseColor("#F2c02d"));
+//            view.setBackgroundResource(R.drawable.selector2);
+//        }
+        try {
+            Date date1 = sdf.parse(books.getBackTime());
 
-      //  convertView.setBackgroundColor(Color.parseColor("#FF4081"));
-        Books books=getItem(position);
-        View view= LayoutInflater.from(getContext()).inflate(resourceId,null);
+            Date nowDate = new Date();
+            Date date2 = sdf.parse(sdf.format(nowDate));
+            long distance = date1.getTime() - date2.getTime();
+            long days = distance / (1000 * 60 * 60 * 24);
+            if (days < 1) {
+                view.setBackgroundResource(R.drawable.selector);
+            }else if(days>=1){
+                view.setBackgroundColor(Color.parseColor("#F2c02d"));
+            }
 
-        TextView bookName=(TextView) view.findViewById(R.id.book_name);
-        TextView bookAuthor=(TextView) view.findViewById(R.id.book_author);
-        TextView bookId=(TextView) view.findViewById(R.id.book_id);
+        } catch (Exception e) {
 
-        bookName.setText(books.getBookName());
-        bookAuthor.setText("作者："+books.getBookAuthor());
-        bookId.setText("编号："+String.valueOf(books.getBookId()));
+        }
+            //  convertView.setBackgroundColor(Color.parseColor("#FF4081"));
 
 
 
-        return view;
-    }
+            TextView bookName = (TextView) view.findViewById(R.id.book_name);
+            TextView bookAuthor = (TextView) view.findViewById(R.id.book_author);
+            TextView bookId = (TextView) view.findViewById(R.id.book_id);
+
+            bookName.setText(books.getBookName());
+            bookAuthor.setText("作者：" + books.getBookAuthor());
+            bookId.setText("编号：" + String.valueOf(books.getBookId()));
+
+
+            return view;
+        }
+
 
 }

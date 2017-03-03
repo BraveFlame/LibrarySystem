@@ -25,14 +25,15 @@ import java.util.List;
 用于增加书库的书
 */
 public class ChangeBooks extends Activity implements View.OnClickListener {
-    private EditText bName, bId, bAuthor, bDes, queryName;
+    private EditText bName, bId, bAuthor, bDes, queryName, bPress, bVersion;
     private Button bsave, bquery;
     private String bookName;
     private ListView bookList;
     private List<Books> booksList = new ArrayList<Books>();
     private LibraryDB libraryDB;
     private boolean isQuery;
-private Toast mToast;
+    private Toast mToast;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +45,10 @@ private Toast mToast;
         bAuthor = (EditText) findViewById(R.id.bAuthor);
         bDes = (EditText) findViewById(R.id.bDesc);
         queryName = (EditText) findViewById((R.id.query_book));
+        bPress = (EditText) findViewById(R.id.bPress);
+        bVersion = (EditText) findViewById(R.id.bVersion);
+
+
         bsave = (Button) findViewById(R.id.bsave);
         bquery = (Button) findViewById(R.id.bquery);
 
@@ -58,19 +63,26 @@ private Toast mToast;
             case R.id.bsave:
                 try {
                     books.setBookId(Integer.valueOf(bId.getText().toString()));
+
+                    books.setBookName(bName.getText().toString());
+                    books.setBookAuthor(bAuthor.getText().toString());
+                    books.setUserDescription(bDes.getText().toString());
+                    books.setPress(bPress.getText().toString());
+                    books.setVersion(bVersion.getText().toString());
+                    books.setIsSubscribe("无");
+                    books.setIsContinue("无");
+                    books.setBackTime("");
+                    books.setIsLent("可借");
+
+                    //如果原来没有则添加成功
+                    if (libraryDB.saveBookMeassage(books)) {
+                        useToast("successful");
+                        finish();
+                    } else {
+                        useToast("已存在！");
+                    }
                 } catch (Exception e) {
                     useToast("编号格式错误！");
-                }
-                books.setBookName(bName.getText().toString());
-                books.setBookAuthor(bAuthor.getText().toString());
-                books.setUserDescription(bDes.getText().toString());
-                books.setIsLent("可借");
-                //如果原来没有则添加成功
-                if (libraryDB.saveBookMeassage(books)) {
-                    useToast("successful");
-                    finish();
-                } else {
-                    useToast("已存在！");
                 }
                 break;
 
@@ -81,7 +93,7 @@ private Toast mToast;
                     isQuery = true;
                     bookName = queryName.getText().toString();
                     libraryDB.getBookMeassage(bookName, booksList);
-                    if(booksList.size()==0){
+                    if (booksList.size() == 0) {
                         useToast("没有符合搜索要求的图书！");
                     }
                     //将搜索结果显示出来
@@ -138,12 +150,13 @@ private Toast mToast;
                     }
                 });
             } catch (Exception e) {
-               useToast("编号格式错误！");
+                useToast("编号格式错误！");
             }
         }
     }
-    public void useToast(String text){
-        if(mToast == null) {
+
+    public void useToast(String text) {
+        if (mToast == null) {
             mToast = Toast.makeText(ChangeBooks.this, text, Toast.LENGTH_SHORT);
         } else {
             mToast.setText(text);
@@ -151,11 +164,13 @@ private Toast mToast;
         }
         mToast.show();
     }
-public void cancelToast(){
-    if(mToast!=null){
-        mToast.cancel();
+
+    public void cancelToast() {
+        if (mToast != null) {
+            mToast.cancel();
+        }
     }
-}
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

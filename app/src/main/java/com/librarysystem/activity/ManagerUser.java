@@ -38,7 +38,12 @@ public class ManagerUser extends Activity {
         searchUser=(EditText)findViewById(R.id.manager_search_user);
         searchButton=(Button)findViewById(R.id.manager_searchuser_button);
         userListView=(ListView)findViewById(R.id.manager_user_list);
+       // String input=searchUser.getText().toString();
 
+//        libraryDB.getUsers(input,usersList);
+//        UserAdapter userAdapter=new UserAdapter(ManagerUser.this,R.layout.user_item,usersList);
+//        userListView=(ListView) findViewById(R.id.manager_user_list);
+//        userListView.setAdapter(userAdapter);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,10 +57,11 @@ public class ManagerUser extends Activity {
                 UserAdapter userAdapter=new UserAdapter(ManagerUser.this,R.layout.user_item,usersList);
                 userListView=(ListView) findViewById(R.id.manager_user_list);
                 userListView.setAdapter(userAdapter);
-                final Intent changeUserIntent=new Intent(ManagerUser.this,ChangeUsers.class);
+
                 userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        final Intent changeUserIntent=new Intent(ManagerUser.this,ChangeUsers.class);
                         PersonMessage personMessage=usersList.get(position);
                         changeUserIntent.putExtra("user_id",personMessage.getUserId());
                         startActivity(changeUserIntent);
