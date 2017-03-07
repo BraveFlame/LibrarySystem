@@ -21,6 +21,9 @@ import java.util.Random;
 
 /**
  * Created by g on 2017/2/22.
+ * 用于用户修改密码的activity
+ * 其中验证码仅是在本活动中生成随机4位数，再通过NotificationManager ,Notification.Builder类进行
+ * 通知，为了避免频繁触发，利用线程限制验证码获取间隔10s。
  */
 
 public class AlterPassword extends Activity implements Runnable {
@@ -32,7 +35,10 @@ public class AlterPassword extends Activity implements Runnable {
     private EditText intoCode;
     private int i = 0, randomcode = 0;
     private Toast mToast;
-    private static final int CODE1 = 1,CODE2=2;
+    private static final int CODE1 = 1, CODE2 = 2;
+    /**
+     * 由于线程无法处理UI，故用Handler类进行处理，以实现验证码获取时间间隔
+     */
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -56,19 +62,15 @@ public class AlterPassword extends Activity implements Runnable {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alter_password);
-
-        rePassword = (Button) findViewById(R.id.repassword);
-        getCode = (Button) findViewById(R.id.getcode);
-        intoCode = (EditText) findViewById(R.id.intocode);
-        libraryDB = LibraryDB.getInstance(this);
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        init();
         libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
-        /*
-        改密码
+        /**
+         *更改密码
          */
         rePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //i作为标志，判断第几次输入，第一次为原密码或验证码，第二次为新密码。
                 NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 manager.cancel(1);
                 i++;
@@ -78,6 +80,7 @@ public class AlterPassword extends Activity implements Runnable {
                         intoCode.setHint("请输入新密码");
                         intoCode.setText("");
                     } else {
+                        //原密码或验证码不对时i要减掉1
                         i--;
                         if (mToast == null) {
                             mToast = Toast.makeText(AlterPassword.this, "密码或验证码错误！", Toast.LENGTH_SHORT);
@@ -90,6 +93,7 @@ public class AlterPassword extends Activity implements Runnable {
                     }
 
                 } else if (i == 2) {
+                    //第二次为新密码
                     personMessage.setUserPassword(code);
                     libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
                     if (mToast == null) {
@@ -101,36 +105,27 @@ public class AlterPassword extends Activity implements Runnable {
                         manager.cancel(1);
                     }
                     mToast.show();
-
-                    pref.edit().putBoolean("remember_password", false);
-                    pref.edit().clear();
-                    pref.edit().commit();
                     finish();
                 } else {
+                    //改完重新为0，以便再改
                     i = 0;
                 }
-
             }
         });
           /*
-          忘记密码，用验证码
+          忘记密码时，用验证码
            */
-
         getCode.setOnClickListener(new View.OnClickListener() {
-
             public void onClick(View v) {
-                     getCode.setEnabled(false);
-                    new Thread(AlterPassword.this).start();
-
+                getCode.setEnabled(false);
+                new Thread(AlterPassword.this).start();
             }
         });
-
     }
-
-
 
     @Override
     public void run() {
+        //停止的秒数
         int a = 11;
         Random random = new Random();
         randomcode = random.nextInt(9000) + 1000;
@@ -138,16 +133,18 @@ public class AlterPassword extends Activity implements Runnable {
         Notification.Builder notification = new Notification.Builder(AlterPassword.this).setTicker("收到验证码").setContentTitle("验证码")
                 .setContentText("" + randomcode).setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
         manager.notify(1, notification.build());
+        Message message = new Message();
         while (true) {
             a--;
-            Message message = new Message();
+            //小于等于0时解除按键禁止
             if (a <= 0) {
-                message.what=CODE2;
+                message.what = CODE2;
                 handler.sendMessage(message);
                 break;
             } else {
-                message.arg1=a;
-                message.what=CODE1;
+                //否则显示秒数
+                message.arg1 = a;
+                message.what = CODE1;
                 handler.sendMessage(message);
             }
             try {
@@ -155,12 +152,16 @@ public class AlterPassword extends Activity implements Runnable {
             } catch (Exception e) {
 
             }
-
-
         }
     }
 
-
+    public void init() {
+        rePassword = (Button) findViewById(R.id.repassword);
+        getCode = (Button) findViewById(R.id.getcode);
+        intoCode = (EditText) findViewById(R.id.intocode);
+        libraryDB = LibraryDB.getInstance(this);
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+    }
 }
 
 

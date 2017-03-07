@@ -10,6 +10,7 @@ import com.librarysystem.R;
 
 /**
  * Created by g on 2017/2/21.
+ * 管理员权限，包括用户管理，图书管理，借阅规则
  */
 
 public class ManagerRoot extends Activity {

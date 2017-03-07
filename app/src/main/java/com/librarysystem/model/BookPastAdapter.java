@@ -16,11 +16,9 @@
 
     /**
      * Created by g on 2016/12/21.
+     *图书适配器，用于显示过去借阅的图书信息
      */
-/*
-图书适配器，用于显示页面的图书信息
 
- */
     public class BookPastAdapter extends ArrayAdapter<Books> {
         private int resourceId;
         public BookPastAdapter(Context context, int textViewResourceId, List<Books> objects){
@@ -44,7 +42,6 @@
             bookId.setText("编号："+String.valueOf(books.getBookId()));
             bookBorrowDate.setText("借阅日期："+books.getLentTime().toString());
             bookBackDate.setText("归还日期："+books.getBackTime().toString());
-
             return view;
         }
 

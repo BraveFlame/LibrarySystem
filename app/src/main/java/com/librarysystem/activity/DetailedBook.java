@@ -16,10 +16,9 @@ import com.librarysystem.sqlite.LibraryDB;
 
 /**
  * Created by g on 2016/12/25.
+ * 从书库获取的书籍具体信息
  */
-/*
-书的主要信息
- */
+
 public class DetailedBook extends Activity {
     private TextView detailed_name, detailed_author, detailed_id, detailed_message, detailed_status, detailed_date;
     private TextView detailed_version, detailed_press;
@@ -34,14 +33,8 @@ public class DetailedBook extends Activity {
         setContentView(R.layout.detailedbook);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         final Books book = (Books) getIntent().getParcelableExtra("bookmessage");
-        detailed_id = (TextView) findViewById(R.id.detailed_id);
-        detailed_name = (TextView) findViewById(R.id.detailed_name);
-        detailed_version = (TextView) findViewById(R.id.detailed_version);
-        detailed_press = (TextView) findViewById(R.id.detailed_press);
-        detailed_author = (TextView) findViewById(R.id.detailed_author);
-        detailed_message = (TextView) findViewById(R.id.detailed_message);
-        detailed_status = (TextView) findViewById(R.id.detailed_status);
-        detailed_date = (TextView) findViewById(R.id.detailed_date);
+        init();
+
         detailed_id.setText("编号：" + book.getBookId());
         detailed_name.setText("书名：" + book.getBookName());
         detailed_author.setText("作者：" + book.getBookAuthor());
@@ -50,39 +43,54 @@ public class DetailedBook extends Activity {
         detailed_message.setText("主要信息：" + book.getUserDescription());
         detailed_status.setText("状态：" + book.getIsLent());
         detailed_subscribe = (Button) findViewById(R.id.book_subscribe);
-        if(book.getIsLent().equals("可借")){
+        /**
+         * 可借时不需要预约，而且借此书者不得预约该书
+         */
+        if (book.getIsLent().equals("可借")) {
             detailed_subscribe.setEnabled(false);
         }
-        if(book.getIsSubscribe().length()>2) {
+        /**
+         *   有人预约时不得预约（预约时以“预约者ID号+预约”存储）
+         */
+
+        if (book.getIsSubscribe().length() > 2) {
             String userSub = book.getIsSubscribe().substring(book.getIsSubscribe().length() - 2);
             if (userSub.equals("预约")) {
                 detailed_subscribe.setEnabled(false);
-                detailed_subscribe.setText("已被预约");
+                detailed_subscribe.setText("预约");
             }
         }
 
         detailed_button = (Button) findViewById(R.id.detailed_button);
 
         libraryDB = LibraryDB.getInstance(this);
+        /**
+         * 借出时显示应还日期
+         */
         if ((book.getIsLent().equals("借出"))) {
             detailed_button.setEnabled(false);
             detailed_date.setText("应还日期：" + book.getBackTime());
         }
-        if(libraryDB.isBelong(book.getBookId(),pref.getInt("userId",0))){
+        /**
+         * 借此书者不得预约该书
+         */
+        if (libraryDB.isBelong(book.getBookId(), pref.getInt("userId", 0))) {
             detailed_subscribe.setEnabled(false);
-            detailed_subscribe.setText("自己无法预约");
+            detailed_subscribe.setText("预约");
         }
+
+        /**
+         * 借书时需满足无过期图书和未达最大借阅量
+         */
         detailed_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (book.getIsLent().equals("可借")) {
-
-
-                    if (libraryDB.borrowBook(pref.getInt("userId", 0), book,pref.getInt("firstborrow",30)
-                            ,pref.getInt("maxnumbook",30))) {
-                        if(book.getIsLent().equals("可借")){
+                    if (libraryDB.borrowBook(pref.getInt("userId", 0), book, pref.getInt("firstborrow", 30)
+                            , pref.getInt("maxnumbook", 30))) {
+                        if (book.getIsLent().equals("可借")) {
                             useToast("已达当前最大借阅量！");
-                        }else {
+                        } else {
                             detailed_status.setText("状态：借出");
                             detailed_button.setEnabled(false);
                             detailed_date.setText("应还日期：" + book.getBackTime());
@@ -93,29 +101,38 @@ public class DetailedBook extends Activity {
                     } else {
                         useToast("您有过期图书未归还，无法借书！");
                     }
-
-
                 }
             }
         });
+
         detailed_subscribe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                    PersonMessage personMessage=new PersonMessage();
-                    libraryDB.getPersonalMeassage(personMessage,pref.getInt("userId",0));
-                    if(Integer.valueOf(personMessage.getPastBooks())>0){
-                        useToast("有未归还图书无法预约！");
-                    }else {
-                        detailed_subscribe.setEnabled(false);
-                        book.setIsSubscribe(pref.getInt("userId", 0) + "预约");
-                        libraryDB.bookSubscribe(book);
-                        detailed_subscribe.setEnabled(false);
-                        detailed_subscribe.setText("已预约");
+                PersonMessage personMessage = new PersonMessage();
+                libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 0));
+                if (Integer.valueOf(personMessage.getPastBooks()) > 0) {
+                    useToast("有未归还图书无法预约！");
+                } else {
+                    detailed_subscribe.setEnabled(false);
+                    book.setIsSubscribe(pref.getInt("userId", 0) + "预约");
+                    libraryDB.bookSubscribe(book);
+                    detailed_subscribe.setEnabled(false);
+                    detailed_subscribe.setText("已预约");
 
                 }
             }
         });
+    }
+
+    public void init() {
+        detailed_id = (TextView) findViewById(R.id.detailed_id);
+        detailed_name = (TextView) findViewById(R.id.detailed_name);
+        detailed_version = (TextView) findViewById(R.id.detailed_version);
+        detailed_press = (TextView) findViewById(R.id.detailed_press);
+        detailed_author = (TextView) findViewById(R.id.detailed_author);
+        detailed_message = (TextView) findViewById(R.id.detailed_message);
+        detailed_status = (TextView) findViewById(R.id.detailed_status);
+        detailed_date = (TextView) findViewById(R.id.detailed_date);
     }
 
     public void useToast(String text) {

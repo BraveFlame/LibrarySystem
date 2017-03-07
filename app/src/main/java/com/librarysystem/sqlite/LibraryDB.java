@@ -17,23 +17,24 @@ import java.util.List;
 
 /**
  * Created by g on 2016/12/2.
+ * 用于数据库各种操作
  */
 
 public class LibraryDB {
-    /*
-    数据库名
+    /**
+     * 数据库名
      */
     public static final String Library_DB = "library_db";
-    /*
-    数据库版本
+    /**
+     * 数据库版本
      */
     public static final int VERSION = 1;
     private static LibraryDB libraryDB;
     private SQLiteDatabase db;
 
 
-    /*
-    构造方法私有化
+    /**
+     * 构造方法私有化
      */
     private LibraryDB(Context context) {
         MySqliteManager dbHelper = new MySqliteManager(context, Library_DB, null, VERSION);
@@ -41,8 +42,8 @@ public class LibraryDB {
 
     }
 
-    /*
-    获取LibraryDB实例
+    /**
+     * 获取LibraryDB实例
      */
     public synchronized static LibraryDB getInstance(Context context) {
         if (libraryDB == null) {
@@ -51,8 +52,8 @@ public class LibraryDB {
         return libraryDB;
     }
 
-    /*
-    将PersonalMessage存入数据库
+    /**
+     * 将PersonalMessage存入数据库
      */
     public boolean savePersonalMeassage(PersonMessage personMessage) {
         int id = -1;
@@ -86,8 +87,8 @@ public class LibraryDB {
         }
     }
 
-    /*
-    从数据库修改个人资料
+    /**
+     * 从数据库修改个人资料
      */
     public void alterPersonalMessage(PersonMessage personMessage, int userId) {
         ContentValues values = new ContentValues();
@@ -104,8 +105,8 @@ public class LibraryDB {
         db.update("PersonalMessages", values, "user_id=?", new String[]{"" + userId});
     }
 
-    /*
-    搜索符合条件的联系人
+    /**
+     * 搜索符合条件的联系人
      */
     public List<PersonMessage> getUsers(String input, List<PersonMessage> usersList) {
         usersList.clear();
@@ -166,8 +167,8 @@ public class LibraryDB {
 
     }
 
-    /*
-    删除用户
+    /**
+     * 删除用户
      */
     public boolean deleteUsers(int id) {
         try {
@@ -178,8 +179,8 @@ public class LibraryDB {
         }
     }
 
-    /*
-    将用户的当前借阅归还
+    /**
+     * 将用户的当前借阅归还
      */
     public boolean forceBackBooks(int userId, int days, int max) {
 
@@ -203,18 +204,22 @@ public class LibraryDB {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        //解除自己预约
+        /**解除自己预约
+         *
+         */
         ContentValues value = new ContentValues();
         value.put("book_subscribe", "无");
         db.update("BookRepertory", value, "book_subscribe=?", new String[]{userId + "预约"});
-       //归还已借
+        /**归还已借
+         *
+         */
         for (int i = 0; i < booksList.size(); i++)
             backBook(userId, booksList.get(i), days, max);
         return true;
     }
 
-    /*
-    将用户的过去借阅删除
+    /**
+     * 将用户的过去借阅删除
      */
     public boolean deletePast(int userId) {
         try {
@@ -225,8 +230,8 @@ public class LibraryDB {
         }
     }
 
-    /*
-    从数据库读取个人PersonalMeassage
+    /**
+     * 从数据库读取个人PersonalMeassage
      */
     public void getPersonalMeassage(PersonMessage personMessage, int userId) {
 
@@ -256,9 +261,9 @@ public class LibraryDB {
 
     }
 
-    /*
-      用户搜索从数据库读取书本的信息
-      */
+    /**
+     * 用户搜索从数据库读取书本的信息
+     */
     public List<Books> getBookMeassage(String bookName, List<Books> booksList) {
         booksList.clear();
         Cursor cursor = db.rawQuery("select * from BookRepertory where book_name like '%" + bookName + "%'  COLLATE NOCASE order by book_id", null);
@@ -283,8 +288,8 @@ public class LibraryDB {
         return booksList;
     }
 
-    /*
-    判断当前被借书是不是自己借的，是则无法预约
+    /**
+     * 判断当前被借书是不是自己借的，是则无法预约
      */
     public boolean isBelong(int bookId, int userId) {
         Cursor cursor = db.rawQuery("select * from PresentBooks where reader_id=" + userId, null);
@@ -300,8 +305,8 @@ public class LibraryDB {
         return false;
     }
 
-    /*
-    当前借阅
+    /**
+     * 当前借阅
      */
     public List<Books> getPresentBooks(int readerId, List<Books> booksList) {
         booksList.clear();
@@ -320,14 +325,15 @@ public class LibraryDB {
                 book.setIsContinue(cursor.getString(cursor.getColumnIndex("book_continue")));
                 book.setIsSubscribe(cursor.getString(cursor.getColumnIndex("book_subscribe")));
                 booksList.add(book);
-            } while (cursor.moveToNext());
+            }
+            while (cursor.moveToNext());
         }
         cursor.close();
         return booksList;
     }
 
-    /*
-    续借
+    /**
+     * 续借
      */
 
     public void bookContinue(Books book) {
@@ -344,8 +350,8 @@ public class LibraryDB {
 
     }
 
-    /*
-    预约
+    /**
+     * 预约
      */
     public void bookSubscribe(Books book) {
 
@@ -360,8 +366,8 @@ public class LibraryDB {
 
     }
 
-    /*
-    过去借阅
+    /**
+     * 过去借阅
      */
     public List<Books> getPastBooks(int readerId, List<Books> booksList) {
         booksList.clear();
@@ -382,8 +388,8 @@ public class LibraryDB {
         return booksList;
     }
 
-    /*
-    管理员保存图书
+    /**
+     * 管理员保存图书
      */
     public boolean saveBookMeassage(Books books) {
         int id = -1;
@@ -405,20 +411,21 @@ public class LibraryDB {
                 values.put("book_author", books.getBookAuthor());
                 values.put("book_description", books.getUserDescription());
                 values.put("book_status", books.getIsLent());
-                values.put("back_time",books.getBackTime());
-                values.put("book_version",books.getVersion());
-                values.put("book_press",books.getPress());
-                values.put("book_subscribe",books.getIsSubscribe());
-                values.put("book_continue",books.getIsContinue());
+                values.put("back_time", books.getBackTime());
+                values.put("book_version", books.getVersion());
+                values.put("book_press", books.getPress());
+                values.put("book_subscribe", books.getIsSubscribe());
+                values.put("book_continue", books.getIsContinue());
                 db.insert("BookRepertory", null, values);
 
             }
             return true;
         }
     }
-/*
-管理员删除图书
- */
+
+    /**
+     * 管理员删除图书
+     */
 
     public boolean deleteBooks(int bookId) {
         try {
@@ -431,8 +438,8 @@ public class LibraryDB {
     }
 
 
-    /*
-    管理员修改图书
+    /**
+     * 管理员修改图书
      */
 
     public void alterBooks(Books book, int bookId) {
@@ -453,19 +460,8 @@ public class LibraryDB {
     }
 
 
-    /*
-    借书
-    http://202.116.174.108:8080
-    /opac/openlink.php?strSearchType=title&historyCount=1&strText=English&doctype=ALL
-
-    http://202.116.174.108:8080
-    /opac/openlink.php?strSearchType=title&historyCount=1&strText=java&doctype=ALL
-
-    http://202.116.174.108:8080
-    /opac/openlink.php?strSearchType=title&historyCount=1&strText=%E8%A5%BF%E6%B8%B8%E8%AE%B0&doctype=ALL
-
-    http://202.116.174.108:8080
-    /opac/openlink.php?strSearchType=title&historyCount=1&strText=%E4%B8%89%E5%9B%BD%E6%BC%94%E4%B9%89&doctype=ALL
+    /**
+     * 借书
      */
     public boolean borrowBook(int readerId, Books book, int days, int max) {
 
@@ -487,8 +483,8 @@ public class LibraryDB {
                 ContentValues values = new ContentValues();
                 values.put("book_id", book.getBookId());
                 values.put("reader_id", readerId);
-                values.put("book_press",book.getPress());
-                values.put("book_version",book.getVersion());
+                values.put("book_press", book.getPress());
+                values.put("book_version", book.getVersion());
                 values.put("book_name", book.getBookName());
                 values.put("book_author", book.getBookAuthor());
                 values.put("book_description", book.getUserDescription());
@@ -525,9 +521,9 @@ public class LibraryDB {
     }
 
 
-    /*
-还书
- */
+    /**
+     * 还书
+     */
     public boolean backBook(int readerId, Books book, int days, int max) {
         if (book != null) {
             db.execSQL("delete from PresentBooks where book_id=?", new String[]{"" + book.getBookId()});

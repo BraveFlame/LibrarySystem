@@ -12,6 +12,7 @@ import com.librarysystem.activity.Login;
 
 /**
  * Created by g on 2017/2/22.
+ * 轮播图片
  */
 
 public class LoginView extends View implements Runnable {

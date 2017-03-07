@@ -23,6 +23,7 @@ import com.librarysystem.sqlite.LibraryDB;
 
 /**
  * Created by g on 2016/10/15.
+ * 启动app的第一个活动，用于登录和注册和修改密码
  */
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
@@ -58,7 +59,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isRemember = pref.getBoolean("remember_password", false);
         boolean change_user = getIntent().getBooleanExtra("change", false);
-
+/**
+ * 如果记住密码则判断是否正确再决定自动登录与否
+ */
         if (isRemember) {
 
             int user = pref.getInt("user", 0);
@@ -70,6 +73,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             int userId = personMessage.getUserId();
             String passwords = personMessage.getUserPassword();
             if (passwords.equals(password)) {
+                /**
+                 * 这里是判断当前活动是不是由主页跳转（即切换账户），是则不会自动登录
+                 */
                 if (!change_user) {
                     lv = new LoginView(this);
                     setContentView(lv);
@@ -102,8 +108,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 break;
             case R.id.login_button:
                 if (userLogin()) {
+                    /**
+                     * 登陆时轮播两张图共1.2秒
+                     */
                     lv = new LoginView(this);
                     setContentView(lv);
+                    /**
+                     * 再次登录时把之前的主页活动销毁，以免显示上个人的搜索以及提醒等信息
+                     */
                     ActivityCollector.finishAll();
                 } else {
                     useToast("用户名或密码错误！");
@@ -119,18 +131,21 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     }
 
     public void gotoMain() {
-
         Intent loginIntent = new Intent(this, MainPage.class);
         startActivity(loginIntent);
         finish();
     }
 
+    /**
+     * 判断账户和密码是否符合
+     *
+     * @return
+     */
     public boolean userLogin() {
         if (userEdit.getText().toString().equals("")) {
             return false;
         }
         try {
-
 
             int userInput = Integer.valueOf(userEdit.getText().toString());
             String passwordInput = passwordEdit.getText().toString();
@@ -140,7 +155,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             if ((userInput == userId) && passwordInput.equals(password)) {
 
                 editor = pref.edit();
-
+/**
+ * 记住密码时保存信息
+ */
                 if (rememberPassword.isChecked()) {
                     editor.putBoolean("remember_password", true);
                     editor.putInt("user", userInput);
@@ -153,13 +170,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
                 editor.commit();
                 editor.putInt("userId", userInput);
-//                if (pref.getInt("userId", 1) == 0) {
-//                    editor.putInt("firstborrow", 30);
-//                    editor.putInt("thanborrow", 30);
-//                    editor.putInt("maxnumbook", 30);
-//                    editor.putInt("remain", 7);
-//
-//                }
+
                 editor.commit();
                 return true;
             } else return false;

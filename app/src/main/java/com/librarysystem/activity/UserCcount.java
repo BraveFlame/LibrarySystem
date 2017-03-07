@@ -15,6 +15,7 @@ import com.librarysystem.sqlite.LibraryDB;
 
 /**
  * Created by g on 2017/2/22.
+ * 账户信息以及跳到修改密码界面
  */
 
 public class UserCcount extends Activity {
@@ -22,8 +23,8 @@ public class UserCcount extends Activity {
     private LibraryDB libraryDB;
     private PersonMessage personMessage = new PersonMessage();
     private TextView accountId, accountName, accountSex, accountpro, accounthobby, accounttel,
-            accountlevel, accountpast, accountwpast,userProperty;
-    private Button  alterPassword;
+            accountlevel, accountpast, accountwpast, userProperty;
+    private Button alterPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +34,6 @@ public class UserCcount extends Activity {
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
         init();
-
-
         final Intent alterpassword = new Intent(this, AlterPassword.class);
         alterPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,20 +53,18 @@ public class UserCcount extends Activity {
         accountlevel = (TextView) findViewById(R.id.userclevel);
         accountpast = (TextView) findViewById(R.id.userclate);
         accountwpast = (TextView) findViewById(R.id.usercwpastbook);
-        userProperty=(TextView)findViewById(R.id.user_property);
+        userProperty = (TextView) findViewById(R.id.user_property);
         alterPassword = (Button) findViewById(R.id.usercpassword);
-
-
-        accountName.setText("姓名："+personMessage.getUserName().toString());
-        accountSex.setText("性别："+personMessage.getUserSex().toString());
-        accountId.setText("账户："+String.valueOf(personMessage.getUserId()));
-        accounthobby.setText("书籍爱好："+personMessage.getUserDescription().toString());
-        accountpro.setText("专业："+personMessage.getUserProfession().toString());
-        accountlevel.setText("借阅等级："+personMessage.getUserLevel().toString());
-        accountpast.setText("逾期书本："+personMessage.getPastBooks().toString());
-        accountwpast.setText("即将到期："+personMessage.getWpastBooks().toString());
-        accounttel.setText("联系方式："+personMessage.getUserTel().toString());
-        userProperty.setText("属性："+personMessage.getIsRootManager().toString());
+        accountName.setText("姓名：" + personMessage.getUserName().toString());
+        accountSex.setText("性别：" + personMessage.getUserSex().toString());
+        accountId.setText("账户：" + String.valueOf(personMessage.getUserId()));
+        accounthobby.setText("书籍爱好：" + personMessage.getUserDescription().toString());
+        accountpro.setText("专业：" + personMessage.getUserProfession().toString());
+        accountlevel.setText("借阅等级：" + personMessage.getUserLevel().toString());
+        accountpast.setText("逾期书本：" + personMessage.getPastBooks().toString());
+        accountwpast.setText("即将到期：" + personMessage.getWpastBooks().toString());
+        accounttel.setText("联系方式：" + personMessage.getUserTel().toString());
+        userProperty.setText("属性：" + personMessage.getIsRootManager().toString());
 
     }
 }

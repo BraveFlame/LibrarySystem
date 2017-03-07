@@ -2,6 +2,7 @@ package com.librarysystem.model;
 
 /**
  * Created by g on 2016/11/30.
+ * 用户实体类
  */
 
 public class PersonMessage {
@@ -10,7 +11,7 @@ public class PersonMessage {
     private String userSex;
     private String userProfession;
     private String userDescription;
-    private  String userPassword;
+    private String userPassword;
     private String userLevel;
     private String pastBooks;
     private String wpastBooks;
@@ -34,6 +35,7 @@ public class PersonMessage {
     public void setIsRootManager(String isRootManager) {
         this.isRootManager = isRootManager;
     }
+
     public String getUserLevel() {
         return userLevel;
     }
@@ -65,7 +67,6 @@ public class PersonMessage {
     public void setUserTel(String userTel) {
         this.userTel = userTel;
     }
-
 
 
     public String getUserPassword() {
@@ -116,8 +117,6 @@ public class PersonMessage {
     public void setUserDescription(String userDescription) {
         this.userDescription = userDescription;
     }
-
-
 
 
 }

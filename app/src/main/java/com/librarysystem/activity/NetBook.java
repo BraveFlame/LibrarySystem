@@ -11,7 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 /**
- * Created by g on 2017/3/3.
+ * 检查不到书籍时联网学习图书馆，以建议管理员加入某书
  */
 
 public class NetBook extends Activity {

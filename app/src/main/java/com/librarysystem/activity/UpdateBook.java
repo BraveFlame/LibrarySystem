@@ -16,10 +16,11 @@ import com.librarysystem.sqlite.LibraryDB;
 
 /**
  * Created by g on 2017/2/21.
+ * 管理员删除，修改书籍
  */
 
 public class UpdateBook extends Activity implements View.OnClickListener {
-    private EditText update_name, update_author, update_id, update_message,update_press, update_version, update_status, update_date;
+    private EditText update_name, update_author, update_id, update_message, update_press, update_version, update_status, update_date;
     private Button balter, bdelete, bupdate;
     private LibraryDB libraryDB;
     private SharedPreferences pref;
@@ -32,20 +33,12 @@ public class UpdateBook extends Activity implements View.OnClickListener {
         setContentView(R.layout.manager_book);
         libraryDB = LibraryDB.getInstance(this);
         book = (Books) getIntent().getParcelableExtra("bookmessage");
-        balter = (Button) findViewById(R.id.balter);
-        bdelete = (Button) findViewById(R.id.bdelete);
-        bupdate = (Button) findViewById(R.id.bupdate);
+        init();
+
         balter.setOnClickListener(this);
         bdelete.setOnClickListener(this);
         bupdate.setOnClickListener(this);
-        update_id = (EditText) findViewById(R.id.update_id);
-        update_name = (EditText) findViewById(R.id.update_name);
-        update_author = (EditText) findViewById(R.id.update_author);
-        update_version = (EditText) findViewById(R.id.update_version);
-        update_message = (EditText) findViewById(R.id.update_message);
-        update_status = (EditText) findViewById(R.id.update_status);
-        update_date = (EditText) findViewById(R.id.update_date);
-        update_press=(EditText)findViewById(R.id.update_press);
+
 
         update_id.setText(String.valueOf(book.getBookId()));
         update_id.setEnabled(false);
@@ -65,6 +58,21 @@ public class UpdateBook extends Activity implements View.OnClickListener {
         update_date.setEnabled(false);
         update_version.setEnabled(false);
         update_press.setEnabled(false);
+
+    }
+
+    private void init() {
+        update_id = (EditText) findViewById(R.id.update_id);
+        update_name = (EditText) findViewById(R.id.update_name);
+        update_author = (EditText) findViewById(R.id.update_author);
+        update_version = (EditText) findViewById(R.id.update_version);
+        update_message = (EditText) findViewById(R.id.update_message);
+        update_status = (EditText) findViewById(R.id.update_status);
+        update_date = (EditText) findViewById(R.id.update_date);
+        update_press = (EditText) findViewById(R.id.update_press);
+        balter = (Button) findViewById(R.id.balter);
+        bdelete = (Button) findViewById(R.id.bdelete);
+        bupdate = (Button) findViewById(R.id.bupdate);
 
     }
 
@@ -101,11 +109,11 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                 break;
             case R.id.bupdate:
                 if (book.getIsLent().equals("借出")) {
-                   useToast("借出无法更新！");
+                    useToast("借出无法更新！");
                 } else {
                     try {
                         book.setBookId(Integer.valueOf(update_id.getText().toString()));
-                        if(!update_author.getText().toString().equals("")&!update_name.getText().toString().equals("")) {
+                        if (!update_author.getText().toString().equals("") & !update_name.getText().toString().equals("")) {
                             book.setBookAuthor(update_author.getText().toString());
                             book.setBookName(update_name.getText().toString());
                             book.setUserDescription(update_message.getText().toString());
@@ -120,17 +128,17 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                             update_version.setEnabled(false);
                             update_press.setEnabled(false);
                             useToast("更新成功！");
-                        }else  {
-                            useToast( "请完善信息！");
+                        } else {
+                            useToast("请完善信息！");
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         useToast("编号格式错误！");
                     }
                 }
                 break;
             case R.id.balter:
                 if (book.getIsLent().equals("借出")) {
-                  useToast( "借出无法更改！");
+                    useToast("借出无法更改！");
                 } else {
 
                     update_id.setEnabled(true);
@@ -139,14 +147,16 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                     update_message.setEnabled(true);
                     update_press.setEnabled(true);
                     update_version.setEnabled(true);
-                    break;}
-                    default:
-                        break;
+                    break;
+                }
+            default:
+                break;
 
         }
     }
-    public void useToast(String text){
-        if(mToast == null) {
+
+    public void useToast(String text) {
+        if (mToast == null) {
             mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
         } else {
             mToast.setText(text);
@@ -154,11 +164,13 @@ public class UpdateBook extends Activity implements View.OnClickListener {
         }
         mToast.show();
     }
-    public void cancelToast(){
-        if(mToast!=null){
+
+    public void cancelToast() {
+        if (mToast != null) {
             mToast.cancel();
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

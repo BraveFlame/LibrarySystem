@@ -1,90 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#a9d9f5"
+    android:orientation="vertical">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="#ab2224">
+        android:background="#3ab9b0">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textSize="25sp"
-            android:text="还书操作"/>
+            android:text="还书操作"
+            android:textSize="25sp" />
     </RelativeLayout>
-        <TextView
-            android:id="@+id/present_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="30sp"
-            android:text="书名："/>
+
+    <TextView
+        android:id="@+id/present_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="书名："
+        android:textSize="20sp" />
+
     <TextView
         android:id="@+id/present_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:text="编号："/>
+        android:layout_marginTop="10dp"
+        android:text="编号："
+        android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/present_version"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="25sp"
-            android:text="版本："/>
+    <TextView
+        android:id="@+id/present_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="版本："
+        android:textSize="20sp" />
+
     <TextView
         android:id="@+id/press_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:text="出版社："/>
-        <TextView
-            android:id="@+id/present_author"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="25sp"
-            android:text="作者："/>
+        android:layout_marginTop="10dp"
+        android:text="出版社："
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/present_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="作者："
+        android:textSize="20sp" />
 
 
     <TextView
         android:id="@+id/start_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:text="借阅日期："/>
-        <TextView
-            android:id="@+id/back_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="25sp"
-            android:text="应还日期："/>
-        <TextView
-            android:id="@+id/present_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="25sp"
-            android:text="主要信息："/>
+        android:layout_marginTop="10dp"
+        android:text="借阅日期："
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/back_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="应还日期："
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/present_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="主要信息："
+        android:maxLines="10"
+        android:textSize="20sp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
+
         <Button
             android:id="@+id/back_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="25sp"
-            android:text="还书"/>
+            android:layout_marginLeft="80dp"
+            android:text="还书"
+            android:textSize="20sp" />
+
         <Button
             android:id="@+id/back_continue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="25sp"
-            android:text="续借"/>
+            android:layout_marginLeft="20dp"
+            android:text="续借"
+            android:textSize="20sp" />
 
 
     </LinearLayout>
-
 
 
 </LinearLayout>

@@ -32,6 +32,7 @@ import java.util.List;
 
 /**
  * Created by g on 2016/10/16.
+ * 本App的主页，包括搜索图书，和切换账号，个人信息，管理员权限，当前借阅，过去借阅，退出程序
  */
 
 public class MainPage extends Activity implements View.OnClickListener {
@@ -56,7 +57,7 @@ public class MainPage extends Activity implements View.OnClickListener {
         libraryDB = LibraryDB.getInstance(this);
         selectButton = (Button) findViewById(R.id.select_button);
         searchButton = (Button) findViewById(R.id.search_book);
-        searchNet=(Button)findViewById(R.id.search_net);
+        searchNet = (Button) findViewById(R.id.search_net);
         inputSearchBook = (EditText) findViewById(R.id.book_search_name);
         impart();
         selectButton.setOnClickListener(this);
@@ -70,17 +71,18 @@ public class MainPage extends Activity implements View.OnClickListener {
         selectButton.setOnClickListener(listener);
 
 
-
     }
 
     @Override
     protected Dialog onCreateDialog(int id) {
         Dialog dialog = null;
-
         switch (id) {
             case LISTSELECT:
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("选择");
+                /**
+                 * 切换账号，个人信息，管理员权限，当前借阅，过去借阅
+                 */
                 final Intent intentChang = new Intent(this, Login.class);
                 intentChang.putExtra("change", true);
                 final Intent intentUser = new Intent(this, UserCcount.class);
@@ -108,12 +110,11 @@ public class MainPage extends Activity implements View.OnClickListener {
                                 break;
                             case 4:
                                 pref = PreferenceManager.getDefaultSharedPreferences(MainPage.this);
-                                if( pref.getInt("userId",0)==12345){
+                                if (pref.getInt("userId", 0) == 12345) {
                                     startActivity(intentRoot);
-                                }else {
-                                   useToast("您不是管理员！");
+                                } else {
+                                    useToast("您不是管理员！");
                                 }
-
                                 break;
                             case 5:
                                 AlertDialog.Builder dialog2 = new AlertDialog.Builder(MainPage.this);
@@ -146,7 +147,10 @@ public class MainPage extends Activity implements View.OnClickListener {
         return dialog;
     }
 
-    //用户搜索图书
+    /**
+     * 用户搜索图书
+     */
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -154,31 +158,32 @@ public class MainPage extends Activity implements View.OnClickListener {
                 isSearch = true;
                 bookName = inputSearchBook.getText().toString();
                 libraryDB.getBookMeassage(bookName, booksList);
-                if(booksList.size()==0){
+                /**
+                 * 没有符合图书时联网，否则将联网按键隐藏
+                 */
+                if (booksList.size() == 0) {
                     useToast("没有符合搜索要求的图书！");
                     searchNet.setVisibility(View.VISIBLE);
                     searchNet.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                          Intent net=new Intent(MainPage.this,NetBook.class);
-                            net.putExtra("search",bookName);
+                            Intent net = new Intent(MainPage.this, NetBook.class);
+                            net.putExtra("search", bookName);
                             startActivity(net);
                         }
                     });
 
-
-
-                }else {
+                } else {
                     searchNet.setVisibility(View.GONE);
                 }
-                //将搜索结果显示出来
+                /**
+                 *将搜索结果显示出来，查看每本书的信息
+                 */
                 BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
                 bookList = (ListView) findViewById(R.id.list_search_book);
                 bookList.setAdapter(adapter);
                 final Intent bookIntent = new Intent(this, DetailedBook.class);
-                /*
-                点击查看每本书的信息
-                 */
+
                 bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -195,6 +200,9 @@ public class MainPage extends Activity implements View.OnClickListener {
         }
     }
 
+    /**
+     * 刷新借阅界面，根据借出，即将过期，过期三种情况将书标识不一样颜色
+     */
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -202,7 +210,6 @@ public class MainPage extends Activity implements View.OnClickListener {
         if (isSearch) {
             bookName = inputSearchBook.getText().toString();
             libraryDB.getBookMeassage(bookName, booksList);
-
             //将搜索结果显示出来
             BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
             bookList = (ListView) findViewById(R.id.list_search_book);
@@ -224,6 +231,9 @@ public class MainPage extends Activity implements View.OnClickListener {
         }
     }
 
+    /**
+     * 有过期，将要过期的书时，notification通知
+     */
     public void impart() {
         SharedPreferences pref;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -241,10 +251,10 @@ public class MainPage extends Activity implements View.OnClickListener {
             try {
                 date1 = sdf.parse(books.get(i).getBackTime());
                 Date nowDate = new Date();
-                Date date2=sdf.parse(sdf.format(nowDate));
+                Date date2 = sdf.parse(sdf.format(nowDate));
                 long distance = date1.getTime() - date2.getTime();
                 long days = distance / (1000 * 60 * 60 * 24);
-                if (days <= pref.getInt("remain",7) && days >= 1) {
+                if (days <= pref.getInt("remain", 7) && days >= 1) {
                     j++;
                 } else if (days < 1) {
                     k++;
@@ -264,7 +274,7 @@ public class MainPage extends Activity implements View.OnClickListener {
             manager.notify(3, notification.build());
             personMessage.setWpastBooks("" + j);
             libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
-        }else {
+        } else {
             personMessage.setWpastBooks("0");
             libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
             manager.cancel(3);
@@ -284,8 +294,9 @@ public class MainPage extends Activity implements View.OnClickListener {
             libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
         }
     }
-    public void useToast(String text){
-        if(mToast == null) {
+
+    public void useToast(String text) {
+        if (mToast == null) {
             mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
         } else {
             mToast.setText(text);
@@ -293,11 +304,13 @@ public class MainPage extends Activity implements View.OnClickListener {
         }
         mToast.show();
     }
-    public void cancelToast(){
-        if(mToast!=null){
+
+    public void cancelToast() {
+        if (mToast != null) {
             mToast.cancel();
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

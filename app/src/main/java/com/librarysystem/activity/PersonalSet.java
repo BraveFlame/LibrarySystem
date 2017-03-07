@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 /**
  * Created by g on 2016/12/2.
+ * 注册填写用户信息界面以及更改资料（但此处将修改资料功能取消，仅能改密码）
  */
 
 public class PersonalSet extends Activity implements View.OnClickListener {
@@ -58,35 +59,28 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                 userSex = rb.getText().toString();
             }
         });
+        init();
         personSet.setOnClickListener(this);
         personSave.setOnClickListener(this);
-
         libraryDB = LibraryDB.getInstance(this);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
 
-        userId = (EditText) findViewById(R.id.userId);
-        userPassword = (EditText) findViewById(R.id.userPassword);
-        userName = (EditText) findViewById(R.id.userName);
-       // userSex = (EditText) findViewById(R.id.userSex);
-        userprofession = (EditText) findViewById(R.id.userProfession);
-        userDescription = (EditText) findViewById(R.id.userDescription);
-        userTel = (EditText) findViewById(R.id.user_tel);
-
-        if (whereActivity.equals("personSet")) {
-            userName.setText(personMessage.getUserName());
-            userName.setEnabled(false);
-            userPassword.setText(personMessage.getUserPassword());
-            userPassword.setEnabled(false);
-            userId.setText(String.valueOf(personMessage.getUserId()));
-            userId.setEnabled(false);
-            //userSex.setText(personMessage.getUserSex());
-            //userSex.setEnabled(false);
-            userprofession.setText(personMessage.getUserProfession());
-            userprofession.setEnabled(false);
-            userDescription.setText(personMessage.getUserDescription());
-            userDescription.setEnabled(false);
-        } else if (whereActivity.equals("register")) {
+//        if (whereActivity.equals("personSet")) {
+//            userName.setText(personMessage.getUserName());
+//            userName.setEnabled(false);
+//            userPassword.setText(personMessage.getUserPassword());
+//            userPassword.setEnabled(false);
+//            userId.setText(String.valueOf(personMessage.getUserId()));
+//            userId.setEnabled(false);
+//            //userSex.setText(personMessage.getUserSex());
+//            //userSex.setEnabled(false);
+//            userprofession.setText(personMessage.getUserProfession());
+//            userprofession.setEnabled(false);
+//            userDescription.setText(personMessage.getUserDescription());
+//            userDescription.setEnabled(false);
+//        } else
+        if (whereActivity.equals("register")) {
             personSave.setText("确定", null);
             personSet.setText("取消", null);
 
@@ -100,26 +94,28 @@ public class PersonalSet extends Activity implements View.OnClickListener {
         final Intent intentLogin = new Intent(this, Login.class);
         switch (v.getId()) {
             case R.id.personsave:
-                if (whereActivity.equals("personSet")) {
-                    personMessage.setUserName(userName.getText().toString());
-                    personMessage.setUserSex(userSex);
-                    personMessage.setUserProfession(userprofession.getText().toString());
-                    personMessage.setUserDescription(userDescription.getText().toString());
-                    libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
-                    userId.setEnabled(false);
-                    userName.setEnabled(false);
-                   // userSex.setEnabled(false);
-                    userprofession.setEnabled(false);
-                    userDescription.setEnabled(false);
-                } else if (whereActivity.equals("register")) {
+//                if (whereActivity.equals("personSet")) {
+//                    personMessage.setUserName(userName.getText().toString());
+//                    personMessage.setUserSex(userSex);
+//                    personMessage.setUserProfession(userprofession.getText().toString());
+//                    personMessage.setUserDescription(userDescription.getText().toString());
+//                    libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
+//                    userId.setEnabled(false);
+//                    userName.setEnabled(false);
+//                    // userSex.setEnabled(false);
+//                    userprofession.setEnabled(false);
+//                    userDescription.setEnabled(false);
+//                } else
+                /**
+                 * 账号不能相同，信息（除兴趣书籍外）不能空白，手机格式要正确
+                 */
+                if (whereActivity.equals("register")) {
                     try {
                         personMessage.setUserId(Integer.valueOf(userId.getText().toString()));
                         if (checkMobileNumber(userTel.getText().toString())) {
                             if (!userName.getText().toString().equals("") && !userPassword.getText().toString().equals("") &&
                                     !userSex.equals("") && !userprofession.getText().toString().equals("")
                                     ) {
-
-
                                 personMessage.setUserPassword(userPassword.getText().toString());
                                 personMessage.setUserName(userName.getText().toString());
                                 personMessage.setUserSex(userSex);
@@ -158,18 +154,19 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                         }
 
                     } catch (Exception e) {
-                        useToast( "账号格式错误！");
+                        useToast("账号格式错误！");
                     }
 
                 }
                 break;
             case R.id.personset:
-                if (whereActivity.equals("personSet")) {
-                    userName.setEnabled(true);
-                   // userSex.setEnabled(true);
-                    userprofession.setEnabled(true);
-                    userDescription.setEnabled(true);
-                } else if (whereActivity.equals("register")) {
+//                if (whereActivity.equals("personSet")) {
+//                    userName.setEnabled(true);
+//                    // userSex.setEnabled(true);
+//                    userprofession.setEnabled(true);
+//                    userDescription.setEnabled(true);
+//                } else
+                if (whereActivity.equals("register")) {
                     startActivity(intentLogin);
                     useToast("已取消注册！");
                     finish();
@@ -180,6 +177,23 @@ public class PersonalSet extends Activity implements View.OnClickListener {
         }
     }
 
+    public void init() {
+
+        userId = (EditText) findViewById(R.id.userId);
+        userPassword = (EditText) findViewById(R.id.userPassword);
+        userName = (EditText) findViewById(R.id.userName);
+        userprofession = (EditText) findViewById(R.id.userProfession);
+        userDescription = (EditText) findViewById(R.id.userDescription);
+        userTel = (EditText) findViewById(R.id.user_tel);
+
+    }
+
+    /***
+     * 检验手机号
+     *
+     * @param mobileNumber
+     * @return
+     */
     public boolean checkMobileNumber(String mobileNumber) {
         boolean flag = false;
         try {
@@ -194,8 +208,9 @@ public class PersonalSet extends Activity implements View.OnClickListener {
         }
         return flag;
     }
-    public void useToast(String text){
-        if(mToast == null) {
+
+    public void useToast(String text) {
+        if (mToast == null) {
             mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
         } else {
             mToast.setText(text);
@@ -203,11 +218,13 @@ public class PersonalSet extends Activity implements View.OnClickListener {
         }
         mToast.show();
     }
-    public void cancelToast(){
-        if(mToast!=null){
+
+    public void cancelToast() {
+        if (mToast != null) {
             mToast.cancel();
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

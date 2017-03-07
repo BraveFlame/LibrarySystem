@@ -17,11 +17,12 @@ import java.util.List;
 
 /**
  * Created by g on 2016/12/21.
+ * 图书适配器，用于显示页面的图书信息
  */
-/*
-图书适配器，用于显示页面的图书信息
 
- */
+
+
+
 public class BookAdapter extends ArrayAdapter<Books> {
     private int resourceId;
     private Context contextThe;
@@ -39,41 +40,39 @@ public class BookAdapter extends ArrayAdapter<Books> {
         View view = LayoutInflater.from(getContext()).inflate(resourceId, null);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-//        if(books.getIsLent().equals("借出")){
-//          //  view.setBackgroundColor(Color.parseColor("#F2c02d"));
-//            view.setBackgroundResource(R.drawable.selector2);
-//        }
         try {
             Date date1 = sdf.parse(books.getBackTime());
-
             Date nowDate = new Date();
             Date date2 = sdf.parse(sdf.format(nowDate));
             long distance = date1.getTime() - date2.getTime();
             long days = distance / (1000 * 60 * 60 * 24);
+            /**
+             * 根据书应该归还时间标识不同颜色
+             */
             if (days < 1) {
                 view.setBackgroundResource(R.drawable.selector);
-            }else if(days>=1){
-                view.setBackgroundColor(Color.parseColor("#F2c02d"));
+            } else if (days >= 1 && days < 7) {
+                view.setBackgroundColor(Color.parseColor("#e4c97a"));
+            } else {
+                view.setBackgroundColor(Color.parseColor("#e7d49e"));
             }
 
         } catch (Exception e) {
 
+
         }
-            //  convertView.setBackgroundColor(Color.parseColor("#FF4081"));
+
+        TextView bookName = (TextView) view.findViewById(R.id.book_name);
+        TextView bookAuthor = (TextView) view.findViewById(R.id.book_author);
+        TextView bookId = (TextView) view.findViewById(R.id.book_id);
+
+        bookName.setText(books.getBookName());
+        bookAuthor.setText("作者：" + books.getBookAuthor());
+        bookId.setText("编号：" + String.valueOf(books.getBookId()));
 
 
-
-            TextView bookName = (TextView) view.findViewById(R.id.book_name);
-            TextView bookAuthor = (TextView) view.findViewById(R.id.book_author);
-            TextView bookId = (TextView) view.findViewById(R.id.book_id);
-
-            bookName.setText(books.getBookName());
-            bookAuthor.setText("作者：" + books.getBookAuthor());
-            bookId.setText("编号：" + String.valueOf(books.getBookId()));
-
-
-            return view;
-        }
+        return view;
+    }
 
 
 }

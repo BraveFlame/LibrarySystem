@@ -20,10 +20,9 @@ import java.util.List;
 
 /**
  * Created by g on 2016/12/21.
+ * 增加书库，以及列出书库的书以便修改
  */
-/*
-用于增加书库的书
-*/
+
 public class ChangeBooks extends Activity implements View.OnClickListener {
     private EditText bName, bId, bAuthor, bDes, queryName, bPress, bVersion;
     private Button bsave, bquery;
@@ -39,19 +38,7 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.change_books);
         libraryDB = LibraryDB.getInstance(this);
-
-        bName = (EditText) findViewById(R.id.bName);
-        bId = (EditText) findViewById(R.id.bId);
-        bAuthor = (EditText) findViewById(R.id.bAuthor);
-        bDes = (EditText) findViewById(R.id.bDesc);
-        queryName = (EditText) findViewById((R.id.query_book));
-        bPress = (EditText) findViewById(R.id.bPress);
-        bVersion = (EditText) findViewById(R.id.bVersion);
-
-
-        bsave = (Button) findViewById(R.id.bsave);
-        bquery = (Button) findViewById(R.id.bquery);
-
+        init();
         bsave.setOnClickListener(this);
         bquery.setOnClickListener(this);
     }
@@ -63,7 +50,6 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
             case R.id.bsave:
                 try {
                     books.setBookId(Integer.valueOf(bId.getText().toString()));
-
                     books.setBookName(bName.getText().toString());
                     books.setBookAuthor(bAuthor.getText().toString());
                     books.setUserDescription(bDes.getText().toString());
@@ -73,8 +59,9 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                     books.setIsContinue("无");
                     books.setBackTime("");
                     books.setIsLent("可借");
-
-                    //如果原来没有则添加成功
+                    /**
+                     * 如果书库原来没有此编号的书，则添加成功
+                     */
                     if (libraryDB.saveBookMeassage(books)) {
                         useToast("successful");
                         finish();
@@ -86,7 +73,9 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                 }
                 break;
 
-
+/**
+ *查询书库的书
+ */
             case R.id.bquery:
 
                 try {
@@ -96,22 +85,22 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                     if (booksList.size() == 0) {
                         useToast("没有符合搜索要求的图书！");
                     }
-                    //将搜索结果显示出来
+                    /**
+                     * 将搜索结果显示出来
+                     */
                     BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, booksList);
                     bookList = (ListView) findViewById(R.id.list_query_book);
                     bookList.setAdapter(adapter);
                     final Intent bookIntent = new Intent(this, UpdateBook.class);
-                /*
-                点击查看每本书的信息
-                 */
+                    /**
+                     *点击查看每本书的信息
+                     */
                     bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             Books book = booksList.get(position);
                             bookIntent.putExtra("bookmessage", book);
                             startActivity(bookIntent);
-
-
                         }
                     });
                 } catch (Exception e) {
@@ -124,6 +113,9 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
         }
     }
 
+    /**
+     * 重写onRestart（）以便有删除书时及时刷新界面
+     */
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -132,27 +124,34 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
 
                 bookName = queryName.getText().toString();
                 libraryDB.getBookMeassage(bookName, booksList);
-                //将搜索结果显示出来
                 BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, booksList);
                 bookList = (ListView) findViewById(R.id.list_query_book);
                 bookList.setAdapter(adapter);
                 final Intent bookIntent = new Intent(this, UpdateBook.class);
-                /*
-                点击查看每本书的信息
-                 */
                 bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Books book = booksList.get(position);
                         bookIntent.putExtra("bookmessage", book);
                         startActivity(bookIntent);
-
                     }
                 });
             } catch (Exception e) {
                 useToast("编号格式错误！");
             }
         }
+    }
+
+    public void init() {
+        bName = (EditText) findViewById(R.id.bName);
+        bId = (EditText) findViewById(R.id.bId);
+        bAuthor = (EditText) findViewById(R.id.bAuthor);
+        bDes = (EditText) findViewById(R.id.bDesc);
+        queryName = (EditText) findViewById((R.id.query_book));
+        bPress = (EditText) findViewById(R.id.bPress);
+        bVersion = (EditText) findViewById(R.id.bVersion);
+        bsave = (Button) findViewById(R.id.bsave);
+        bquery = (Button) findViewById(R.id.bquery);
     }
 
     public void useToast(String text) {

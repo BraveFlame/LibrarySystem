@@ -19,16 +19,17 @@ import java.util.Random;
 
 /**
  * Created by g on 2017/2/23.
+ * 忘记密码时修改，该方法仅仅是输入账号就可修改（因为验证码获取不是利用手机号，故存在弊端）
  */
 
-public class ForgetPassword extends Activity implements View.OnClickListener,Runnable{
+public class ForgetPassword extends Activity implements View.OnClickListener, Runnable {
     private LibraryDB libraryDB;
     private PersonMessage personMessage = new PersonMessage();
     private Button rePassword, getCode;
     private EditText inputId, intoCode;
     private int i = 0, randomcode = 0;
     private Toast mToast;
-    private static final int CODE1 = 1,CODE2=2;
+    private static final int CODE1 = 1, CODE2 = 2;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -47,6 +48,7 @@ public class ForgetPassword extends Activity implements View.OnClickListener,Run
 
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +85,7 @@ public class ForgetPassword extends Activity implements View.OnClickListener,Run
                         break;
                     }
                 } catch (Exception e) {
-                   useToast("账号格式错误！");
+                    useToast("账号格式错误！");
                     break;
                 }
                 manager.cancel(2);
@@ -95,7 +97,7 @@ public class ForgetPassword extends Activity implements View.OnClickListener,Run
                         intoCode.setText("");
                     } else {
                         i--;
-                       useToast("验证码错误！");
+                        useToast("验证码错误！");
                     }
 
                 } else if (i == 2) {
@@ -122,8 +124,9 @@ public class ForgetPassword extends Activity implements View.OnClickListener,Run
                 break;
         }
     }
-    public void useToast(String text){
-        if(mToast == null) {
+
+    public void useToast(String text) {
+        if (mToast == null) {
             mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
         } else {
             mToast.setText(text);
@@ -131,11 +134,13 @@ public class ForgetPassword extends Activity implements View.OnClickListener,Run
         }
         mToast.show();
     }
-    public void cancelToast(){
-        if(mToast!=null){
+
+    public void cancelToast() {
+        if (mToast != null) {
             mToast.cancel();
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -155,12 +160,12 @@ public class ForgetPassword extends Activity implements View.OnClickListener,Run
             a--;
             Message message = new Message();
             if (a <= 0) {
-                message.what=CODE2;
+                message.what = CODE2;
                 handler.sendMessage(message);
                 break;
             } else {
-                message.arg1=a;
-                message.what=CODE1;
+                message.arg1 = a;
+                message.what = CODE1;
                 handler.sendMessage(message);
             }
             try {

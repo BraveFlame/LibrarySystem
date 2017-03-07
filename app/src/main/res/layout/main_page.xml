@@ -6,29 +6,34 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:background="#484E61">
+    android:background="#c681f2"
+    >
     <Button
         android:id="@+id/select_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:text="选择"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:background="#d791b6"
+       />
     <EditText
         android:id="@+id/book_search_name"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_centerInParent="true"
         android:hint="搜索图书"/>
     <Button
         android:id="@+id/search_book"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_alignParentRight="true"
-        android:text="搜索"/>
+        android:text="搜索"
+        android:background="#d791b6"/>
 </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#e9dcae">
         <ListView
             android:id="@+id/list_search_book"
             android:layout_width="match_parent"

@@ -1,85 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#a5d8f5">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="#ab2224">
+        android:background="#f15859">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textSize="25sp"
-            android:text="管理图书"/>
+            android:text="管理图书"
+            android:textSize="25sp" />
     </RelativeLayout>
-    <EditText
-        android:id="@+id/bId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:hint="请输书编号："
-        />
-    <EditText
-        android:id="@+id/bName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:hint="请输书名"
-        />
-    <EditText
-        android:id="@+id/bVersion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:hint="请输版本："/>
-    <EditText
-        android:id="@+id/bPress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:hint="请输出版社："/>
 
-    <EditText
-        android:id="@+id/bAuthor"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:hint="请输作者"/>
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="账号："
+            android:textSize="20sp" />
 
-    <EditText
-        android:id="@+id/bDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:hint="请输描述："/>
-    <Button
-        android:id="@+id/bsave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:text="增加"/>
+        <EditText
+            android:id="@+id/bId"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_bg"
 
-<RelativeLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-    <EditText
-        android:id="@+id/query_book"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:hint="请输入书名！"
-        />
-    <Button
-        android:id="@+id/bquery"
-        android:layout_toRightOf="@id/query_book"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:text="查询"/>
+            android:textSize="25sp" />
+    </LinearLayout>
 
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="书名："
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/bName"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_bg"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="版本："
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/bVersion"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_bg"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="出版社："
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/bPress"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_bg"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="作者："
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/bAuthor"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_bg"
+            android:textSize="25sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="描述："
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/bDesc"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_bg"
+            android:textSize="25sp"
+            android:maxLines="4"/>
+
+        <Button
+            android:id="@+id/bsave"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:text="增加"
+            android:textSize="20sp"
+            android:layout_marginLeft="10dp"
+            android:background="#f5bc6e"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+
+        <EditText
+            android:id="@+id/query_book"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:hint="***请输入书名!***"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/bquery"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@id/query_book"
+            android:text="查询"
+            android:layout_centerInParent="true"
+            android:background="#f5bc6e"
+            android:textSize="20sp" />
+
+    </RelativeLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

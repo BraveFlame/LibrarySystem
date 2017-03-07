@@ -20,6 +20,7 @@ import java.util.List;
 
 /**
  * Created by g on 2017/2/27.
+ * 管理员搜索用户
  */
 
 public class ManagerUser extends Activity {
@@ -38,13 +39,9 @@ public class ManagerUser extends Activity {
         searchUser=(EditText)findViewById(R.id.manager_search_user);
         searchButton=(Button)findViewById(R.id.manager_searchuser_button);
         userListView=(ListView)findViewById(R.id.manager_user_list);
-       // String input=searchUser.getText().toString();
-
-//        libraryDB.getUsers(input,usersList);
-//        UserAdapter userAdapter=new UserAdapter(ManagerUser.this,R.layout.user_item,usersList);
-//        userListView=(ListView) findViewById(R.id.manager_user_list);
-//        userListView.setAdapter(userAdapter);
-
+/**
+ * 从账户和姓名两重搜索
+ */
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

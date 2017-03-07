@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#a5d8f5">
     <TextView
         android:id="@+id/manager_user"
         android:background="#ff2525"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="50sp"
-        android:text="用户管理"/>
+        android:text="用户管理"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="50dp"/>
     <TextView
         android:id="@+id/manager_book"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:textSize="50sp"
         android:background="#Ebb833"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="50dp"
         android:text="图书管理"/>
     <TextView
         android:id="@+id/manager_bookroot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="50dp"
         android:textSize="50sp"
         android:background="#19a2fa"
         android:text="借阅管理"/>

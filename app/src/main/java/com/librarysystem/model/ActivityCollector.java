@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Created by g on 2017/3/2.
+ * 管理活动，用以销毁
  */
 
 public class ActivityCollector {

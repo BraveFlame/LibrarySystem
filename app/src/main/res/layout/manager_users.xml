@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#9a958f">
+    android:background="#a5d8f5">
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="25sp"
-        android:background="#d18a35"
+        android:background="#e9c07c"
         android:text="查找"
         />
     </LinearLayout>

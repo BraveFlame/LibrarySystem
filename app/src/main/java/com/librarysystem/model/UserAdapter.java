@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * Created by g on 2017/2/27.
+ * 用户适配器
  */
 
 public class UserAdapter extends ArrayAdapter<PersonMessage> {
@@ -30,6 +31,9 @@ private int resourceId;
 
         PersonMessage personMessage=getItem(position);
         View view= LayoutInflater.from(getContext()).inflate(resourceId,null);
+        /**
+         * 过期图书的用户标识为粉红色
+         */
         if(!personMessage.getPastBooks().equals("0"))
             view.setBackgroundResource(R.drawable.selector);
         TextView userName=(TextView) view.findViewById(R.id.user_item_name);

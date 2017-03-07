@@ -25,10 +25,11 @@ import java.util.List;
 
 /**
  * Created by g on 2016/12/25.
+ * 还书或续借的activity
  */
 
 public class BackBook extends Activity {
-    private TextView detailed_name, detailed_author,book_press,book_version,
+    private TextView detailed_name, detailed_author, book_press, book_version,
             detailed_id, detailed_message, borrow_date, back_date;
     private Button detailed_button, back_continue;
     private LibraryDB libraryDB;
@@ -41,29 +42,19 @@ public class BackBook extends Activity {
         setContentView(R.layout.back_book);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         final Books book = (Books) getIntent().getParcelableExtra("bookmessage");
-        detailed_id = (TextView) findViewById(R.id.present_id);
-        detailed_name = (TextView) findViewById(R.id.present_name);
-        detailed_author = (TextView) findViewById(R.id.present_author);
-        detailed_message = (TextView) findViewById(R.id.present_message);
-        borrow_date = (TextView) findViewById(R.id.start_date);
-        back_date = (TextView) findViewById(R.id.back_date);
-        book_version=(TextView)findViewById(R.id.present_version) ;
-        book_press=(TextView)findViewById(R.id.press_id);
-
-
+        libraryDB = LibraryDB.getInstance(this);
+        init();
         detailed_id.setText("编号：" + book.getBookId());
         detailed_name.setText("书名：" + book.getBookName());
         detailed_author.setText("作者：" + book.getBookAuthor());
         detailed_message.setText("主要信息：" + book.getUserDescription());
         borrow_date.setText("借阅日期：" + book.getLentTime());
         back_date.setText("应还日期：" + book.getBackTime());
-        book_press.setText("出版社："+book.getPress());
-        book_version.setText("版本："+book.getVersion());
-        detailed_button = (Button) findViewById(R.id.back_button);
-        back_continue = (Button) findViewById(R.id.back_continue);
-
-        libraryDB = LibraryDB.getInstance(this);
-
+        book_press.setText("出版社：" + book.getPress());
+        book_version.setText("版本：" + book.getVersion());
+        /**
+         *  还书按键
+         */
         detailed_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,24 +63,22 @@ public class BackBook extends Activity {
                 dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (libraryDB.backBook(pref.getInt("userId", 0), book, pref.getInt("firstborrow", 30), pref.getInt("maxnumbook", 30)))
-                            ;
-                        {
+                        /**
+                         * 还书成功时，更新借阅等级，每五本加一级
+                         */
+                        if (libraryDB.backBook(pref.getInt("userId", 0), book, pref.getInt("firstborrow", 30), pref.getInt("maxnumbook", 30))) {
                             List<Books> books = new ArrayList<Books>();
                             libraryDB.getPastBooks(pref.getInt("userId", 0), books);
                             PersonMessage personMessage = new PersonMessage();
                             libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 0));
                             personMessage.setNowBorrow(personMessage.getNowBorrow() - 1);
-                            if (books.size() > 2) {
-
-                                personMessage.setUserLevel("" + books.size() / 2);
-
+                            if (books.size() > 5) {
+                                personMessage.setUserLevel("" + books.size() / 5);
                             }
                             libraryDB.alterPersonalMessage(personMessage, pref.getInt("userId", 0));
                             finish();
                         }
                     }
-
                 });
                 dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
@@ -98,11 +87,11 @@ public class BackBook extends Activity {
                     }
                 });
                 dialog.show();
-
-
             }
         });
-
+/**
+ * 续借，按照管理员设置的续借天数，把读者的应还日期延迟
+ */
         back_continue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,13 +123,32 @@ public class BackBook extends Activity {
                 }
             }
         });
-
-
     }
 
+    /**
+     * 初始化控件
+     */
+    public void init() {
+        detailed_id = (TextView) findViewById(R.id.present_id);
+        detailed_name = (TextView) findViewById(R.id.present_name);
+        detailed_author = (TextView) findViewById(R.id.present_author);
+        detailed_message = (TextView) findViewById(R.id.present_message);
+        borrow_date = (TextView) findViewById(R.id.start_date);
+        back_date = (TextView) findViewById(R.id.back_date);
+        book_version = (TextView) findViewById(R.id.present_version);
+        book_press = (TextView) findViewById(R.id.press_id);
+        detailed_button = (Button) findViewById(R.id.back_button);
+        back_continue = (Button) findViewById(R.id.back_continue);
+    }
+
+    /**
+     * 偌该书已过期，则无法续借
+     *
+     * @param date
+     * @return
+     */
     private boolean impart(String date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
         try {
             Date date1 = sdf.parse(date);
             Date nowDate = new Date();
@@ -150,14 +158,14 @@ public class BackBook extends Activity {
             if (days < 1)
                 return false;
             else return true;
-
         } catch (Exception e) {
             return false;
-
         }
-
     }
 
+    /**
+     * 解决Toast频繁显示
+     */
     public void useToast(String text) {
         if (mToast == null) {
             mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
@@ -179,4 +187,5 @@ public class BackBook extends Activity {
         super.onBackPressed();
         cancelToast();
     }
+
 }

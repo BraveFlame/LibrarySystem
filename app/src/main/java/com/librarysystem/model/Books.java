@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 /**
  * Created by g on 2016/11/30.
+ * 书的实体类
  */
 
 public class Books implements Parcelable {
