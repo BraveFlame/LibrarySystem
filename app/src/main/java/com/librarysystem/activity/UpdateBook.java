@@ -32,7 +32,7 @@ public class UpdateBook extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manager_book);
         libraryDB = LibraryDB.getInstance(this);
-        book = (Books) getIntent().getParcelableExtra("bookmessage");
+        book = (Books) getIntent().getSerializableExtra("bookmessage");
         init();
 
         balter.setOnClickListener(this);

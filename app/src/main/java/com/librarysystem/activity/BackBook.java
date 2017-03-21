@@ -41,7 +41,7 @@ public class BackBook extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.back_book);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        final Books book = (Books) getIntent().getParcelableExtra("bookmessage");
+        final Books book = (Books) getIntent().getSerializableExtra("bookmessage");
         libraryDB = LibraryDB.getInstance(this);
         init();
         detailed_id.setText("编号：" + book.getBookId());

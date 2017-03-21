@@ -18,6 +18,9 @@ import com.librarysystem.sqlite.LibraryDB;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
+
 /**
  * Created by g on 2016/12/21.
  * 增加书库，以及列出书库的书以便修改
@@ -59,6 +62,19 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                     books.setIsContinue("无");
                     books.setBackTime("");
                     books.setIsLent("可借");
+
+                    /**
+                    Bmob
+                     */
+                    books.save(new SaveListener<String>() {
+                        @Override
+                        public void done(String s, BmobException e) {
+
+                        }
+                    });
+
+
+
                     /**
                      * 如果书库原来没有此编号的书，则添加成功
                      */

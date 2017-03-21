@@ -19,8 +19,14 @@ import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.sqlite.LibraryDB;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
 
 /**
  * Created by g on 2016/12/2.
@@ -111,6 +117,7 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                  */
                 if (whereActivity.equals("register")) {
                     try {
+
                         personMessage.setUserId(Integer.valueOf(userId.getText().toString()));
                         if (checkMobileNumber(userTel.getText().toString())) {
                             if (!userName.getText().toString().equals("") && !userPassword.getText().toString().equals("") &&
@@ -131,13 +138,33 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                                 dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        if (libraryDB.savePersonalMeassage(personMessage)) {
-                                            Toast.makeText(PersonalSet.this, "注册成功", Toast.LENGTH_LONG).show();
-                                            startActivity(intentLogin);
-                                            finish();
-                                        } else
-                                            useToast("该账户已存在！");
-                                    }
+                                        BmobQuery<PersonMessage> personMessageBmobQuery=new BmobQuery<PersonMessage>();
+                                        personMessageBmobQuery.addWhereEqualTo("userId",personMessage.getUserId());
+                                        personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
+                                            @Override
+                                            public void done(List<PersonMessage> list, BmobException e) {
+
+                                                            if(list.size()==0){
+                                                                personMessage.save(new SaveListener<String>() {
+                                                                    @Override
+                                                                    public void done(String s, BmobException e) {
+                                                                        useToast("注册成功！");
+                                                                        finish();
+                                                                    }
+                                                                });
+                                                            }else {
+                                                                    useToast("该账户已存在！");
+                                                            }
+                                            }
+                                        });
+//                                        if (libraryDB.savePersonalMeassage(personMessage)) {
+//                                            Toast.makeText(PersonalSet.this, "注册成功", Toast.LENGTH_LONG).show();
+//                                            startActivity(intentLogin);
+//                                            finish();
+//                                        } else
+//                                            useToast("该账户已存在！");
+//
+                                      }
 
                                 });
                                 dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {

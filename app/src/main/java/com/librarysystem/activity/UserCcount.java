@@ -8,10 +8,15 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.sqlite.LibraryDB;
+
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.QueryListener;
 
 /**
  * Created by g on 2017/2/22.
@@ -19,6 +24,7 @@ import com.librarysystem.sqlite.LibraryDB;
  */
 
 public class UserCcount extends Activity {
+    private Toast mToast;
     private SharedPreferences pref;
     private LibraryDB libraryDB;
     private PersonMessage personMessage = new PersonMessage();
@@ -32,15 +38,47 @@ public class UserCcount extends Activity {
         setContentView(R.layout.user_ccount);
         libraryDB = LibraryDB.getInstance(this);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
+        alterPassword = (Button) findViewById(R.id.usercpassword);
         init();
-        final Intent alterpassword = new Intent(this, AlterPassword.class);
-        alterPassword.setOnClickListener(new View.OnClickListener() {
+        // libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
+        BmobQuery<PersonMessage>personMessage=new BmobQuery<PersonMessage>();
+        personMessage.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
             @Override
-            public void onClick(View v) {
-                startActivity(alterpassword);
+            public void done(PersonMessage personMessage, BmobException e) {
+                if(e==null){
+
+                    accountName.setText("姓名：" + personMessage.getUserName().toString());
+                    accountSex.setText("性别：" + personMessage.getUserSex().toString());
+                    accountId.setText("账户：" + String.valueOf(personMessage.getUserId()));
+                    accounthobby.setText("书籍爱好：" + personMessage.getUserDescription().toString());
+                    accountpro.setText("专业：" + personMessage.getUserProfession().toString());
+                    accountlevel.setText("借阅等级：" + personMessage.getUserLevel().toString());
+                    accountpast.setText("逾期书本：" + personMessage.getPastBooks().toString());
+                    accountwpast.setText("即将到期：" + personMessage.getWpastBooks().toString());
+                    accounttel.setText("联系方式：" + personMessage.getUserTel().toString());
+                    userProperty.setText("属性：" + personMessage.getIsRootManager().toString());
+
+                    final Intent alterpassword = new Intent(UserCcount.this, AlterPassword.class);
+                    alterpassword.putExtra("alterpassword",personMessage);
+                    alterPassword.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startActivity(alterpassword);
+                        }
+                    });
+                }else{
+                    useToast("未联网！");
+                    alterPassword.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            useToast("请先联网！");
+                        }
+                    });
+                }
+
             }
         });
+
     }
 
     public void init() {
@@ -54,17 +92,31 @@ public class UserCcount extends Activity {
         accountpast = (TextView) findViewById(R.id.userclate);
         accountwpast = (TextView) findViewById(R.id.usercwpastbook);
         userProperty = (TextView) findViewById(R.id.user_property);
-        alterPassword = (Button) findViewById(R.id.usercpassword);
-        accountName.setText("姓名：" + personMessage.getUserName().toString());
-        accountSex.setText("性别：" + personMessage.getUserSex().toString());
-        accountId.setText("账户：" + String.valueOf(personMessage.getUserId()));
-        accounthobby.setText("书籍爱好：" + personMessage.getUserDescription().toString());
-        accountpro.setText("专业：" + personMessage.getUserProfession().toString());
-        accountlevel.setText("借阅等级：" + personMessage.getUserLevel().toString());
-        accountpast.setText("逾期书本：" + personMessage.getPastBooks().toString());
-        accountwpast.setText("即将到期：" + personMessage.getWpastBooks().toString());
-        accounttel.setText("联系方式：" + personMessage.getUserTel().toString());
-        userProperty.setText("属性：" + personMessage.getIsRootManager().toString());
 
+    }
+
+
+
+    public void useToast(String text) {
+
+        if (mToast == null) {
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+            mToast.setDuration(Toast.LENGTH_SHORT);
+        }
+        mToast.show();
+    }
+
+    public void cancelToast() {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        cancelToast();
     }
 }

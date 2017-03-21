@@ -32,9 +32,8 @@ public class DetailedBook extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detailedbook);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        final Books book = (Books) getIntent().getParcelableExtra("bookmessage");
+        final Books book = (Books) getIntent().getSerializableExtra("bookmessage");
         init();
-
         detailed_id.setText("编号：" + book.getBookId());
         detailed_name.setText("书名：" + book.getBookName());
         detailed_author.setText("作者：" + book.getBookAuthor());

@@ -1,12 +1,14 @@
 package com.librarysystem.model;
 
+import cn.bmob.v3.BmobObject;
+
 /**
  * Created by g on 2016/11/30.
  * 用户实体类
  */
 
-public class PersonMessage {
-    private int userId;
+public class PersonMessage extends BmobObject{
+    private Integer userId;
     private String userName;
     private String userSex;
     private String userProfession;

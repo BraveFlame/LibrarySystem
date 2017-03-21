@@ -3,23 +3,44 @@ package com.librarysystem.model;
 import cn.bmob.v3.BmobObject;
 
 /**
- * Created by g on 2016/11/30.
- * 书的实体类 implements Parcelable
+ * Created by g on 2017/3/21.
  */
 
-public class Books extends BmobObject  {
+public class PresentBooks extends BmobObject {
     private Integer bookId;
-
     private String bookName;
     private String bookAuthor;
-    private String isLent;
+    private String press;
+    private String version;
     private String userDescription;
+
+    private String isLent;
     private String LentTime;
     private String backTime;
-    private String version;
+
     private String isSubscribe;
     private String isContinue;
-    private String press;
+
+
+    private Integer userId;
+    private String userName;
+
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
 
     public String getIsContinue() {
@@ -61,11 +82,11 @@ public class Books extends BmobObject  {
 
 
 
-    public int getBookId() {
+    public Integer getBookId() {
         return bookId;
     }
 
-    public void setBookId(int bookId) {
+    public void setBookId(Integer bookId) {
         this.bookId = bookId;
     }
 
@@ -116,52 +137,4 @@ public class Books extends BmobObject  {
     public void setBackTime(String backTime) {
         this.backTime = backTime;
     }
-
-//
-//    @Override
-//    public int describeContents() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public void writeToParcel(Parcel dest, int flags) {
-//        dest.writeInt(bookId);
-//        dest.writeString(bookName);
-//        dest.writeString(bookAuthor);
-//        dest.writeString(version);
-//        dest.writeString(press);
-//        dest.writeString(userDescription);
-//        dest.writeString(isLent);
-//        dest.writeString(LentTime);
-//        dest.writeString(backTime);
-//        dest.writeString(isContinue);
-//        dest.writeString(isSubscribe);
-//
-//    }
-//
-//    public static final Parcelable.Creator<Books> CREATOR = new Parcelable.Creator<Books>() {
-//        @Override
-//        public Books createFromParcel(Parcel source) {
-//            Books book = new Books();
-//            book.bookId = source.readInt();
-//            book.bookName = source.readString();
-//            book.bookAuthor = source.readString();
-//            book.version=source.readString();
-//            book.press=source.readString();
-//            book.userDescription=source.readString();
-//            book.isLent=source.readString();
-//            book.LentTime=source.readString();
-//            book.backTime=source.readString();
-//            book.isContinue=source.readString();
-//            book.isSubscribe=source.readString();
-//            return book;
-//        }
-//
-//        @Override
-//        public Books[] newArray(int size) {
-//            return new Books[size];
-//        }
-//    };
-//
-
 }

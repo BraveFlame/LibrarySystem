@@ -19,6 +19,9 @@ import com.librarysystem.sqlite.LibraryDB;
 
 import java.util.Random;
 
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.UpdateListener;
+
 /**
  * Created by g on 2017/2/22.
  * 用于用户修改密码的activity
@@ -63,22 +66,24 @@ public class AlterPassword extends Activity implements Runnable {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alter_password);
         init();
-        libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
+       // libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
+         personMessage=(PersonMessage)getIntent().getSerializableExtra("alterpassword");
         /**
          *更改密码
          */
-        rePassword.setOnClickListener(new View.OnClickListener() {
+                rePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //i作为标志，判断第几次输入，第一次为原密码或验证码，第二次为新密码。
                 NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                manager.cancel(1);
+
                 i++;
                 String code = intoCode.getText().toString();
                 if (i == 1) {
                     if (code.equals(personMessage.getUserPassword()) || code.equals(String.valueOf(randomcode))) {
                         intoCode.setHint("请输入新密码");
                         intoCode.setText("");
+                        manager.cancel(1);
                     } else {
                         //原密码或验证码不对时i要减掉1
                         i--;
@@ -95,17 +100,28 @@ public class AlterPassword extends Activity implements Runnable {
                 } else if (i == 2) {
                     //第二次为新密码
                     personMessage.setUserPassword(code);
-                    libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
-                    if (mToast == null) {
-                        mToast = Toast.makeText(AlterPassword.this, "密码修改成功！", Toast.LENGTH_SHORT);
-                        manager.cancel(1);
-                    } else {
-                        mToast.setText("密码修改成功！");
-                        mToast.setDuration(Toast.LENGTH_SHORT);
-                        manager.cancel(1);
-                    }
-                    mToast.show();
-                    finish();
+                    //libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
+                    personMessage.update(pref.getString("objectid", ""), new UpdateListener() {
+                        @Override
+                        public void done(BmobException e) {
+                            if (mToast == null) {
+                                mToast = Toast.makeText(AlterPassword.this, "密码修改成功！", Toast.LENGTH_SHORT);
+
+                            } else {
+                                mToast.setText("密码修改成功！");
+                                mToast.setDuration(Toast.LENGTH_SHORT);
+
+                            }
+                            mToast.show();
+                            editor=pref.edit();
+                            editor.putBoolean("remember_password",false);
+                            editor.commit();
+                            finish();
+
+                        }
+                    });
+
+
                 } else {
                     //改完重新为0，以便再改
                     i = 0;

@@ -469,6 +469,7 @@ public class LibraryDB {
             try {
                 PersonMessage personMessage = new PersonMessage();
                 libraryDB.getPersonalMeassage(personMessage, readerId);
+
                 int i = Integer.valueOf(personMessage.getPastBooks());
                 int j = personMessage.getNowBorrow();
                 if (i > 0) {

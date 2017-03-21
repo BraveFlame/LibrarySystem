@@ -30,6 +30,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.UpdateListener;
+
 /**
  * Created by g on 2016/10/16.
  * 本App的主页，包括搜索图书，和切换账号，个人信息，管理员权限，当前借阅，过去借阅，退出程序
@@ -42,6 +47,7 @@ public class MainPage extends Activity implements View.OnClickListener {
     private String bookName;
     private ListView bookList;
     private List<Books> booksList = new ArrayList<Books>();
+    private List<Books> books = new ArrayList<Books>();
     private LibraryDB libraryDB;
     private boolean isSearch;
     private SharedPreferences pref;
@@ -157,31 +163,43 @@ public class MainPage extends Activity implements View.OnClickListener {
             case R.id.search_book:
                 isSearch = true;
                 bookName = inputSearchBook.getText().toString();
-                libraryDB.getBookMeassage(bookName, booksList);
+                BmobQuery<Books> b=new BmobQuery<Books>();
+
+              b.findObjects(new FindListener<Books>() {
+                  @Override
+                  public void done(List<Books> list, BmobException e) {
+
+                     booksList=list;
+                      BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
+                      bookList = (ListView) findViewById(R.id.list_search_book);
+                      bookList.setAdapter(adapter);
+                      if (booksList.size() == 0) {
+                          useToast("没有符合搜索要求的图书！");
+                          searchNet.setVisibility(View.VISIBLE);
+                          searchNet.setOnClickListener(new View.OnClickListener() {
+                              @Override
+                              public void onClick(View v) {
+                                  Intent net = new Intent(MainPage.this, NetBook.class);
+                                  net.putExtra("search", bookName);
+                                  startActivity(net);
+                              }
+                          });
+
+                      } else {
+                          searchNet.setVisibility(View.GONE);
+                      }
+                  }
+              });
+               //libraryDB.getBookMeassage(bookName, booksList);
+
                 /**
                  * 没有符合图书时联网，否则将联网按键隐藏
                  */
-                if (booksList.size() == 0) {
-                    useToast("没有符合搜索要求的图书！");
-                    searchNet.setVisibility(View.VISIBLE);
-                    searchNet.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent net = new Intent(MainPage.this, NetBook.class);
-                            net.putExtra("search", bookName);
-                            startActivity(net);
-                        }
-                    });
 
-                } else {
-                    searchNet.setVisibility(View.GONE);
-                }
                 /**
                  *将搜索结果显示出来，查看每本书的信息
                  */
-                BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
-                bookList = (ListView) findViewById(R.id.list_search_book);
-                bookList.setAdapter(adapter);
+
                 final Intent bookIntent = new Intent(this, DetailedBook.class);
 
                 bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -190,8 +208,6 @@ public class MainPage extends Activity implements View.OnClickListener {
                         Books book = booksList.get(position);
                         bookIntent.putExtra("bookmessage", book);
                         startActivity(bookIntent);
-
-
                     }
                 });
                 break;
@@ -206,11 +222,18 @@ public class MainPage extends Activity implements View.OnClickListener {
     @Override
     protected void onRestart() {
         super.onRestart();
-        impart();
+       // impart();
         if (isSearch) {
             bookName = inputSearchBook.getText().toString();
-            libraryDB.getBookMeassage(bookName, booksList);
-            //将搜索结果显示出来
+            //libraryDB.getBookMeassage(bookName, booksList);
+            BmobQuery<Books> b=new BmobQuery<Books>();
+            b.findObjects(new FindListener<Books>() {
+                @Override
+                public void done(List<Books> list, BmobException e) {
+                    booksList=list;
+                }
+            });
+
             BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
             bookList = (ListView) findViewById(R.id.list_search_book);
             bookList.setAdapter(adapter);
@@ -238,12 +261,17 @@ public class MainPage extends Activity implements View.OnClickListener {
         SharedPreferences pref;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         int j = 0, k = 0;
-        PersonMessage personMessage = new PersonMessage();
-        Books book = new Books();
-        List<Books> books = new ArrayList<Books>();
 
-        libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
-        libraryDB.getPresentBooks(pref.getInt("userId", 200000), books);
+        BmobQuery<Books>b=new BmobQuery<Books>();
+        b.findObjects(new FindListener<Books>() {
+            @Override
+            public void done(List<Books> list, BmobException e) {
+                books=list;
+            }
+        });
+//        PersonMessage personMessage = new PersonMessage();
+//        libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
+  //      libraryDB.getPresentBooks(pref.getInt("userId", 200000), books);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date date1 = new Date();
         for (int i = 0; i < books.size(); i++) {
@@ -263,36 +291,45 @@ public class MainPage extends Activity implements View.OnClickListener {
             } catch (Exception e) {
 
             }
-
         }
+         PersonMessage personMessage=new PersonMessage();
+
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (j > 0) {
             personMessage.setWpastBooks("" + j);
-
             Notification.Builder notification = new Notification.Builder(this).setTicker("图书通知！").setContentTitle("图书通知")
                     .setContentText("您有" + j + "本书将要过期！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
             manager.notify(3, notification.build());
             personMessage.setWpastBooks("" + j);
-            libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
+
+           // libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
         } else {
             personMessage.setWpastBooks("0");
-            libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
+            //libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
             manager.cancel(3);
         }
+
         if (k > 0) {
             personMessage.setPastBooks("" + k);
-
             Notification.Builder notification = new Notification.Builder(this).setTicker("图书通知！").setContentTitle("图书通知")
                     .setContentText("您有" + k + "本书已过期，请尽快归还！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
             manager.notify(4, notification.build());
             personMessage.setPastBooks("" + k);
-            libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
+
+            //libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
 
         } else {
             manager.cancel(4);
             personMessage.setPastBooks("0");
-            libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
+
+          //  libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
         }
+        personMessage.update(pref.getString("objectid", ""), new UpdateListener() {
+            @Override
+            public void done(BmobException e) {
+
+            }
+        });
     }
 
     public void useToast(String text) {
