@@ -128,9 +128,9 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                                 personMessage.setUserSex(userSex);
                                 personMessage.setUserProfession(userprofession.getText().toString());
                                 personMessage.setUserDescription(userDescription.getText().toString());
-                                personMessage.setUserLevel("0");
-                                personMessage.setPastBooks("0");
-                                personMessage.setWpastBooks("0");
+                                personMessage.setUserLevel(null);
+                                personMessage.setPastBooks(null);
+                                personMessage.setWpastBooks(null);
                                 personMessage.setUserTel(userTel.getText().toString());
                                 personMessage.setIsRootManager("普通用户");
                                 AlertDialog.Builder dialog = new AlertDialog.Builder(PersonalSet.this);

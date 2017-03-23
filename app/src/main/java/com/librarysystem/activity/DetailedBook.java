@@ -12,7 +12,20 @@ import android.widget.Toast;
 import com.librarysystem.R;
 import com.librarysystem.model.Books;
 import com.librarysystem.model.PersonMessage;
+import com.librarysystem.model.PresentBooks;
+import com.librarysystem.model.Rule;
 import com.librarysystem.sqlite.LibraryDB;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.QueryListener;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Created by g on 2016/12/25.
@@ -24,15 +37,20 @@ public class DetailedBook extends Activity {
     private TextView detailed_version, detailed_press;
     private Button detailed_button, detailed_subscribe;
     private LibraryDB libraryDB;
+    private SharedPreferences.Editor editor;
     private SharedPreferences pref;
     private Toast mToast;
+    private Books book;
+    private PersonMessage personMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detailedbook);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        final Books book = (Books) getIntent().getSerializableExtra("bookmessage");
+        personMessage = (PersonMessage) getIntent().getSerializableExtra("person");
+        book = (Books) getIntent().getSerializableExtra("bookmessage");
+        personMessage = (PersonMessage) getIntent().getSerializableExtra("person");
         init();
         detailed_id.setText("编号：" + book.getBookId());
         detailed_name.setText("书名：" + book.getBookName());
@@ -40,43 +58,52 @@ public class DetailedBook extends Activity {
         detailed_version.setText("版本：" + book.getVersion());
         detailed_press.setText("出版社：" + book.getPress());
         detailed_message.setText("主要信息：" + book.getUserDescription());
+        if(book.getIsLent().equals("可借"))
         detailed_status.setText("状态：" + book.getIsLent());
+        else {
+            detailed_status.setText("状态：" + book.getIsLent().substring(0, book.getIsLent().length() - 2));
+        }
         detailed_subscribe = (Button) findViewById(R.id.book_subscribe);
+        detailed_button = (Button) findViewById(R.id.detailed_button);
+
+        libraryDB = LibraryDB.getInstance(this);
+
+
         /**
          * 可借时不需要预约，而且借此书者不得预约该书
          */
+
+
         if (book.getIsLent().equals("可借")) {
             detailed_subscribe.setEnabled(false);
+        } else {
+
+            /**
+             * 借出时显示应还日期
+             */
+
+            detailed_button.setEnabled(false);
+            detailed_date.setText("应还日期：" + book.getBackTime());
         }
         /**
          *   有人预约时不得预约（预约时以“预约者ID号+预约”存储）
          */
 
         if (book.getIsSubscribe().length() > 2) {
-            String userSub = book.getIsSubscribe().substring(book.getIsSubscribe().length() - 2);
-            if (userSub.equals("预约")) {
-                detailed_subscribe.setEnabled(false);
-                detailed_subscribe.setText("预约");
+            String userSub = book.getIsSubscribe().substring(0, book.getIsSubscribe().length() - 2);
+            detailed_subscribe.setEnabled(false);
+            if (Integer.valueOf(userSub) == personMessage.getUserId()) {
+                detailed_subscribe.setText("吾约");
+            } else {
+                detailed_subscribe.setText("其约");
             }
         }
 
-        detailed_button = (Button) findViewById(R.id.detailed_button);
 
-        libraryDB = LibraryDB.getInstance(this);
-        /**
-         * 借出时显示应还日期
-         */
-        if ((book.getIsLent().equals("借出"))) {
-            detailed_button.setEnabled(false);
-            detailed_date.setText("应还日期：" + book.getBackTime());
-        }
         /**
          * 借此书者不得预约该书
          */
-        if (libraryDB.isBelong(book.getBookId(), pref.getInt("userId", 0))) {
-            detailed_subscribe.setEnabled(false);
-            detailed_subscribe.setText("预约");
-        }
+
 
         /**
          * 借书时需满足无过期图书和未达最大借阅量
@@ -85,43 +112,108 @@ public class DetailedBook extends Activity {
             @Override
             public void onClick(View v) {
                 if (book.getIsLent().equals("可借")) {
-                    if (libraryDB.borrowBook(pref.getInt("userId", 0), book, pref.getInt("firstborrow", 30)
-                            , pref.getInt("maxnumbook", 30))) {
-                        if (book.getIsLent().equals("可借")) {
-                            useToast("已达当前最大借阅量！");
-                        } else {
-                            detailed_status.setText("状态：借出");
-                            detailed_button.setEnabled(false);
-                            detailed_date.setText("应还日期：" + book.getBackTime());
-                            detailed_subscribe.setEnabled(false);
-                            book.setIsLent("借出");
-                        }
+                    BmobQuery<Rule> r = new BmobQuery<>();
+                    r.getObject("c9cf23b8fb", new QueryListener<Rule>() {
+                        @Override
+                        public void done(Rule rule, BmobException e) {
+                            if (e == null) {
+                                if (personMessage.getNowBorrow() < rule.getMaxBooks() && personMessage.getPastBooks() == 0) {
+                                    personMessage.setNowBorrow(personMessage.getNowBorrow() + 1);
+                                    book.setIsLent(personMessage.getUserName() + "借出");
+                                    Date date1 = new Date();
+                                    Date date2 = new Date();
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    String borrowdate = sdf.format(date1);
+                                    Calendar calendar = new GregorianCalendar();
+                                    calendar.setTime(date2);
+                                    calendar.add(calendar.DATE, rule.getFirstDay());//把日期往后增加60天整数往后推,负数往前移动
+                                    date2 = calendar.getTime();   //这个时间就是日期往后推60天的结果
+                                    String backdate = sdf.format(date2);
+                                    book.setLentTime(borrowdate);
+                                    book.setBackTime(backdate);
+                                    book.update(book.getObjectId(), new UpdateListener() {
+                                        @Override
+                                        public void done(BmobException e) {
+                                            if (e == null) {
+                                                detailed_status.setText("状态：借出");
+                                                detailed_button.setEnabled(false);
+                                                detailed_date.setText("应还日期：" + book.getBackTime());
+                                                detailed_subscribe.setEnabled(false);
 
-                    } else {
-                        useToast("您有过期图书未归还，无法借书！");
-                    }
+                                            } else {
+                                                useToast("网络异常");
+                                            }
+                                        }
+                                    });
+                                    PresentBooks pb = new PresentBooks();
+                                    pb.setBookId(book.getBookId());
+                                    pb.setBookName(book.getBookName());
+                                    pb.setBookAuthor(book.getBookAuthor());
+                                    pb.setPress(book.getPress());
+                                    pb.setVersion(book.getVersion());
+                                    pb.setIsContinue(book.getIsContinue());
+                                    pb.setIsSubscribe(book.getIsSubscribe());
+                                    pb.setBackTime(book.getBackTime());
+                                    pb.setLentTime(book.getLentTime());
+                                    pb.setUserDescription(book.getUserDescription());
+                                    pb.setUserId(personMessage.getUserId());
+                                    pb.setUserName(personMessage.getUserName());
+                                    pb.save(new SaveListener<String>() {
+                                        @Override
+                                        public void done(String s, BmobException e) {
+                                            if (e == null) {
+                                            } else {
+                                                useToast("网络异常");
+                                            }
+                                        }
+                                    });
+                                    personMessage.update(pref.getString("objectid", ""), new UpdateListener() {
+                                        @Override
+                                        public void done(BmobException e) {
+                                        }
+                                    });
+
+                                } else if (personMessage.getNowBorrow() >= pref.getInt("maxnumbook", 0)) {
+                                    useToast("已达最大续借量！");
+                                } else if (personMessage.getPastBooks() > 0) {
+                                    useToast("请先归还过期图书！");
+                                }
+
+                            } else {
+                                useToast("网络异常");
+                            }
+                        }
+                    });
                 }
+
             }
         });
 
         detailed_subscribe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PersonMessage personMessage = new PersonMessage();
-                libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 0));
-                if (Integer.valueOf(personMessage.getPastBooks()) > 0) {
+                String userName = book.getIsLent().substring(0, book.getIsLent().length() - 2);
+                if (userName.equals(personMessage.getUserName())) {
+                    useToast("借阅者不得预约！");
+                } else if (personMessage.getNowBorrow() > pref.getInt("maxnumbook", 0)) {
+                    useToast("最大借阅时不可预约");
+                } else if (personMessage.getPastBooks() > 0) {
                     useToast("有未归还图书无法预约！");
                 } else {
-                    detailed_subscribe.setEnabled(false);
                     book.setIsSubscribe(pref.getInt("userId", 0) + "预约");
-                    libraryDB.bookSubscribe(book);
-                    detailed_subscribe.setEnabled(false);
-                    detailed_subscribe.setText("已预约");
-
+                    book.update(book.getObjectId(), new UpdateListener() {
+                        @Override
+                        public void done(BmobException e) {
+                            detailed_subscribe.setEnabled(false);
+                            detailed_subscribe.setText("吾约");
+                        }
+                    });
                 }
             }
         });
+
     }
+
 
     public void init() {
         detailed_id = (TextView) findViewById(R.id.detailed_id);

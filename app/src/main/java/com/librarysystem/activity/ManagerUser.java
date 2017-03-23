@@ -18,6 +18,10 @@ import com.librarysystem.sqlite.LibraryDB;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+
 /**
  * Created by g on 2017/2/27.
  * 管理员搜索用户
@@ -46,21 +50,34 @@ public class ManagerUser extends Activity {
             @Override
             public void onClick(View v) {
                 isSearch=true;
-                String input=searchUser.getText().toString();
-                libraryDB.getUsers(input,usersList);
-                if(usersList.size()==0){
-                    useToast("没有符合搜索要求的用户！");
-                }
-                UserAdapter userAdapter=new UserAdapter(ManagerUser.this,R.layout.user_item,usersList);
                 userListView=(ListView) findViewById(R.id.manager_user_list);
-                userListView.setAdapter(userAdapter);
+//                String input=searchUser.getText().toString();
+//                libraryDB.getUsers(input,usersList);
+                BmobQuery<PersonMessage>personMessageBmobQuery=new BmobQuery<PersonMessage>();
+                personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
+                    @Override
+                    public void done(List<PersonMessage> list, BmobException e) {
+                        if(e==null){
+                            usersList=list;
+//                            for(PersonMessage p:list)
+//                            libraryDB.savePersonalMeassage(p);
+                            if(usersList.size()==0){
+                                useToast("没有符合搜索要求的用户！");
+                            }
+                            UserAdapter userAdapter=new UserAdapter(ManagerUser.this,R.layout.user_item,usersList);
+                            userListView.setAdapter(userAdapter);
+                        }else {
+                            useToast("网络异常");
+                        }
+                    }
+                });
 
                 userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final Intent changeUserIntent=new Intent(ManagerUser.this,ChangeUsers.class);
                         PersonMessage personMessage=usersList.get(position);
-                        changeUserIntent.putExtra("user_id",personMessage.getUserId());
+                        changeUserIntent.putExtra("user_id",personMessage);
                         startActivity(changeUserIntent);
                     }
                 });

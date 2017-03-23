@@ -19,9 +19,9 @@
      *图书适配器，用于显示过去借阅的图书信息
      */
 
-    public class BookPastAdapter extends ArrayAdapter<Books> {
+    public class BookPastAdapter extends ArrayAdapter<PastBooks> {
         private int resourceId;
-        public BookPastAdapter(Context context, int textViewResourceId, List<Books> objects){
+        public BookPastAdapter(Context context, int textViewResourceId, List<PastBooks> objects){
             super(context,textViewResourceId,objects);
             resourceId=textViewResourceId;
 
@@ -30,7 +30,7 @@
         @NonNull
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Books books=getItem(position);
+            PastBooks books=getItem(position);
             View view= LayoutInflater.from(getContext()).inflate(resourceId,null);
             TextView bookName=(TextView) view.findViewById(R.id.past_book_name);
             TextView bookAuthor=(TextView) view.findViewById(R.id.past_book_author);
@@ -39,8 +39,8 @@
             TextView bookBackDate=(TextView)view.findViewById(R.id.book_back_date);
             bookName.setText(books.getBookName());
             bookAuthor.setText("作者："+books.getBookAuthor());
-            bookId.setText("编号："+String.valueOf(books.getBookId()));
-            bookBorrowDate.setText("借阅日期："+books.getLentTime().toString());
+            bookId.setText("编号："+books.getBookId().toString());
+            bookBorrowDate.setText("借阅日期："+books.getBorrowTime().toString());
             bookBackDate.setText("归还日期："+books.getBackTime().toString());
             return view;
         }

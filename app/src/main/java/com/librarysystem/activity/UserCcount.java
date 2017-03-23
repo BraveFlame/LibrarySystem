@@ -18,6 +18,7 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.QueryListener;
 
+
 /**
  * Created by g on 2017/2/22.
  * 账户信息以及跳到修改密码界面
@@ -42,22 +43,25 @@ public class UserCcount extends Activity {
         init();
         // libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
         BmobQuery<PersonMessage>personMessage=new BmobQuery<PersonMessage>();
+        //pref.getString("objectid", "")    ea173120a2
+        String dd=pref.getString("objectid", "");
         personMessage.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
             @Override
             public void done(PersonMessage personMessage, BmobException e) {
                 if(e==null){
-
                     accountName.setText("姓名：" + personMessage.getUserName().toString());
                     accountSex.setText("性别：" + personMessage.getUserSex().toString());
                     accountId.setText("账户：" + String.valueOf(personMessage.getUserId()));
                     accounthobby.setText("书籍爱好：" + personMessage.getUserDescription().toString());
                     accountpro.setText("专业：" + personMessage.getUserProfession().toString());
-                    accountlevel.setText("借阅等级：" + personMessage.getUserLevel().toString());
+                    accountlevel.setText("借阅等级：" + String.valueOf(personMessage.getUserLevel()));
+                            accountpast.setText("逾期书本：" + String.valueOf(personMessage.getPastBooks()));
+                         accountwpast.setText("即将到期：" + String.valueOf(personMessage.getWpastBooks()));
+                   accountlevel.setText("借阅等级：" + personMessage.getUserLevel().toString());
                     accountpast.setText("逾期书本：" + personMessage.getPastBooks().toString());
                     accountwpast.setText("即将到期：" + personMessage.getWpastBooks().toString());
                     accounttel.setText("联系方式：" + personMessage.getUserTel().toString());
                     userProperty.setText("属性：" + personMessage.getIsRootManager().toString());
-
                     final Intent alterpassword = new Intent(UserCcount.this, AlterPassword.class);
                     alterpassword.putExtra("alterpassword",personMessage);
                     alterPassword.setOnClickListener(new View.OnClickListener() {
@@ -75,7 +79,6 @@ public class UserCcount extends Activity {
                         }
                     });
                 }
-
             }
         });
 

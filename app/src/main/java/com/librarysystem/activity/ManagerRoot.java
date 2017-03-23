@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import com.librarysystem.R;
 
@@ -14,14 +14,15 @@ import com.librarysystem.R;
  */
 
 public class ManagerRoot extends Activity {
-    private TextView bookManager,userManager,bookRoot;
+    private ImageView bookManager,userManager,bookRoot,bmobManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manager_root);
-        bookManager=(TextView)findViewById(R.id.manager_book);
-        userManager=(TextView)findViewById(R.id.manager_user);
-        bookRoot=(TextView)findViewById(R.id.manager_bookroot);
+        bookManager=(ImageView )findViewById(R.id.manager_book);
+        userManager=(ImageView )findViewById(R.id.manager_user);
+        bookRoot=(ImageView )findViewById(R.id.manager_bookroot);
+        bmobManager=(ImageView)findViewById(R.id.manager_bmob);
         bookManager.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -41,6 +42,13 @@ public class ManagerRoot extends Activity {
             public void onClick(View v) {
               Intent bookRootIntent=new Intent(ManagerRoot.this,BookRoot.class);
                 startActivity(bookRootIntent);
+            }
+        });
+        bmobManager.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent bmobManager=new Intent(ManagerRoot.this,NetBook.class);
+                startActivity(bmobManager);
             }
         });
     }

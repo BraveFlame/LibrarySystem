@@ -15,7 +15,13 @@ import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.sqlite.LibraryDB;
 
+import java.util.List;
 import java.util.Random;
+
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Created by g on 2017/2/23.
@@ -58,7 +64,6 @@ public class ForgetPassword extends Activity implements View.OnClickListener, Ru
         intoCode = (EditText) findViewById(R.id.forgetintocode);
         inputId = (EditText) findViewById(R.id.forgetid);
         libraryDB = LibraryDB.getInstance(this);
-
           /*
         改密码
          */
@@ -67,58 +72,72 @@ public class ForgetPassword extends Activity implements View.OnClickListener, Ru
           忘记密码，用验证码
            */
         getCode.setOnClickListener(this);
-
-
     }
 
     @Override
     public void onClick(View v) {
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         switch (v.getId()) {
             case R.id.forgetpassword:
                 try {
                     int id = Integer.valueOf(inputId.getText().toString());
-                    libraryDB.getPersonalMeassage(personMessage, id);
-                    if (personMessage.getUserName() == null) {
-                        inputId.setText("");
-                        useToast("账号不存在或已被注销！");
-                        break;
-                    }
-                } catch (Exception e) {
+                    BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<>();
+                    personMessageBmobQuery.addWhereEqualTo("userId", id);
+                    personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
+                        @Override
+                        public void done(List<PersonMessage> list, BmobException e) {
+                            if (e == null) {
+                                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                                if (list.size() == 0) {
+                                    inputId.setText("");
+                                    useToast("账号不存在或已被注销！");
+                                    intoCode.setText("");
+                                    manager.cancel(2);
+                                } else {
+                                    personMessage = list.get(0);
+                                    i++;
+                                    String code = intoCode.getText().toString();
+                                    if (i == 1) {
+                                        if (code.equals(String.valueOf(randomcode))) {
+                                            intoCode.setHint("请输入新密码");
+                                            intoCode.setText("");
+                                        } else {
+                                            i--;
+                                            useToast("验证码错误！");
+                                            manager.cancel(2);
+                                        }
+                                    } else if (i == 2) {
+                                        personMessage.setUserPassword(code);
+                                        personMessage.update(personMessage.getObjectId(), new UpdateListener() {
+                                            @Override
+                                            public void done(BmobException e) {
+                                                if (e == null) {
+                                                    useToast("密码修改成功！");
+                                                    i = 0;
+                                                    finish();
+
+                                                } else {
+                                                    useToast("网络异常");
+                                                }
+                                            }
+                                        });
+                                        manager.cancel(2);
+                                    } else {
+                                        i = 0;
+                                    }
+                                }
+                            } else {
+                                useToast("网络异常");
+                            }
+                        }
+                    });
+
+                } catch (Exception ee) {
                     useToast("账号格式错误！");
-                    break;
                 }
-                manager.cancel(2);
-                i++;
-                String code = intoCode.getText().toString();
-                if (i == 1) {
-                    if (code.equals(String.valueOf(randomcode))) {
-                        intoCode.setHint("请输入新密码");
-                        intoCode.setText("");
-                    } else {
-                        i--;
-                        useToast("验证码错误！");
-                    }
-
-                } else if (i == 2) {
-                    personMessage.setUserPassword(code);
-                    libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
-                    useToast("密码修改成功！");
-                    manager.cancel(2);
-                    finish();
-                    i = 0;
-                } else {
-                    i = 0;
-                }
-
-
                 break;
             case R.id.forgetgetcode:
-
                 getCode.setEnabled(false);
                 new Thread(ForgetPassword.this).start();
-
-
                 break;
             default:
                 break;

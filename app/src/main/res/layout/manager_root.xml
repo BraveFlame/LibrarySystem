@@ -3,32 +3,56 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#a5d8f5">
-    <TextView
-        android:id="@+id/manager_user"
-        android:background="#ff2525"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#5996ac">
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="管理员"
+            android:textSize="25sp" />
+    </RelativeLayout>
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="50sp"
-        android:text="用户管理"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="50dp"/>
-    <TextView
-        android:id="@+id/manager_book"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="50sp"
-        android:background="#Ebb833"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="50dp"
-        android:text="图书管理"/>
-    <TextView
-        android:id="@+id/manager_bookroot"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="50dp"
-        android:textSize="50sp"
-        android:background="#19a2fa"
-        android:text="借阅管理"/>
+        android:orientation="horizontal"
+        android:layout_marginLeft="67dp"
+        android:layout_marginTop="70dp">
 
+        <ImageView
+            android:id="@+id/manager_user"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@mipmap/user"
+            />
+        <ImageView
+            android:id="@+id/manager_book"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="40dp"
+            android:background="@mipmap/bookmanager"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="67dp"
+        android:layout_marginTop="40dp">
+    <ImageView
+        android:id="@+id/manager_bookroot"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@mipmap/bookrule"/>
+
+        <ImageView
+            android:id="@+id/manager_bmob"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="40dp"
+            android:background="@mipmap/bmob"/>
+    </LinearLayout>
 </LinearLayout>

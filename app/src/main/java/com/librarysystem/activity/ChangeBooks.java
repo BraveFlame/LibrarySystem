@@ -18,7 +18,9 @@ import com.librarysystem.sqlite.LibraryDB;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 
 /**
@@ -62,27 +64,29 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                     books.setIsContinue("无");
                     books.setBackTime("");
                     books.setIsLent("可借");
-
+                    if(!books.getBookName().equals("")&& !books.getBookAuthor().equals("")&& !books.getPress().equals("")
+                            &&!books.getVersion().equals("")){
                     /**
-                    Bmob
+                     Bmob
                      */
                     books.save(new SaveListener<String>() {
                         @Override
                         public void done(String s, BmobException e) {
-
+                            if (e == null) {
+                                useToast("增加成功");
+                                bName.setText("");
+                                bId.setText("");
+                                bAuthor.setText("");
+                                bDes.setText("");
+                                bPress.setText("");
+                                bVersion.setText("");
+                            } else {
+                                useToast("已存在或网络异常");
+                            }
                         }
                     });
-
-
-
-                    /**
-                     * 如果书库原来没有此编号的书，则添加成功
-                     */
-                    if (libraryDB.saveBookMeassage(books)) {
-                        useToast("successful");
-                        finish();
-                    } else {
-                        useToast("已存在！");
+                    }else {
+                        useToast("输入书名");
                     }
                 } catch (Exception e) {
                     useToast("编号格式错误！");
@@ -93,20 +97,30 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
  *查询书库的书
  */
             case R.id.bquery:
-
                 try {
                     isQuery = true;
-                    bookName = queryName.getText().toString();
-                    libraryDB.getBookMeassage(bookName, booksList);
-                    if (booksList.size() == 0) {
-                        useToast("没有符合搜索要求的图书！");
-                    }
-                    /**
-                     * 将搜索结果显示出来
-                     */
-                    BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, booksList);
+//                    bookName = queryName.getText().toString();
+//                    libraryDB.getBookMeassage(bookName, booksList);
                     bookList = (ListView) findViewById(R.id.list_query_book);
-                    bookList.setAdapter(adapter);
+                    BmobQuery<Books> pb = new BmobQuery<>();
+                    pb.findObjects(new FindListener<Books>() {
+                        @Override
+                        public void done(List<Books> list, BmobException e) {
+                            if (e == null) {
+                                booksList = list;
+                                /**
+                                 * 将搜索结果显示出来
+                                 */
+                                BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, booksList);
+                                bookList.setAdapter(adapter);
+                                if (booksList.size() == 0) {
+                                  useToast("没有符合搜索要求的图书！");
+                                }
+                            } else {
+                                useToast("网络异常！");
+                            }
+                        }
+                    });
                     final Intent bookIntent = new Intent(this, UpdateBook.class);
                     /**
                      *点击查看每本书的信息

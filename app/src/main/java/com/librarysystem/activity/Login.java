@@ -43,8 +43,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private int i = 0;
     private int userInput;
     private String passwordInput;
-
-
     public static float ScreenW, ScreenH;
     public static Login instans;
     private LoginView lv;
@@ -61,34 +59,28 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         ScreenH = metrics.heightPixels;
         ScreenW = metrics.widthPixels;
-
         libraryDB = LibraryDB.getInstance(this);
-
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isRemember = pref.getBoolean("remember_password", false);
-        boolean change_user = getIntent().getBooleanExtra("change", false);
+        final boolean change_user = getIntent().getBooleanExtra("change", false);
 /**
  * 如果记住密码则判断是否正确再决定自动登录与否
  */
         if (isRemember) {
-            // PersonMessage personMessage = new PersonMessage();
             int user = pref.getInt("user", 0);
             String password = pref.getString("password", "");
             userEdit.setText("" + user);
             passwordEdit.setText(password);
             rememberPassword.setChecked(true);
-            //  libraryDB.getPersonalMeassage(personMessage, user);
-            // int userId = personMessage.getUserId();
-            // String passwords = personMessage.getUserPassword();
-            // if (passwords.equals(password)) {
             /**
              * 这里是判断当前活动是不是由主页跳转（即切换账户），是则不会自动登录
+             *
              */
             if (!change_user) {
-                lv = new LoginView(this);
+                lv = new LoginView(Login.this);
                 setContentView(lv);
             }
-            //}
+
         }
     }
 
@@ -99,7 +91,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         register = (Button) findViewById(R.id.register_button);
         login = (Button) findViewById(R.id.login_button);
         forgetPassword = (TextView) findViewById(R.id.forget_password);
-
         register.setOnClickListener(this);
         login.setOnClickListener(this);
         forgetPassword.setOnClickListener(this);
@@ -127,7 +118,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     }
 
     public void gotoMain() {
-        Intent loginIntent = new Intent(this, MainPage.class);
+        Intent loginIntent = new Intent(Login.this, MainPage.class);
         startActivity(loginIntent);
         finish();
     }
@@ -138,14 +129,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
      * @return
      */
     public void userLogin() {
-
         if (userEdit.getText().toString().equals("")) {
             useToast("用户名或密码错误！");
         }
         try {
             userInput = Integer.valueOf(userEdit.getText().toString());
             passwordInput = passwordEdit.getText().toString();
-
             /**
              *
              */
@@ -153,56 +142,51 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
                 @Override
                 public void done(List<PersonMessage> list, BmobException e) {
-
-                    for (PersonMessage personMessage : list) {
-                        int userId = personMessage.getUserId();
-                        String password = personMessage.getUserPassword();
-                        if ((userInput == userId) && passwordInput.equals(password)) {
-                            editor = pref.edit();
+                    if (e == null) {
+                        for (PersonMessage personMessage : list) {
+                            int userId = personMessage.getUserId();
+                            String password = personMessage.getUserPassword();
+                            if ((userInput == userId) && passwordInput.equals(password)) {
+                                editor = pref.edit();
 /**
  * 记住密码时保存信息
  */
-                            if (rememberPassword.isChecked()) {
-                                editor.putBoolean("remember_password", true);
-                                editor.putInt("user", userInput);
-                                editor.putString("password", passwordInput);
-                            } else {
-                                editor.clear();
-                            }
-
-                            editor.commit();
-                            editor.putString("objectid", personMessage.getObjectId());
-                            editor.putInt("userId", userInput);
-                            editor.commit();
-                            i = 1;
-                            break;
-                        } else i = 0;
-                    }
-                    if (i == 1) {
-                        /**
-                         * 登陆时轮播两张图共1.2秒
-                         */
-                        lv = new LoginView(Login.this);
-                        setContentView(lv);
-                        /**
-                         * 再次登录时把之前的主页活动销毁，以免显示上个人的搜索以及提醒等信息
-                         */
-                        ActivityCollector.finishAll();
-
+                                if (rememberPassword.isChecked()) {
+                                    editor.putBoolean("remember_password", true);
+                                    editor.putInt("user", userInput);
+                                    editor.putString("password", passwordInput);
+                                } else {
+                                    editor.clear();
+                                }
+                                editor.commit();
+                                editor.putString("objectid", personMessage.getObjectId());
+                                editor.putInt("userId", userInput);
+                                editor.commit();
+                                i = 1;
+                                break;
+                            } else i = 0;
+                        }
+                        if (i == 1) {
+                            /**
+                             * 登陆时轮播两张图共1.2秒
+                             */
+                            lv = new LoginView(Login.this);
+                            setContentView(lv);
+                            /**
+                             * 再次登录时把之前的主页活动销毁，以免显示上个人的搜索以及提醒等信息
+                             */
+                            ActivityCollector.finishAll();
+                        } else {
+                            useToast("用户名或密码错误！");
+                        }
                     } else {
-                        useToast("用户名或密码错误！");
+                        useToast("网络异常！");
                     }
-
-
                 }
             });
         } catch (Exception e) {
             useToast("用户名或密码错误！");
         }
-
-        // libraryDB.getPersonalMeassage(personMessage, userInput);
-        //PersonMessage personMessage = new PersonMessage();
-
     }
 
     public void useToast(String text) {
@@ -226,5 +210,4 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         super.onBackPressed();
         cancelToast();
     }
-
 }

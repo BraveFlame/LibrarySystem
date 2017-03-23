@@ -13,15 +13,24 @@ import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.Books;
+import com.librarysystem.model.PastBooks;
 import com.librarysystem.model.PersonMessage;
+import com.librarysystem.model.PresentBooks;
+import com.librarysystem.model.Rule;
 import com.librarysystem.sqlite.LibraryDB;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListener;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Created by g on 2016/12/25.
@@ -35,13 +44,16 @@ public class BackBook extends Activity {
     private LibraryDB libraryDB;
     private SharedPreferences pref;
     private Toast mToast;
+    private PersonMessage person;
+    private Books books;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.back_book);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        final Books book = (Books) getIntent().getSerializableExtra("bookmessage");
+        final PresentBooks book = (PresentBooks) getIntent().getSerializableExtra("bookmessage");
+        person = (PersonMessage) getIntent().getSerializableExtra("person");
         libraryDB = LibraryDB.getInstance(this);
         init();
         detailed_id.setText("编号：" + book.getBookId());
@@ -63,27 +75,179 @@ public class BackBook extends Activity {
                 dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        /**
-                         * 还书成功时，更新借阅等级，每五本加一级
-                         */
-                        if (libraryDB.backBook(pref.getInt("userId", 0), book, pref.getInt("firstborrow", 30), pref.getInt("maxnumbook", 30))) {
-                            List<Books> books = new ArrayList<Books>();
-                            libraryDB.getPastBooks(pref.getInt("userId", 0), books);
-                            PersonMessage personMessage = new PersonMessage();
-                            libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 0));
-                            personMessage.setNowBorrow(personMessage.getNowBorrow() - 1);
-                            if (books.size() > 5) {
-                                personMessage.setUserLevel("" + books.size() / 5);
+
+                        person.setNowBorrow(person.getNowBorrow() - 1);
+                        person.setUserLevel(person.getUserLevel() + 1);
+                        person.update(person.getObjectId(), new UpdateListener() {
+                            @Override
+                            public void done(BmobException e) {
+                                if (e == null) {
+
+                                    PastBooks psb = new PastBooks();
+                                    psb.setBookId(book.getBookId());
+                                    psb.setBookAuthor(book.getBookAuthor());
+                                    psb.setBookName(book.getBookName());
+                                    psb.setPress(book.getPress());
+                                    psb.setVersion(book.getVersion());
+
+                                    psb.setUserDescription(book.getUserDescription());
+                                    psb.setUserId(person.getUserId());
+                                    psb.setUserName(person.getUserName());
+                                    psb.setBorrowTime(book.getLentTime());
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    String borrowdate = sdf.format(new Date());
+                                    psb.setBackTime(borrowdate);
+                                    psb.save(new SaveListener<String>() {
+                                        @Override
+                                        public void done(String s, BmobException e) {
+                                            if (e == null) {
+                                                final BmobQuery<Books> b = new BmobQuery<Books>();
+                                                b.addWhereEqualTo("bookId", book.getBookId());
+                                                b.findObjects(new FindListener<Books>() {
+                                                    @Override
+                                                    public void done(List<Books> list, BmobException e) {
+                                                        if (e == null) {
+                                                            books = list.get(0);
+                                                            String s=book.getBookName();
+                                                            if (books.getIsSubscribe().equals("无")) {
+                                                                books.setIsSubscribe("无");
+                                                                books.setIsContinue("无");
+                                                                books.setBackTime("");
+                                                                books.setLentTime("");
+                                                                books.setIsLent("可借");
+                                                                books.update(books.getObjectId(), new UpdateListener() {
+                                                                    @Override
+                                                                    public void done(BmobException e) {
+                                                                        if (e == null) {
+                                                                            book.delete(book.getObjectId(), new UpdateListener() {
+                                                                                @Override
+                                                                                public void done(BmobException e) {
+                                                                                    if (e == null) {
+
+                                                                                        finish();
+
+                                                                                    } else {
+                                                                                        useToast("网络异常！");
+                                                                                    }
+                                                                                }
+                                                                            });
+
+                                                                        } else {
+                                                                            useToast("网络异常！");
+                                                                        }
+                                                                    }
+                                                                });
+
+                                                            } else {
+
+                                                                String ss = books.getIsSubscribe().substring(0, books.getIsSubscribe().length() - 2);
+                                                                final int userId = Integer.valueOf(ss);
+                                                                BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<PersonMessage>();
+                                                                personMessageBmobQuery.addWhereEqualTo("userId", userId);
+                                                                personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
+                                                                    @Override
+                                                                    public void done(List<PersonMessage> list, BmobException e) {
+                                                                        person = list.get(0);
+                                                                        if (e == null) {
+                                                                            BmobQuery<Rule> ruleBmobQuery = new BmobQuery<Rule>();
+                                                                            ruleBmobQuery.getObject("c9cf23b8fb", new QueryListener<Rule>() {
+                                                                                @Override
+                                                                                public void done(Rule rule, BmobException e) {
+                                                                                    if (e == null) {
+                                                                                        books.setIsContinue("无");
+                                                                                        books.setIsSubscribe("无");
+                                                                                        books.setIsLent(person.getUserName() + "借出");
+                                                                                        Date date1 = new Date();
+                                                                                        Date date2 = new Date();
+                                                                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                                                                        final String borrowdate = sdf.format(date1);
+                                                                                        Calendar calendar = new GregorianCalendar();
+                                                                                        calendar.setTime(date2);
+                                                                                        //pref.getInt("firstborrow", 30)
+                                                                                        calendar.add(calendar.DATE, rule.getFirstDay());//把日期往后增加60天整数往后推,负数往前移动
+                                                                                        date2 = calendar.getTime();   //这个时间就是日期往后推60天的结果
+                                                                                        final String backdate = sdf.format(date2);
+                                                                                        books.setLentTime(borrowdate);
+                                                                                        books.setBackTime(backdate);
+                                                                                        books.update(books.getObjectId(), new UpdateListener() {
+                                                                                            @Override
+                                                                                            public void done(BmobException e) {
+                                                                                                if (e == null) {
+                                                                                                    book.setUserId(person.getUserId());
+                                                                                                    book.setUserName(person.getUserName());
+                                                                                                    book.setIsSubscribe("无");
+                                                                                                    book.setIsContinue("无");
+                                                                                                    book.setLentTime(borrowdate);
+                                                                                                    book.setBackTime(backdate);
+                                                                                                    book.update(book.getObjectId(), new UpdateListener() {
+                                                                                                        @Override
+                                                                                                        public void done(BmobException e) {
+                                                                                                            if (e == null) {
+                                                                                                                person.setNowBorrow(person.getNowBorrow() + 1);
+                                                                                                                person.update(person.getObjectId(), new UpdateListener() {
+                                                                                                                    @Override
+                                                                                                                    public void done(BmobException e) {
+
+                                                                                                                        if (e == null)
+                                                                                                                            finish();
+                                                                                                                        else useToast("网络异常！");
+                                                                                                                    }
+                                                                                                                });
+                                                                                                            } else {
+                                                                                                                useToast("网络异常！");
+
+                                                                                                            }
+                                                                                                        }
+                                                                                                    });
+                                                                                                } else {
+                                                                                                    useToast("网络异常！");
+                                                                                                }
+                                                                                            }
+                                                                                        });
+
+
+                                                                                    } else {
+                                                                                        useToast("网络异常！");
+                                                                                    }
+
+                                                                                }
+                                                                            });
+
+                                                                        } else {
+                                                                            useToast("网络异常！");
+                                                                        }
+                                                                    }
+                                                                });
+
+
+                                                            }
+                                                        } else {
+                                                            useToast("网络异常！");
+                                                        }
+
+                                                    }
+                                                });
+
+                                            } else {
+                                                useToast("网络异常！");
+                                            }
+                                        }
+                                    });
+
+
+                                } else {
+                                    useToast("网络异常！");
+                                }
                             }
-                            libraryDB.alterPersonalMessage(personMessage, pref.getInt("userId", 0));
-                            finish();
-                        }
+                        });
+
                     }
                 });
+
+
                 dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                     }
                 });
                 dialog.show();
@@ -97,23 +261,42 @@ public class BackBook extends Activity {
             public void onClick(View v) {
                 if (book.getIsContinue().equals("无")) {
                     if (impart(book.getBackTime())) {
-                        book.setIsContinue("续借");
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                        Date date1 = new Date();
-                        try {
+                        BmobQuery<Rule> r = new BmobQuery<>();
+                        r.getObject("c9cf23b8fb", new QueryListener<Rule>() {
+                            @Override
+                            public void done(Rule rule, BmobException e) {
+                                if (e == null) {
+                                    book.setIsContinue("续借");
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    Date date1 = new Date();
+                                    try {
+                                        date1 = sdf.parse(book.getBackTime());
+                                        Calendar calendar = new GregorianCalendar();
+                                        calendar.setTime(date1);
+                                        calendar.add(calendar.DATE, rule.getSecondDay());//把日期往后增加n天整数往后推,负数往前移动
+                                        date1 = calendar.getTime();   //这个时间就是日期往后推1天的结果
+                                        book.setBackTime(sdf.format(date1));
+                                        book.update(book.getObjectId(), new UpdateListener() {
+                                            @Override
+                                            public void done(BmobException e) {
+                                                if(e==null){
+                                                    back_date.setText("应还日期：" + book.getBackTime());
+                                                    useToast("续借成功！");}
+                                                else
+                                                useToast("网络异常！");
+                                            }
+                                        });
 
-                            date1 = sdf.parse(book.getBackTime());
-                            Calendar calendar = new GregorianCalendar();
-                            calendar.setTime(date1);
-                            calendar.add(calendar.DATE, pref.getInt("thanborrow", 30));//把日期往后增加n天整数往后推,负数往前移动
-                            date1 = calendar.getTime();   //这个时间就是日期往后推1天的结果
-                            book.setBackTime(sdf.format(date1));
-                            libraryDB.bookContinue(book);
-                            back_date.setText("应还日期：" + book.getBackTime());
-                            useToast("续借成功！");
-                        } catch (Exception e) {
-                            useToast("续借失败！");
-                        }
+                                    } catch (Exception ee) {
+                                        useToast("续借失败！");
+                                    }
+                                } else
+
+                                {
+                                    useToast("网络异常！");
+                                }
+                            }
+                        });
 
                     } else {
                         useToast("已过期，无法续借！");
@@ -155,7 +338,7 @@ public class BackBook extends Activity {
             Date date2 = sdf.parse(sdf.format(nowDate));
             long distance = date1.getTime() - date2.getTime();
             long days = distance / (1000 * 60 * 60 * 24);
-            if (days < 1)
+            if (days < 0)
                 return false;
             else return true;
         } catch (Exception e) {

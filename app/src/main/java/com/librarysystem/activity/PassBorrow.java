@@ -10,11 +10,15 @@ import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.BookPastAdapter;
-import com.librarysystem.model.Books;
+import com.librarysystem.model.PastBooks;
 import com.librarysystem.sqlite.LibraryDB;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 
 /**
  * Created by g on 2016/12/25.
@@ -25,7 +29,7 @@ public class PassBorrow extends Activity {
     private LibraryDB libraryDB;
     private ListView bookList;
     private TextView title;
-    private List<Books> booksList = new ArrayList<Books>();
+    private List<PastBooks> booksList = new ArrayList<PastBooks>();
     private SharedPreferences pref;
     private Toast mToast;
 
@@ -37,14 +41,28 @@ public class PassBorrow extends Activity {
         title.setText("历史借阅");
         libraryDB = LibraryDB.getInstance(this);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        libraryDB.getPastBooks(pref.getInt("userId", 0), booksList);
-        if (booksList.size() == 0) {
-            useToast("暂无历史借阅！");
-        }
-        //将搜索结果显示出来
-        BookPastAdapter adapter = new BookPastAdapter(this, R.layout.past_book_item, booksList);
         bookList = (ListView) findViewById(R.id.list_present_book);
-        bookList.setAdapter(adapter);
+
+        BmobQuery<PastBooks> pb = new BmobQuery<>();
+        pb.addWhereEqualTo("userId", pref.getInt("userId", 0));
+        pb.findObjects(new FindListener<PastBooks>() {
+            @Override
+            public void done(List<PastBooks> list, BmobException e) {
+                if (e == null) {
+                    booksList = list;
+                    //将搜索结果显示出来
+                    BookPastAdapter adapter = new BookPastAdapter(PassBorrow.this, R.layout.past_book_item, booksList);
+                    bookList.setAdapter(adapter);
+                    if (booksList.size() == 0) {
+                        useToast("暂无历史借阅！");
+                    }
+                } else {
+                    useToast("网络异常！");
+                }
+            }
+        });
+
+
 
     }
 

@@ -23,6 +23,7 @@ import com.librarysystem.model.ActivityCollector;
 import com.librarysystem.model.BookAdapter;
 import com.librarysystem.model.Books;
 import com.librarysystem.model.PersonMessage;
+import com.librarysystem.model.PresentBooks;
 import com.librarysystem.sqlite.LibraryDB;
 
 import java.text.SimpleDateFormat;
@@ -33,7 +34,9 @@ import java.util.List;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
+
 
 /**
  * Created by g on 2016/10/16.
@@ -47,12 +50,15 @@ public class MainPage extends Activity implements View.OnClickListener {
     private String bookName;
     private ListView bookList;
     private List<Books> booksList = new ArrayList<Books>();
-    private List<Books> books = new ArrayList<Books>();
+    private List<PresentBooks> books = new ArrayList<PresentBooks>();
     private LibraryDB libraryDB;
     private boolean isSearch;
     private SharedPreferences pref;
     private Toast mToast;
     private Button searchNet;
+    private PersonMessage ps;
+    private int j = 0, k = 0;
+    private PersonMessage person;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,39 +168,19 @@ public class MainPage extends Activity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.search_book:
                 isSearch = true;
+                bookList = (ListView) findViewById(R.id.list_search_book);
                 bookName = inputSearchBook.getText().toString();
-                BmobQuery<Books> b=new BmobQuery<Books>();
-
-              b.findObjects(new FindListener<Books>() {
-                  @Override
-                  public void done(List<Books> list, BmobException e) {
-
-                     booksList=list;
-                      BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
-                      bookList = (ListView) findViewById(R.id.list_search_book);
-                      bookList.setAdapter(adapter);
-                      if (booksList.size() == 0) {
-                          useToast("没有符合搜索要求的图书！");
-                          searchNet.setVisibility(View.VISIBLE);
-                          searchNet.setOnClickListener(new View.OnClickListener() {
-                              @Override
-                              public void onClick(View v) {
-                                  Intent net = new Intent(MainPage.this, NetBook.class);
-                                  net.putExtra("search", bookName);
-                                  startActivity(net);
-                              }
-                          });
-
-                      } else {
-                          searchNet.setVisibility(View.GONE);
-                      }
-                  }
-              });
-               //libraryDB.getBookMeassage(bookName, booksList);
-
-                /**
-                 * 没有符合图书时联网，否则将联网按键隐藏
-                 */
+                BmobQuery<Books> bs = new BmobQuery<Books>();
+                bs.findObjects(new FindListener<Books>() {
+                    @Override
+                    public void done(List<Books> list, BmobException e) {
+                        if (e == null) {
+                            booksList = list;
+                            BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
+                            bookList.setAdapter(adapter);
+                        } else useToast("网络异常！");
+                    }
+                });
 
                 /**
                  *将搜索结果显示出来，查看每本书的信息
@@ -205,9 +191,37 @@ public class MainPage extends Activity implements View.OnClickListener {
                 bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        //ea173120a2
+                        pref = PreferenceManager.getDefaultSharedPreferences(MainPage.this);
                         Books book = booksList.get(position);
                         bookIntent.putExtra("bookmessage", book);
-                        startActivity(bookIntent);
+                        final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
+                        p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
+                            @Override
+                            public void done(PersonMessage personMessage, BmobException e) {
+                                if (e == null) {
+                                    ps = personMessage;
+                                    String sss = personMessage.getIsRootManager();
+                                    if (ps.getNowBorrow() == null) {
+                                        ps.setNowBorrow(0);
+                                    }
+                                    if (ps.getPastBooks() == null) {
+                                        ps.setPastBooks(0);
+                                    }
+                                    if (ps.getWpastBooks() == null) {
+                                        ps.setWpastBooks(0);
+                                    }
+                                    if (ps.getUserLevel() == null) {
+                                        ps.setUserLevel(0);
+                                    }
+                                    bookIntent.putExtra("person", ps);
+                                    startActivity(bookIntent);
+                                } else {
+                                    useToast("未联网！");
+
+                                }
+                            }
+                        });
                     }
                 });
                 break;
@@ -222,21 +236,21 @@ public class MainPage extends Activity implements View.OnClickListener {
     @Override
     protected void onRestart() {
         super.onRestart();
-       // impart();
+        impart();
         if (isSearch) {
             bookName = inputSearchBook.getText().toString();
-            //libraryDB.getBookMeassage(bookName, booksList);
-            BmobQuery<Books> b=new BmobQuery<Books>();
+            bookList = (ListView) findViewById(R.id.list_search_book);
+            BmobQuery<Books> b = new BmobQuery<Books>();
             b.findObjects(new FindListener<Books>() {
                 @Override
                 public void done(List<Books> list, BmobException e) {
-                    booksList=list;
+                    if (e == null) {
+                        booksList = list;
+                        BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
+                        bookList.setAdapter(adapter);
+                    } else useToast("网络异常！");
                 }
             });
-
-            BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
-            bookList = (ListView) findViewById(R.id.list_search_book);
-            bookList.setAdapter(adapter);
             final Intent bookIntent = new Intent(this, DetailedBook.class);
                 /*
                 点击查看每本书的信息
@@ -246,90 +260,110 @@ public class MainPage extends Activity implements View.OnClickListener {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Books book = booksList.get(position);
                     bookIntent.putExtra("bookmessage", book);
-                    startActivity(bookIntent);
-
+                    final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
+                    p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
+                        @Override
+                        public void done(PersonMessage personMessage, BmobException e) {
+                            if (e == null) {
+                                ps = personMessage;
+                                String sss = personMessage.getIsRootManager();
+                                if (ps.getNowBorrow() == null) {
+                                    ps.setNowBorrow(0);
+                                }
+                                if (ps.getPastBooks() == null) {
+                                    ps.setPastBooks(0);
+                                }
+                                if (ps.getWpastBooks() == null) {
+                                    ps.setWpastBooks(0);
+                                }
+                                if (ps.getUserLevel() == null) {
+                                    ps.setUserLevel(0);
+                                }
+                                bookIntent.putExtra("person", ps);
+                                startActivity(bookIntent);
+                            } else {
+                                useToast("未联网！");
+                            }
+                        }
+                    });
 
                 }
             });
         }
     }
-
     /**
      * 有过期，将要过期的书时，notification通知
      */
     public void impart() {
-        SharedPreferences pref;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        int j = 0, k = 0;
-
-        BmobQuery<Books>b=new BmobQuery<Books>();
-        b.findObjects(new FindListener<Books>() {
+        BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<>();
+        personMessageBmobQuery.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
             @Override
-            public void done(List<Books> list, BmobException e) {
-                books=list;
+            public void done(PersonMessage personMessage, BmobException e) {
+                person = personMessage;
+                BmobQuery<PresentBooks> pb = new BmobQuery<>();
+                pb.addWhereEqualTo("userId", pref.getInt("userId", 0));
+                pb.findObjects(new FindListener<PresentBooks>() {
+                    @Override
+                    public void done(List<PresentBooks> list, BmobException e) {
+                        if (e == null) {
+                            books = list;
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            Date date1 = new Date();
+                            for (int i = 0; i < books.size(); i++) {
+                                try {
+                                    date1 = sdf.parse(books.get(i).getBackTime());
+                                    Date nowDate = new Date();
+                                    Date date2 = sdf.parse(sdf.format(nowDate));
+                                    long distance = date1.getTime() - date2.getTime();
+                                    long days = distance / (1000 * 60 * 60 * 24);
+                                    if (days <= 7 && days >= 1) {
+                                        j++;
+                                    } else if (days < 1) {
+                                        k++;
+                                    }
+                                } catch (Exception ee) {
+                                }
+                            }
+                            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                            if (j > 0) {
+                                person.setWpastBooks(j);
+                                Notification.Builder notification = new Notification.Builder(MainPage.this).setTicker("图书通知！").setContentTitle("图书通知")
+                                        .setContentText("您有" + j + "本书将要过期！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
+                                manager.notify(3, notification.build());
+                                person.setWpastBooks(j);
+                            } else {
+                                person.setWpastBooks(0);
+                                manager.cancel(3);
+                            }
+                            if (k > 0) {
+                                person.setPastBooks(k);
+                                Notification.Builder notification = new Notification.Builder(MainPage.this).setTicker("图书通知！").setContentTitle("图书通知")
+                                        .setContentText("您有" + k + "本书已过期，请尽快归还！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
+                                manager.notify(4, notification.build());
+                                person.setPastBooks(k);
+                            } else {
+                                manager.cancel(4);
+                                person.setPastBooks(0);
+
+                            }
+                            person.update(pref.getString("objectid", ""), new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    if (e == null) {
+                                     j=0;k=0;
+                                    }else    useToast("网络错误！");
+                                }
+                            });
+                        } else {
+                            useToast("网络异常");
+                        }
+                    }
+                });
             }
         });
-//        PersonMessage personMessage = new PersonMessage();
-//        libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
-  //      libraryDB.getPresentBooks(pref.getInt("userId", 200000), books);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date date1 = new Date();
-        for (int i = 0; i < books.size(); i++) {
 
-            try {
-                date1 = sdf.parse(books.get(i).getBackTime());
-                Date nowDate = new Date();
-                Date date2 = sdf.parse(sdf.format(nowDate));
-                long distance = date1.getTime() - date2.getTime();
-                long days = distance / (1000 * 60 * 60 * 24);
-                if (days <= pref.getInt("remain", 7) && days >= 1) {
-                    j++;
-                } else if (days < 1) {
-                    k++;
-                }
 
-            } catch (Exception e) {
-
-            }
-        }
-         PersonMessage personMessage=new PersonMessage();
-
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        if (j > 0) {
-            personMessage.setWpastBooks("" + j);
-            Notification.Builder notification = new Notification.Builder(this).setTicker("图书通知！").setContentTitle("图书通知")
-                    .setContentText("您有" + j + "本书将要过期！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
-            manager.notify(3, notification.build());
-            personMessage.setWpastBooks("" + j);
-
-           // libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
-        } else {
-            personMessage.setWpastBooks("0");
-            //libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
-            manager.cancel(3);
-        }
-
-        if (k > 0) {
-            personMessage.setPastBooks("" + k);
-            Notification.Builder notification = new Notification.Builder(this).setTicker("图书通知！").setContentTitle("图书通知")
-                    .setContentText("您有" + k + "本书已过期，请尽快归还！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
-            manager.notify(4, notification.build());
-            personMessage.setPastBooks("" + k);
-
-            //libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
-
-        } else {
-            manager.cancel(4);
-            personMessage.setPastBooks("0");
-
-          //  libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
-        }
-        personMessage.update(pref.getString("objectid", ""), new UpdateListener() {
-            @Override
-            public void done(BmobException e) {
-
-            }
-        });
     }
 
     public void useToast(String text) {

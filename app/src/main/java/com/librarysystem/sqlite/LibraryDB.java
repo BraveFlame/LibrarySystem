@@ -97,10 +97,10 @@ public class LibraryDB {
         values.put("user_sex", personMessage.getUserSex().toString());
         values.put("user_profession", personMessage.getUserProfession().toString());
         values.put("user_description", personMessage.getUserDescription().toString());
-        values.put("user_pastbooks", personMessage.getPastBooks().toString());
-        values.put("user_wpastbooks", personMessage.getWpastBooks().toString());
+       // values.put("user_pastbooks", personMessage.getPastBooks().toString());
+       // values.put("user_wpastbooks", personMessage.getWpastBooks().toString());
         values.put("rootmanager", personMessage.getIsRootManager().toString());
-        values.put("user_level", personMessage.getUserLevel().toString());
+        //values.put("user_level", personMessage.getUserLevel().toString());
         values.put("now_borrow", personMessage.getNowBorrow());
         db.update("PersonalMessages", values, "user_id=?", new String[]{"" + userId});
     }
@@ -124,9 +124,9 @@ public class LibraryDB {
                     personMessage.setUserProfession(cursor.getString(cursor.getColumnIndex("user_profession")));
                     personMessage.setUserDescription(cursor.getString(cursor.getColumnIndex("user_description")));
                     personMessage.setUserTel(cursor.getString(cursor.getColumnIndex("user_tel")));
-                    personMessage.setUserLevel(cursor.getString(cursor.getColumnIndex("user_level")));
-                    personMessage.setPastBooks(cursor.getString(cursor.getColumnIndex("user_pastbooks")));
-                    personMessage.setWpastBooks(cursor.getString(cursor.getColumnIndex("user_wpastbooks")));
+                    personMessage.setUserLevel(cursor.getInt(cursor.getColumnIndex("user_level")));
+                    personMessage.setPastBooks(cursor.getInt(cursor.getColumnIndex("user_pastbooks")));
+                    personMessage.setWpastBooks(cursor.getInt(cursor.getColumnIndex("user_wpastbooks")));
                     personMessage.setIsRootManager(cursor.getString(cursor.getColumnIndex("rootmanager")));
                     usersList.add(personMessage);
 
@@ -149,9 +149,9 @@ public class LibraryDB {
                         personMessage.setUserProfession(cursor.getString(cursor.getColumnIndex("user_profession")));
                         personMessage.setUserDescription(cursor.getString(cursor.getColumnIndex("user_description")));
                         personMessage.setUserTel(cursor.getString(cursor.getColumnIndex("user_tel")));
-                        personMessage.setUserLevel(cursor.getString(cursor.getColumnIndex("user_level")));
-                        personMessage.setPastBooks(cursor.getString(cursor.getColumnIndex("user_pastbooks")));
-                        personMessage.setWpastBooks(cursor.getString(cursor.getColumnIndex("user_wpastbooks")));
+                        personMessage.setUserLevel(cursor.getInt(cursor.getColumnIndex("user_level")));
+                        personMessage.setPastBooks(cursor.getInt(cursor.getColumnIndex("user_pastbooks")));
+                        personMessage.setWpastBooks(cursor.getInt(cursor.getColumnIndex("user_wpastbooks")));
                         personMessage.setIsRootManager(cursor.getString(cursor.getColumnIndex("rootmanager")));
                         usersList.add(personMessage);
 
@@ -248,9 +248,9 @@ public class LibraryDB {
                     personMessage.setUserProfession(cursor.getString(cursor.getColumnIndex("user_profession")));
                     personMessage.setUserDescription(cursor.getString(cursor.getColumnIndex("user_description")));
                     personMessage.setUserTel(cursor.getString(cursor.getColumnIndex("user_tel")));
-                    personMessage.setUserLevel(cursor.getString(cursor.getColumnIndex("user_level")));
-                    personMessage.setPastBooks(cursor.getString(cursor.getColumnIndex("user_pastbooks")));
-                    personMessage.setWpastBooks(cursor.getString(cursor.getColumnIndex("user_wpastbooks")));
+                    personMessage.setUserLevel(cursor.getInt(cursor.getColumnIndex("user_level")));
+                    personMessage.setPastBooks(cursor.getInt(cursor.getColumnIndex("user_pastbooks")));
+                    personMessage.setWpastBooks(cursor.getInt(cursor.getColumnIndex("user_wpastbooks")));
                     personMessage.setIsRootManager(cursor.getString(cursor.getColumnIndex("rootmanager")));
                     personMessage.setNowBorrow(cursor.getInt(cursor.getColumnIndex("now_borrow")));
 

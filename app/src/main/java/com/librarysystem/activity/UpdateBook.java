@@ -14,6 +14,9 @@ import com.librarysystem.R;
 import com.librarysystem.model.Books;
 import com.librarysystem.sqlite.LibraryDB;
 
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.UpdateListener;
+
 /**
  * Created by g on 2017/2/21.
  * 管理员删除，修改书籍
@@ -34,7 +37,6 @@ public class UpdateBook extends Activity implements View.OnClickListener {
         libraryDB = LibraryDB.getInstance(this);
         book = (Books) getIntent().getSerializableExtra("bookmessage");
         init();
-
         balter.setOnClickListener(this);
         bdelete.setOnClickListener(this);
         bupdate.setOnClickListener(this);
@@ -80,9 +82,8 @@ public class UpdateBook extends Activity implements View.OnClickListener {
     public void onClick(View v) {
         int id = book.getBookId();
         switch (v.getId()) {
-
             case R.id.bdelete:
-                if (book.getIsLent().equals("借出")) {
+                if (!book.getIsLent().equals("无")) {
                     useToast("书已借出,无法删除！");
                 } else {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(UpdateBook.this);
@@ -90,11 +91,21 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                     dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if (libraryDB.deleteBooks(book.getBookId())) {
-
-                                useToast("删除成功！");
-                                finish();
-                            }
+//                            if (libraryDB.deleteBooks(book.getBookId())) {
+//
+//
+                            //}
+                            book.delete(book.getObjectId(), new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    if(e==null){
+                                        useToast("删除成功");
+                                        finish();
+                                    }else {
+                                        useToast("网络异常");
+                                    }
+                                }
+                            });
                         }
 
                     });
@@ -108,7 +119,7 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                 }
                 break;
             case R.id.bupdate:
-                if (book.getIsLent().equals("借出")) {
+                if (!book.getIsLent().equals("无")) {
                     useToast("借出无法更新！");
                 } else {
                     try {
@@ -119,15 +130,25 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                             book.setUserDescription(update_message.getText().toString());
                             book.setVersion(update_version.getText().toString());
                             book.setPress(update_press.getText().toString());
+                            book.update(book.getObjectId(), new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    if(e==null){
+                                        useToast("更新成功");
+                                        update_id.setEnabled(false);
+                                        update_name.setEnabled(false);
+                                        update_author.setEnabled(false);
+                                        update_message.setEnabled(false);
+                                        update_version.setEnabled(false);
+                                        update_press.setEnabled(false);
+
+                                    }else {
+                                        useToast("网络异常");
+                                    }
+                                }
+                            });
 
                             libraryDB.alterBooks(book, id);
-                            update_id.setEnabled(false);
-                            update_name.setEnabled(false);
-                            update_author.setEnabled(false);
-                            update_message.setEnabled(false);
-                            update_version.setEnabled(false);
-                            update_press.setEnabled(false);
-                            useToast("更新成功！");
                         } else {
                             useToast("请完善信息！");
                         }
@@ -137,10 +158,9 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                 }
                 break;
             case R.id.balter:
-                if (book.getIsLent().equals("借出")) {
+                if (!book.getIsLent().equals("无")) {
                     useToast("借出无法更改！");
                 } else {
-
                     update_id.setEnabled(true);
                     update_name.setEnabled(true);
                     update_author.setEnabled(true);

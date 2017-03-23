@@ -14,7 +14,7 @@ public class PresentBooks extends BmobObject {
     private String version;
     private String userDescription;
 
-    private String isLent;
+
     private String LentTime;
     private String backTime;
 
@@ -106,13 +106,6 @@ public class PresentBooks extends BmobObject {
         this.bookAuthor = bookAuthor;
     }
 
-    public String getIsLent() {
-        return isLent;
-    }
-
-    public void setIsLent(String lent) {
-        isLent = lent;
-    }
 
     public String getUserDescription() {
         return userDescription;

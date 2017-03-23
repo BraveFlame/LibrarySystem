@@ -7,6 +7,10 @@ import cn.bmob.v3.BmobObject;
  */
 
 public class PastBooks extends BmobObject {
+    public Integer getBookId() {
+        return bookId;
+    }
+
     private Integer bookId;
     private String bookName;
     private String bookAuthor;

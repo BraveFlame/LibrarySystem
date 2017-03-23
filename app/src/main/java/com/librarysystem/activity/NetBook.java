@@ -7,9 +7,6 @@ import android.webkit.WebViewClient;
 
 import com.librarysystem.R;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
  * 检查不到书籍时联网学习图书馆，以建议管理员加入某书
  */
@@ -24,17 +21,12 @@ public class NetBook extends Activity {
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient());
 
-        try {
-            String addresses = (URLEncoder.encode(getIntent().getStringExtra("search"), "UTF-8"));
-            webView.loadUrl("http://202.116.174.108:8080/opac/openlink.php?strSearchType=title&historyCount=1&strText="+addresses+"&doctype=ALL");
+           // String addresses = (URLEncoder.encode(getIntent().getStringExtra("search"), "UTF-8"));
+           // webView.loadUrl("http://202.116.174.108:8080/opac/openlink.php?strSearchType=title&historyCount=1&strText="+addresses+"&doctype=ALL");
+            webView.loadUrl("http://www.bmob.cn/login");
             webView.getSettings().setUseWideViewPort(true);
             webView.getSettings().setBuiltInZoomControls(true);
             webView.setInitialScale(50);
-
-        } catch (UnsupportedEncodingException e) {
-
-        }
-
 
         /*
         webView.getSettings().setUseWideViewPort(true);设置此属性，可恣意比例缩放。

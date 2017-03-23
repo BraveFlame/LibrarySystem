@@ -9,7 +9,6 @@ import cn.bmob.v3.BmobObject;
 
 public class Books extends BmobObject  {
     private Integer bookId;
-
     private String bookName;
     private String bookAuthor;
     private String isLent;

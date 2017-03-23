@@ -34,7 +34,7 @@ private int resourceId;
         /**
          * 过期图书的用户标识为粉红色
          */
-        if(!personMessage.getPastBooks().equals("0"))
+        if(personMessage.getPastBooks()!=0)
             view.setBackgroundResource(R.drawable.selector);
         TextView userName=(TextView) view.findViewById(R.id.user_item_name);
         TextView userId=(TextView) view.findViewById(R.id.user_item_id);

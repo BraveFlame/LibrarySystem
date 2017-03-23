@@ -23,10 +23,10 @@ import com.librarysystem.sqlite.LibraryDB;
 public class ChangeUsers extends Activity {
     private SharedPreferences pref;
     private LibraryDB libraryDB;
-    private PersonMessage personMessage = new PersonMessage();
     private TextView accountId, accountName, accountSex, accountpro, accounthobby, accounttel,
             accountlevel, accountpast, accountwpast, accountProperty;
     private Button deleteUser;
+    private PersonMessage personMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +34,9 @@ public class ChangeUsers extends Activity {
         setContentView(R.layout.change_users);
         libraryDB = LibraryDB.getInstance(this);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        libraryDB.getPersonalMeassage(personMessage, getIntent().getIntExtra("user_id", 0));
+        //libraryDB.getPersonalMeassage(personMessage, getIntent().getIntExtra("user_id", 0));
+        personMessage = (PersonMessage) getIntent().getSerializableExtra("user_id");
         init();
-
         deleteUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -45,14 +45,16 @@ public class ChangeUsers extends Activity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         /**
-                         * 用户注销时需同时将其借阅的书籍归化（若有人预约其书籍，需要及时转接预约者），以及将其预约的书籍取消预约
+                         * 用户注销时需同时将其借阅的书籍归还（若有人预约其书籍，需要及时转接预约者），以及将其预约的书籍取消预约
                          * 然后删除其过去借阅，最后删除个人信息
                          */
+
                         if (libraryDB.forceBackBooks(personMessage.getUserId(), pref.getInt("firstborrow", 30), pref.getInt("maxnumbook", 30))
                                 && libraryDB.deletePast(personMessage.getUserId()) && libraryDB.deleteUsers(personMessage.getUserId())) {
                             Toast.makeText(ChangeUsers.this, "用户已删除！", Toast.LENGTH_SHORT).show();
                             finish();
                         }
+
                     }
                 })
                         .setNegativeButton("否", new DialogInterface.OnClickListener() {

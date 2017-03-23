@@ -14,21 +14,23 @@ public class PersonMessage extends BmobObject{
     private String userProfession;
     private String userDescription;
     private String userPassword;
-    private String userLevel;
-    private String pastBooks;
-    private String wpastBooks;
+    private Integer userLevel;
+    private Integer pastBooks;
+    private Integer wpastBooks;
     private String userTel;
     private String isRootManager;
+    private Integer nowBorrow;
 
-    public int getNowBorrow() {
+
+    public Integer getNowBorrow() {
         return nowBorrow;
     }
 
-    public void setNowBorrow(int nowBorrow) {
+    public void setNowBorrow(Integer nowBorrow) {
         this.nowBorrow = nowBorrow;
     }
 
-    private int nowBorrow;
+
 
     public String getIsRootManager() {
         return isRootManager;
@@ -38,27 +40,27 @@ public class PersonMessage extends BmobObject{
         this.isRootManager = isRootManager;
     }
 
-    public String getUserLevel() {
+    public Integer getUserLevel() {
         return userLevel;
     }
 
-    public void setUserLevel(String userLevel) {
+    public void setUserLevel(Integer userLevel) {
         this.userLevel = userLevel;
     }
 
-    public String getPastBooks() {
+    public Integer getPastBooks() {
         return pastBooks;
     }
 
-    public void setPastBooks(String pastBooks) {
+    public void setPastBooks(Integer pastBooks) {
         this.pastBooks = pastBooks;
     }
 
-    public String getWpastBooks() {
+    public Integer getWpastBooks() {
         return wpastBooks;
     }
 
-    public void setWpastBooks(String wpastBooks) {
+    public void setWpastBooks(Integer wpastBooks) {
         this.wpastBooks = wpastBooks;
     }
 

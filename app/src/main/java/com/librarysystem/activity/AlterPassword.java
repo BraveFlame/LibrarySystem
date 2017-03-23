@@ -66,7 +66,6 @@ public class AlterPassword extends Activity implements Runnable {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alter_password);
         init();
-       // libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
          personMessage=(PersonMessage)getIntent().getSerializableExtra("alterpassword");
         /**
          *更改密码
@@ -76,7 +75,6 @@ public class AlterPassword extends Activity implements Runnable {
             public void onClick(View v) {
                 //i作为标志，判断第几次输入，第一次为原密码或验证码，第二次为新密码。
                 NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
                 i++;
                 String code = intoCode.getText().toString();
                 if (i == 1) {
@@ -100,7 +98,6 @@ public class AlterPassword extends Activity implements Runnable {
                 } else if (i == 2) {
                     //第二次为新密码
                     personMessage.setUserPassword(code);
-                    //libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
                     personMessage.update(pref.getString("objectid", ""), new UpdateListener() {
                         @Override
                         public void done(BmobException e) {
@@ -149,10 +146,11 @@ public class AlterPassword extends Activity implements Runnable {
         Notification.Builder notification = new Notification.Builder(AlterPassword.this).setTicker("收到验证码").setContentTitle("验证码")
                 .setContentText("" + randomcode).setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
         manager.notify(1, notification.build());
-        Message message = new Message();
+
         while (true) {
             a--;
             //小于等于0时解除按键禁止
+            Message message = new Message();
             if (a <= 0) {
                 message.what = CODE2;
                 handler.sendMessage(message);
