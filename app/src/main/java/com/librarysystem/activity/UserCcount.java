@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -34,6 +35,7 @@ public class UserCcount extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_ccount);
         alterPassword = (Button) findViewById(R.id.usercpassword);
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
         init();
         BmobQuery<PersonMessage>personMessage=new BmobQuery<PersonMessage>();
         personMessage.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {

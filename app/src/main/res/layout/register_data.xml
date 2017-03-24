@@ -187,7 +187,7 @@
             android:id="@+id/personset"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="确定"
+            android:text="取消"
             android:textSize="23sp"
             android:layout_marginLeft="50dp"/>
 
@@ -196,7 +196,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/personset"
-            android:text="取消"
+            android:text="确定"
             android:textSize="23sp"
             android:layout_marginLeft="50dp"/>
     </RelativeLayout>
