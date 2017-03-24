@@ -6,7 +6,7 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:background="#72a5f1"
+    android:background="#7faae9"
     >
     <Button
         android:id="@+id/select_button"
@@ -14,7 +14,7 @@
         android:layout_height="50dp"
         android:text="选择"
         android:textSize="18sp"
-        android:background="#448de6"
+        android:background="#4d92e6"
        />
     <EditText
         android:id="@+id/book_search_name"
@@ -28,12 +28,12 @@
         android:layout_height="50dp"
         android:layout_alignParentRight="true"
         android:text="搜索"
-        android:background="#448de6"/>
+        android:background="#4d92e6"/>
 </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#e9dcae">
+        android:background="#ece5cb">
         <ListView
             android:id="@+id/list_search_book"
             android:layout_width="match_parent"

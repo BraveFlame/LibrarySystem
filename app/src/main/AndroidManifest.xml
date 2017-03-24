@@ -23,6 +23,8 @@
     <!--推送所需的权限-->
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!--手机振动所需的权限-->
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <application
         android:name=".activity.BmobApplication"
         android:allowBackup="true"
@@ -42,6 +44,8 @@
             android:name=".activity.MainPage"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".activity.BmobRemain"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".activity.RegisterUser"
             android:windowSoftInputMode="adjustPan" />

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -32,6 +33,7 @@ import java.util.Date;
 import java.util.List;
 
 import cn.bmob.push.BmobPush;
+import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobInstallation;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
@@ -67,8 +69,8 @@ public class MainPage extends Activity implements View.OnClickListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main_page);
         ActivityCollector.addActivity(this);
-      // 初始化BmobSDK
-        //Bmob.initialize(this,"32d94fb0a064700f838f59bc0083ad70");
+        // 初始化BmobSDK
+        Bmob.initialize(this, "32d94fb0a064700f838f59bc0083ad70");
         // 使用推送服务时的初始化操作
         BmobInstallation.getCurrentInstallation().save();
         // 启动推送服务
@@ -189,7 +191,7 @@ public class MainPage extends Activity implements View.OnClickListener {
                                 if (repertoryBooks.size() == 0) {
                                     useToast("没有该书籍！");
                                 } else {
-                                //repertoryBooks=list;
+                                    //repertoryBooks=list;
 
                                 }
                             }
@@ -210,23 +212,23 @@ public class MainPage extends Activity implements View.OnClickListener {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         //ea173120a2
                         pref = PreferenceManager.getDefaultSharedPreferences(MainPage.this);
-                        Books book =repertoryBooks.get(position);
+                        Books book = repertoryBooks.get(position);
                         bookIntent.putExtra("bookmessage", book);
 
-                            final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
-                            p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
-                                @Override
-                                public void done(PersonMessage personMessage, BmobException e) {
-                                    if (e == null) {
-                                        ps = personMessage;
-                                        bookIntent.putExtra("person", ps);
-                                        startActivity(bookIntent);
-                                        startActivity(bookIntent);
-                                    } else {
-                                        useToast("获取个人信息失败！");
-                                    }
+                        final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
+                        p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
+                            @Override
+                            public void done(PersonMessage personMessage, BmobException e) {
+                                if (e == null) {
+                                    ps = personMessage;
+                                    bookIntent.putExtra("person", ps);
+                                    startActivity(bookIntent);
+                                    startActivity(bookIntent);
+                                } else {
+                                    useToast("获取个人信息失败！");
                                 }
-                            });
+                            }
+                        });
 
 
                     }
@@ -236,6 +238,7 @@ public class MainPage extends Activity implements View.OnClickListener {
                 break;
         }
     }
+
     /**
      * 刷新借阅界面，根据借出，即将过期，过期三种情况将书标识不一样颜色
      */
@@ -259,7 +262,7 @@ public class MainPage extends Activity implements View.OnClickListener {
                             if (repertoryBooks.size() == 0) {
                                 useToast("没有该书籍！");
                             } else {
-                            //repertoryBooks=list;
+                                //repertoryBooks=list;
 
                             }
                             BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, repertoryBooks);
@@ -278,21 +281,20 @@ public class MainPage extends Activity implements View.OnClickListener {
                     Books book = repertoryBooks.get(position);
                     bookIntent.putExtra("bookmessage", book);
 
-                        final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
-                        p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
-                            @Override
-                            public void done(PersonMessage personMessage, BmobException e) {
-                                if (e == null) {
-                                    ps = personMessage;
-                                    bookIntent.putExtra("person", ps);
-                                    startActivity(bookIntent);
-                                    startActivity(bookIntent);
-                                } else {
-                                    useToast("获取个人信息失败！");
-                                }
+                    final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
+                    p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
+                        @Override
+                        public void done(PersonMessage personMessage, BmobException e) {
+                            if (e == null) {
+                                ps = personMessage;
+                                bookIntent.putExtra("person", ps);
+                                startActivity(bookIntent);
+                                startActivity(bookIntent);
+                            } else {
+                                useToast("获取个人信息失败！");
                             }
-                        });
-
+                        }
+                    });
 
 
                 }
@@ -316,7 +318,7 @@ public class MainPage extends Activity implements View.OnClickListener {
                     @Override
                     public void done(List<PresentBooks> list, BmobException e) {
                         if (e == null) {
-                            presentBooks= list;
+                            presentBooks = list;
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                             Date date1;
                             for (int i = 0; i < presentBooks.size(); i++) {
@@ -394,7 +396,27 @@ public class MainPage extends Activity implements View.OnClickListener {
 
     @Override
     public void onBackPressed() {
+        moveTaskToBack(true);
         super.onBackPressed();
         cancelToast();
+    }
+
+    /**
+     * 后台运行
+     *
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // 过滤按键动作
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+
+            moveTaskToBack(true);
+
+        }
+
+        return super.onKeyDown(keyCode, event);
     }
 }
