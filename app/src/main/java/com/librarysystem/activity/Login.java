@@ -19,7 +19,6 @@ import com.librarysystem.R;
 import com.librarysystem.model.ActivityCollector;
 import com.librarysystem.model.LoginView;
 import com.librarysystem.model.PersonMessage;
-import com.librarysystem.sqlite.LibraryDB;
 
 import java.util.List;
 
@@ -39,7 +38,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private TextView forgetPassword;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
-    private LibraryDB libraryDB;
     private int i = 0;
     private int userInput;
     private String passwordInput;
@@ -59,7 +57,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         ScreenH = metrics.heightPixels;
         ScreenW = metrics.widthPixels;
-        libraryDB = LibraryDB.getInstance(this);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isRemember = pref.getBoolean("remember_password", false);
         final boolean change_user = getIntent().getBooleanExtra("change", false);
@@ -100,9 +97,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.register_button:
-                String data = "register";
-                Intent registerIntent = new Intent(this, PersonalSet.class);
-                registerIntent.putExtra("activity", data);
+                Intent registerIntent = new Intent(this, RegisterUser.class);
                 startActivity(registerIntent);
                 break;
             case R.id.login_button:
@@ -139,11 +134,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
              *
              */
             BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<PersonMessage>();
+            personMessageBmobQuery.addWhereEqualTo("userId", userInput);
             personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
                 @Override
                 public void done(List<PersonMessage> list, BmobException e) {
                     if (e == null) {
-                        for (PersonMessage personMessage : list) {
+                        if (list.size() == 1) {
+                            PersonMessage personMessage = list.get(0);
                             int userId = personMessage.getUserId();
                             String password = personMessage.getUserPassword();
                             if ((userInput == userId) && passwordInput.equals(password)) {
@@ -162,30 +159,34 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                 editor.putString("objectid", personMessage.getObjectId());
                                 editor.putInt("userId", userInput);
                                 editor.commit();
-                                i = 1;
-                                break;
-                            } else i = 0;
-                        }
-                        if (i == 1) {
-                            /**
-                             * 登陆时轮播两张图共1.2秒
-                             */
-                            lv = new LoginView(Login.this);
-                            setContentView(lv);
-                            /**
-                             * 再次登录时把之前的主页活动销毁，以免显示上个人的搜索以及提醒等信息
-                             */
-                            ActivityCollector.finishAll();
+                                /**
+                                 * 登陆时轮播两张图共1.2秒
+                                 */
+                                lv = new LoginView(Login.this);
+                                setContentView(lv);
+                                /**
+                                 * 再次登录时把之前的主页活动销毁，以免显示上个人的搜索以及提醒等信息
+                                 */
+                                ActivityCollector.finishAll();
+
+                            } else {
+
+                                useToast("用户名或密码错误！");
+                            }
+
                         } else {
-                            useToast("用户名或密码错误！");
+                            useToast("用户不存在");
+
                         }
+
+
                     } else {
                         useToast("网络异常！");
                     }
                 }
             });
         } catch (Exception e) {
-            useToast("用户名或密码错误！");
+            useToast("格式错误！");
         }
     }
 

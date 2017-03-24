@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -17,7 +15,6 @@ import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
-import com.librarysystem.sqlite.LibraryDB;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -33,25 +30,21 @@ import cn.bmob.v3.listener.SaveListener;
  * 注册填写用户信息界面以及更改资料（但此处将修改资料功能取消，仅能改密码）
  */
 
-public class PersonalSet extends Activity implements View.OnClickListener {
-    private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
-    private LibraryDB libraryDB;
+public class RegisterUser extends Activity implements View.OnClickListener {
+
     private PersonMessage personMessage = new PersonMessage();
     private EditText userId, userPassword, userName, userprofession;
     private EditText userDescription, userTel;
     private Button personSave, personSet;
     private RadioGroup groupSex;
-    private String whereActivity, userSex;
+    private String  userSex;
     private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.person_data);
-        Intent intent = getIntent();
-        whereActivity = intent.getStringExtra("activity");
+        setContentView(R.layout.register_data);
         personSave = (Button) findViewById(R.id.personsave);
         personSet = (Button) findViewById(R.id.personset);
         groupSex = (RadioGroup) findViewById(R.id.radioGroup);
@@ -68,29 +61,7 @@ public class PersonalSet extends Activity implements View.OnClickListener {
         init();
         personSet.setOnClickListener(this);
         personSave.setOnClickListener(this);
-        libraryDB = LibraryDB.getInstance(this);
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
-        libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
 
-//        if (whereActivity.equals("personSet")) {
-//            userName.setText(personMessage.getUserName());
-//            userName.setEnabled(false);
-//            userPassword.setText(personMessage.getUserPassword());
-//            userPassword.setEnabled(false);
-//            userId.setText(String.valueOf(personMessage.getUserId()));
-//            userId.setEnabled(false);
-//            //userSex.setText(personMessage.getUserSex());
-//            //userSex.setEnabled(false);
-//            userprofession.setText(personMessage.getUserProfession());
-//            userprofession.setEnabled(false);
-//            userDescription.setText(personMessage.getUserDescription());
-//            userDescription.setEnabled(false);
-//        } else
-        if (whereActivity.equals("register")) {
-            personSave.setText("确定", null);
-            personSet.setText("取消", null);
-
-        }
 
     }
 
@@ -100,24 +71,10 @@ public class PersonalSet extends Activity implements View.OnClickListener {
         final Intent intentLogin = new Intent(this, Login.class);
         switch (v.getId()) {
             case R.id.personsave:
-//                if (whereActivity.equals("personSet")) {
-//                    personMessage.setUserName(userName.getText().toString());
-//                    personMessage.setUserSex(userSex);
-//                    personMessage.setUserProfession(userprofession.getText().toString());
-//                    personMessage.setUserDescription(userDescription.getText().toString());
-//                    libraryDB.alterPersonalMessage(personMessage, personMessage.getUserId());
-//                    userId.setEnabled(false);
-//                    userName.setEnabled(false);
-//                    // userSex.setEnabled(false);
-//                    userprofession.setEnabled(false);
-//                    userDescription.setEnabled(false);
-//                } else
                 /**
                  * 账号不能相同，信息（除兴趣书籍外）不能空白，手机格式要正确
                  */
-                if (whereActivity.equals("register")) {
                     try {
-
                         personMessage.setUserId(Integer.valueOf(userId.getText().toString()));
                         if (checkMobileNumber(userTel.getText().toString())) {
                             if (!userName.getText().toString().equals("") && !userPassword.getText().toString().equals("") &&
@@ -128,44 +85,40 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                                 personMessage.setUserSex(userSex);
                                 personMessage.setUserProfession(userprofession.getText().toString());
                                 personMessage.setUserDescription(userDescription.getText().toString());
-                                personMessage.setUserLevel(null);
-                                personMessage.setPastBooks(null);
-                                personMessage.setWpastBooks(null);
+                                personMessage.setUserLevel(0);
+                                personMessage.setPastBooks(0);
+                                personMessage.setWpastBooks(0);
+                                personMessage.setNowBorrow(0);
                                 personMessage.setUserTel(userTel.getText().toString());
                                 personMessage.setIsRootManager("普通用户");
-                                AlertDialog.Builder dialog = new AlertDialog.Builder(PersonalSet.this);
+                                AlertDialog.Builder dialog = new AlertDialog.Builder(RegisterUser.this);
                                 dialog.setTitle("用户注册").setMessage("是否确定注册？").setCancelable(false);
                                 dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        BmobQuery<PersonMessage> personMessageBmobQuery=new BmobQuery<PersonMessage>();
-                                        personMessageBmobQuery.addWhereEqualTo("userId",personMessage.getUserId());
+                                        BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<PersonMessage>();
+                                        personMessageBmobQuery.addWhereEqualTo("userId", personMessage.getUserId());
                                         personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
                                             @Override
                                             public void done(List<PersonMessage> list, BmobException e) {
-
-                                                            if(list.size()==0){
-                                                                personMessage.save(new SaveListener<String>() {
-                                                                    @Override
-                                                                    public void done(String s, BmobException e) {
-                                                                        useToast("注册成功！");
-                                                                        finish();
-                                                                    }
-                                                                });
-                                                            }else {
-                                                                    useToast("该账户已存在！");
+                                                if (e == null) {
+                                                    if (list.size() == 0) {
+                                                        personMessage.save(new SaveListener<String>() {
+                                                            @Override
+                                                            public void done(String s, BmobException e) {
+                                                                useToast("注册成功！");
+                                                                finish();
                                                             }
+                                                        });
+                                                    } else {
+                                                        useToast("该账户已存在！");
+                                                    }
+                                                } else {
+                                                    useToast("网络异常");
+                                                }
                                             }
                                         });
-//                                        if (libraryDB.savePersonalMeassage(personMessage)) {
-//                                            Toast.makeText(PersonalSet.this, "注册成功", Toast.LENGTH_LONG).show();
-//                                            startActivity(intentLogin);
-//                                            finish();
-//                                        } else
-//                                            useToast("该账户已存在！");
-//
-                                      }
-
+                                    }
                                 });
                                 dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                                     @Override
@@ -177,27 +130,16 @@ public class PersonalSet extends Activity implements View.OnClickListener {
                             }
                         } else {
                             useToast("手机格式错误！");
-
                         }
-
                     } catch (Exception e) {
                         useToast("账号格式错误！");
                     }
 
-                }
                 break;
             case R.id.personset:
-//                if (whereActivity.equals("personSet")) {
-//                    userName.setEnabled(true);
-//                    // userSex.setEnabled(true);
-//                    userprofession.setEnabled(true);
-//                    userDescription.setEnabled(true);
-//                } else
-                if (whereActivity.equals("register")) {
                     startActivity(intentLogin);
                     useToast("已取消注册！");
                     finish();
-                }
                 break;
             default:
                 break;

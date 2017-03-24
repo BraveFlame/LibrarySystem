@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
-import com.librarysystem.sqlite.LibraryDB;
 
 import java.util.List;
 import java.util.Random;
@@ -29,7 +28,7 @@ import cn.bmob.v3.listener.UpdateListener;
  */
 
 public class ForgetPassword extends Activity implements View.OnClickListener, Runnable {
-    private LibraryDB libraryDB;
+
     private PersonMessage personMessage = new PersonMessage();
     private Button rePassword, getCode;
     private EditText inputId, intoCode;
@@ -63,7 +62,7 @@ public class ForgetPassword extends Activity implements View.OnClickListener, Ru
         getCode = (Button) findViewById(R.id.forgetgetcode);
         intoCode = (EditText) findViewById(R.id.forgetintocode);
         inputId = (EditText) findViewById(R.id.forgetid);
-        libraryDB = LibraryDB.getInstance(this);
+
           /*
         改密码
          */
@@ -116,7 +115,7 @@ public class ForgetPassword extends Activity implements View.OnClickListener, Ru
                                                     finish();
 
                                                 } else {
-                                                    useToast("网络异常");
+                                                    useToast("修改失败");
                                                 }
                                             }
                                         });
@@ -126,7 +125,7 @@ public class ForgetPassword extends Activity implements View.OnClickListener, Ru
                                     }
                                 }
                             } else {
-                                useToast("网络异常");
+                                useToast("获取信息异常");
                             }
                         }
                     });

@@ -19,7 +19,7 @@
     </RelativeLayout>
 
     <ListView
-        android:background="#e7d49e"
+        android:background="#f2d47e"
         android:id="@+id/list_present_book"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

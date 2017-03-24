@@ -18,7 +18,7 @@ public class BmobApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-       // Bmob.initialize(this,APPID,"demo");
+        Bmob.initialize(this,APPID,"demo");
         BmobConfig config =new BmobConfig.Builder(this)
         //设置appkey
         .setApplicationId(APPID)
@@ -30,5 +30,6 @@ public class BmobApplication extends Application {
         .setFileExpiration(2500)
         .build();
         Bmob.initialize(config);
+
     }
 }

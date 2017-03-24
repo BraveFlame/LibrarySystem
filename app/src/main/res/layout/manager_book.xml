@@ -1,96 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:orientation="vertical" android:layout_width="match_parent"
-android:layout_height="match_parent"
-    android:background="#50a9e2">
-<RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:background="#c681f2">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textSize="25sp"
-        android:text="书本信息"/>
-</RelativeLayout>
+    android:layout_height="match_parent"
+    android:background="#50a9e2"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#c681f2">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="书本信息"
+            android:textSize="25sp" />
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/update_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="书名："/>
+        android:text="书名："
+        android:textSize="20sp" />
 
     <EditText
-    android:id="@+id/update_version"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="20sp"
-    android:text="版本："/>
+        android:id="@+id/update_version"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="版本："
+        android:textSize="20sp" />
+
     <EditText
         android:id="@+id/update_press"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="出版社："/>
-    <EditText
-    android:id="@+id/update_author"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="20sp"
-    android:text="作者："/>
+        android:text="出版社："
+        android:textSize="20sp" />
 
     <EditText
-    android:id="@+id/update_id"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="20sp"
-    android:text="编号："/>
-    <EditText
-    android:id="@+id/update_status"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="20sp"
-    android:text="状态："/>
-    <EditText
-    android:id="@+id/update_date"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="20sp"
-    android:text="应还日期："/>
-    <EditText
-    android:id="@+id/update_message"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="20sp"
-    android:text="主要信息："
-        android:maxLines="6"/>
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginLeft="60dp">
-    <Button
-        android:id="@+id/balter"
-        android:layout_width="wrap_content"
+        android:id="@+id/update_author"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="修改"/>
+        android:text="作者："
+        android:textSize="20sp" />
 
-    <Button
-        android:id="@+id/bdelete"
-        android:layout_toRightOf="@id/balter"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/update_id"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="删除"/>
-    <Button
-        android:id="@+id/bupdate"
-        android:layout_toRightOf="@id/bdelete"
-        android:layout_width="wrap_content"
+        android:text="编号："
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/update_status"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="更新"/>
-</RelativeLayout>
+        android:text="状态："
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/update_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="应还日期："
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/update_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="6"
+        android:text="主要信息："
+        android:textSize="20sp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="60dp">
+
+        <Button
+            android:id="@+id/balter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="修改"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/bdelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/balter"
+            android:text="删除"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/bupdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/bdelete"
+            android:text="更新"
+            android:textSize="20sp" />
+    </RelativeLayout>
 
 </LinearLayout>

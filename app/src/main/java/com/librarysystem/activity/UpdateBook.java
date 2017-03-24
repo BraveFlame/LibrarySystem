@@ -3,7 +3,6 @@ package com.librarysystem.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,7 +11,6 @@ import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.Books;
-import com.librarysystem.sqlite.LibraryDB;
 
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.UpdateListener;
@@ -25,8 +23,6 @@ import cn.bmob.v3.listener.UpdateListener;
 public class UpdateBook extends Activity implements View.OnClickListener {
     private EditText update_name, update_author, update_id, update_message, update_press, update_version, update_status, update_date;
     private Button balter, bdelete, bupdate;
-    private LibraryDB libraryDB;
-    private SharedPreferences pref;
     private Books book;
     private Toast mToast;
 
@@ -34,7 +30,6 @@ public class UpdateBook extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manager_book);
-        libraryDB = LibraryDB.getInstance(this);
         book = (Books) getIntent().getSerializableExtra("bookmessage");
         init();
         balter.setOnClickListener(this);
@@ -75,7 +70,6 @@ public class UpdateBook extends Activity implements View.OnClickListener {
         balter = (Button) findViewById(R.id.balter);
         bdelete = (Button) findViewById(R.id.bdelete);
         bupdate = (Button) findViewById(R.id.bupdate);
-
     }
 
     @Override
@@ -83,7 +77,7 @@ public class UpdateBook extends Activity implements View.OnClickListener {
         int id = book.getBookId();
         switch (v.getId()) {
             case R.id.bdelete:
-                if (!book.getIsLent().equals("无")) {
+                if (!book.getIsLent().equals("可借")) {
                     useToast("书已借出,无法删除！");
                 } else {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(UpdateBook.this);
@@ -91,18 +85,14 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                     dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-//                            if (libraryDB.deleteBooks(book.getBookId())) {
-//
-//
-                            //}
                             book.delete(book.getObjectId(), new UpdateListener() {
                                 @Override
                                 public void done(BmobException e) {
-                                    if(e==null){
+                                    if (e == null) {
                                         useToast("删除成功");
                                         finish();
-                                    }else {
-                                        useToast("网络异常");
+                                    } else {
+                                        useToast("删除异常");
                                     }
                                 }
                             });
@@ -119,7 +109,7 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                 }
                 break;
             case R.id.bupdate:
-                if (!book.getIsLent().equals("无")) {
+                if (!book.getIsLent().equals("可借")) {
                     useToast("借出无法更新！");
                 } else {
                     try {
@@ -133,7 +123,7 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                             book.update(book.getObjectId(), new UpdateListener() {
                                 @Override
                                 public void done(BmobException e) {
-                                    if(e==null){
+                                    if (e == null) {
                                         useToast("更新成功");
                                         update_id.setEnabled(false);
                                         update_name.setEnabled(false);
@@ -142,13 +132,12 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                                         update_version.setEnabled(false);
                                         update_press.setEnabled(false);
 
-                                    }else {
-                                        useToast("网络异常");
+                                    } else {
+                                        useToast("更新异常");
                                     }
                                 }
                             });
 
-                            libraryDB.alterBooks(book, id);
                         } else {
                             useToast("请完善信息！");
                         }
@@ -158,7 +147,7 @@ public class UpdateBook extends Activity implements View.OnClickListener {
                 }
                 break;
             case R.id.balter:
-                if (!book.getIsLent().equals("无")) {
+                if (!book.getIsLent().equals("可借")) {
                     useToast("借出无法更改！");
                 } else {
                     update_id.setEnabled(true);

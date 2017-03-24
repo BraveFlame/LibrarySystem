@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import cn.bmob.push.BmobPush;
+import cn.bmob.v3.BmobInstallation;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
@@ -49,13 +51,12 @@ public class MainPage extends Activity implements View.OnClickListener {
     private EditText inputSearchBook;
     private String bookName;
     private ListView bookList;
-    private List<Books> booksList = new ArrayList<Books>();
-    private List<PresentBooks> books = new ArrayList<PresentBooks>();
+    private List<Books> repertoryBooks = new ArrayList<Books>();
+    private List<PresentBooks> presentBooks = new ArrayList<PresentBooks>();
     private LibraryDB libraryDB;
     private boolean isSearch;
     private SharedPreferences pref;
     private Toast mToast;
-    private Button searchNet;
     private PersonMessage ps;
     private int j = 0, k = 0;
     private PersonMessage person;
@@ -66,10 +67,15 @@ public class MainPage extends Activity implements View.OnClickListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main_page);
         ActivityCollector.addActivity(this);
+      // 初始化BmobSDK
+        //Bmob.initialize(this,"32d94fb0a064700f838f59bc0083ad70");
+        // 使用推送服务时的初始化操作
+        BmobInstallation.getCurrentInstallation().save();
+        // 启动推送服务
+        BmobPush.startWork(this);
         libraryDB = LibraryDB.getInstance(this);
         selectButton = (Button) findViewById(R.id.select_button);
         searchButton = (Button) findViewById(R.id.search_book);
-        searchNet = (Button) findViewById(R.id.search_net);
         inputSearchBook = (EditText) findViewById(R.id.book_search_name);
         impart();
         selectButton.setOnClickListener(this);
@@ -175,10 +181,21 @@ public class MainPage extends Activity implements View.OnClickListener {
                     @Override
                     public void done(List<Books> list, BmobException e) {
                         if (e == null) {
-                            booksList = list;
-                            BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
+                            if (list.size() == 0) {
+                                useToast("没有该书籍！");
+                            } else {
+                                libraryDB.saveBookMeassage(list);
+                                libraryDB.getBookMeassage(bookName, repertoryBooks);
+                                if (repertoryBooks.size() == 0) {
+                                    useToast("没有该书籍！");
+                                } else {
+                                //repertoryBooks=list;
+
+                                }
+                            }
+                            BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, repertoryBooks);
                             bookList.setAdapter(adapter);
-                        } else useToast("网络异常！");
+                        } else useToast("获取失败！");
                     }
                 });
 
@@ -193,35 +210,25 @@ public class MainPage extends Activity implements View.OnClickListener {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         //ea173120a2
                         pref = PreferenceManager.getDefaultSharedPreferences(MainPage.this);
-                        Books book = booksList.get(position);
+                        Books book =repertoryBooks.get(position);
                         bookIntent.putExtra("bookmessage", book);
-                        final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
-                        p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
-                            @Override
-                            public void done(PersonMessage personMessage, BmobException e) {
-                                if (e == null) {
-                                    ps = personMessage;
-                                    String sss = personMessage.getIsRootManager();
-                                    if (ps.getNowBorrow() == null) {
-                                        ps.setNowBorrow(0);
-                                    }
-                                    if (ps.getPastBooks() == null) {
-                                        ps.setPastBooks(0);
-                                    }
-                                    if (ps.getWpastBooks() == null) {
-                                        ps.setWpastBooks(0);
-                                    }
-                                    if (ps.getUserLevel() == null) {
-                                        ps.setUserLevel(0);
-                                    }
-                                    bookIntent.putExtra("person", ps);
-                                    startActivity(bookIntent);
-                                } else {
-                                    useToast("未联网！");
 
+                            final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
+                            p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
+                                @Override
+                                public void done(PersonMessage personMessage, BmobException e) {
+                                    if (e == null) {
+                                        ps = personMessage;
+                                        bookIntent.putExtra("person", ps);
+                                        startActivity(bookIntent);
+                                        startActivity(bookIntent);
+                                    } else {
+                                        useToast("获取个人信息失败！");
+                                    }
                                 }
-                            }
-                        });
+                            });
+
+
                     }
                 });
                 break;
@@ -229,7 +236,6 @@ public class MainPage extends Activity implements View.OnClickListener {
                 break;
         }
     }
-
     /**
      * 刷新借阅界面，根据借出，即将过期，过期三种情况将书标识不一样颜色
      */
@@ -245,9 +251,20 @@ public class MainPage extends Activity implements View.OnClickListener {
                 @Override
                 public void done(List<Books> list, BmobException e) {
                     if (e == null) {
-                        booksList = list;
-                        BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, booksList);
-                        bookList.setAdapter(adapter);
+                        if (list.size() == 0) {
+                            useToast("没有该书籍！");
+                        } else {
+                            libraryDB.saveBookMeassage(list);
+                            libraryDB.getBookMeassage(bookName, repertoryBooks);
+                            if (repertoryBooks.size() == 0) {
+                                useToast("没有该书籍！");
+                            } else {
+                            //repertoryBooks=list;
+
+                            }
+                            BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, repertoryBooks);
+                            bookList.setAdapter(adapter);
+                        }
                     } else useToast("网络异常！");
                 }
             });
@@ -258,39 +275,31 @@ public class MainPage extends Activity implements View.OnClickListener {
             bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Books book = booksList.get(position);
+                    Books book = repertoryBooks.get(position);
                     bookIntent.putExtra("bookmessage", book);
-                    final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
-                    p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
-                        @Override
-                        public void done(PersonMessage personMessage, BmobException e) {
-                            if (e == null) {
-                                ps = personMessage;
-                                String sss = personMessage.getIsRootManager();
-                                if (ps.getNowBorrow() == null) {
-                                    ps.setNowBorrow(0);
+
+                        final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
+                        p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
+                            @Override
+                            public void done(PersonMessage personMessage, BmobException e) {
+                                if (e == null) {
+                                    ps = personMessage;
+                                    bookIntent.putExtra("person", ps);
+                                    startActivity(bookIntent);
+                                    startActivity(bookIntent);
+                                } else {
+                                    useToast("获取个人信息失败！");
                                 }
-                                if (ps.getPastBooks() == null) {
-                                    ps.setPastBooks(0);
-                                }
-                                if (ps.getWpastBooks() == null) {
-                                    ps.setWpastBooks(0);
-                                }
-                                if (ps.getUserLevel() == null) {
-                                    ps.setUserLevel(0);
-                                }
-                                bookIntent.putExtra("person", ps);
-                                startActivity(bookIntent);
-                            } else {
-                                useToast("未联网！");
                             }
-                        }
-                    });
+                        });
+
+
 
                 }
             });
         }
     }
+
     /**
      * 有过期，将要过期的书时，notification通知
      */
@@ -307,12 +316,12 @@ public class MainPage extends Activity implements View.OnClickListener {
                     @Override
                     public void done(List<PresentBooks> list, BmobException e) {
                         if (e == null) {
-                            books = list;
+                            presentBooks= list;
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                            Date date1 = new Date();
-                            for (int i = 0; i < books.size(); i++) {
+                            Date date1;
+                            for (int i = 0; i < presentBooks.size(); i++) {
                                 try {
-                                    date1 = sdf.parse(books.get(i).getBackTime());
+                                    date1 = sdf.parse(presentBooks.get(i).getBackTime());
                                     Date nowDate = new Date();
                                     Date date2 = sdf.parse(sdf.format(nowDate));
                                     long distance = date1.getTime() - date2.getTime();
@@ -351,12 +360,13 @@ public class MainPage extends Activity implements View.OnClickListener {
                                 @Override
                                 public void done(BmobException e) {
                                     if (e == null) {
-                                     j=0;k=0;
-                                    }else    useToast("网络错误！");
+                                        j = 0;
+                                        k = 0;
+                                    } else useToast("个人更新失败！");
                                 }
                             });
                         } else {
-                            useToast("网络异常");
+                            useToast("获取更新异常");
                         }
                     }
                 });

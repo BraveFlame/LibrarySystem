@@ -18,7 +18,7 @@
         android:id="@+id/manager_searchuser_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="25sp"
+        android:textSize="22sp"
         android:background="#e9c07c"
         android:text="查找"
         />

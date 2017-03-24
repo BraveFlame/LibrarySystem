@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,7 +11,6 @@ import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
-import com.librarysystem.sqlite.LibraryDB;
 
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
@@ -27,8 +25,6 @@ import cn.bmob.v3.listener.QueryListener;
 public class UserCcount extends Activity {
     private Toast mToast;
     private SharedPreferences pref;
-    private LibraryDB libraryDB;
-    private PersonMessage personMessage = new PersonMessage();
     private TextView accountId, accountName, accountSex, accountpro, accounthobby, accounttel,
             accountlevel, accountpast, accountwpast, userProperty;
     private Button alterPassword;
@@ -37,14 +33,9 @@ public class UserCcount extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_ccount);
-        libraryDB = LibraryDB.getInstance(this);
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
         alterPassword = (Button) findViewById(R.id.usercpassword);
         init();
-        // libraryDB.getPersonalMeassage(personMessage, pref.getInt("userId", 200000));
         BmobQuery<PersonMessage>personMessage=new BmobQuery<PersonMessage>();
-        //pref.getString("objectid", "")    ea173120a2
-        String dd=pref.getString("objectid", "");
         personMessage.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
             @Override
             public void done(PersonMessage personMessage, BmobException e) {

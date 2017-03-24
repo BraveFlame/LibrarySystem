@@ -25,12 +25,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="账号："
+        android:layout_marginLeft="10dp"
         android:textSize="25sp" />
     <TextView
         android:id="@+id/user_property"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="25sp"
+        android:layout_marginLeft="10dp"
         android:text="属性："/>
 
 
@@ -39,6 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="姓名："
+        android:layout_marginLeft="10dp"
         android:textSize="25sp" />
 
 
@@ -47,6 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="性别："
+        android:layout_marginLeft="10dp"
         android:textSize="25sp" />
 
 
@@ -55,6 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="专业："
+        android:layout_marginLeft="10dp"
         android:textSize="25sp" />
 
 
@@ -63,6 +68,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="书籍爱好："
+        android:layout_marginLeft="10dp"
         android:textSize="25sp" />
 
 
@@ -71,6 +77,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="联系方式："
+        android:layout_marginLeft="10dp"
         android:textSize="25sp" />
 
 
@@ -79,6 +86,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="逾期书本："
+        android:layout_marginLeft="10dp"
         android:textSize="25sp" />
 
     <TextView
@@ -86,6 +94,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="即将到期："
+        android:layout_marginLeft="10dp"
         android:textSize="25sp" />
 
 
@@ -94,12 +103,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="借阅等级："
+        android:layout_marginLeft="10dp"
         android:textSize="25sp" />
 
         <Button
             android:id="@+id/usercpassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="100dp"
             android:text="修改密码"
             android:textSize="25sp" />
 

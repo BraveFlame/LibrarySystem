@@ -11,7 +11,6 @@ import android.widget.Toast;
 import com.librarysystem.R;
 import com.librarysystem.model.BookPastAdapter;
 import com.librarysystem.model.PastBooks;
-import com.librarysystem.sqlite.LibraryDB;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,7 @@ import cn.bmob.v3.listener.FindListener;
  */
 
 public class PassBorrow extends Activity {
-    private LibraryDB libraryDB;
+
     private ListView bookList;
     private TextView title;
     private List<PastBooks> booksList = new ArrayList<PastBooks>();
@@ -39,7 +38,6 @@ public class PassBorrow extends Activity {
         setContentView(R.layout.listview_book);
         title = (TextView) findViewById(R.id.title);
         title.setText("历史借阅");
-        libraryDB = LibraryDB.getInstance(this);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         bookList = (ListView) findViewById(R.id.list_present_book);
 
@@ -57,7 +55,7 @@ public class PassBorrow extends Activity {
                         useToast("暂无历史借阅！");
                     }
                 } else {
-                    useToast("网络异常！");
+                    useToast("获取异常！");
                 }
             }
         });

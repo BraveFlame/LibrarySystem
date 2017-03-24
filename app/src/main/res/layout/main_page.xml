@@ -6,7 +6,7 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:background="#c681f2"
+    android:background="#72a5f1"
     >
     <Button
         android:id="@+id/select_button"
@@ -14,7 +14,7 @@
         android:layout_height="50dp"
         android:text="选择"
         android:textSize="18sp"
-        android:background="#d791b6"
+        android:background="#448de6"
        />
     <EditText
         android:id="@+id/book_search_name"
@@ -28,7 +28,7 @@
         android:layout_height="50dp"
         android:layout_alignParentRight="true"
         android:text="搜索"
-        android:background="#d791b6"/>
+        android:background="#448de6"/>
 </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"

@@ -33,7 +33,7 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
     private Button bsave, bquery;
     private String bookName;
     private ListView bookList;
-    private List<Books> booksList = new ArrayList<Books>();
+    private List<Books> repertoryBooks = new ArrayList<Books>();
     private LibraryDB libraryDB;
     private boolean isQuery;
     private Toast mToast;
@@ -99,25 +99,27 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
             case R.id.bquery:
                 try {
                     isQuery = true;
-//                    bookName = queryName.getText().toString();
-//                    libraryDB.getBookMeassage(bookName, booksList);
+                   bookName = queryName.getText().toString();
                     bookList = (ListView) findViewById(R.id.list_query_book);
                     BmobQuery<Books> pb = new BmobQuery<>();
                     pb.findObjects(new FindListener<Books>() {
                         @Override
                         public void done(List<Books> list, BmobException e) {
                             if (e == null) {
-                                booksList = list;
-                                /**
-                                 * 将搜索结果显示出来
-                                 */
-                                BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, booksList);
-                                bookList.setAdapter(adapter);
-                                if (booksList.size() == 0) {
-                                  useToast("没有符合搜索要求的图书！");
+                                if (list.size() == 0) {
+                                    useToast("没有该书籍！");
+                                } else {
+                                    libraryDB.saveBookMeassage(list);
+                                    libraryDB.getBookMeassage(bookName, repertoryBooks);
+                                    if (repertoryBooks.size() == 0) {
+                                        useToast("没有该书籍！");
+                                    } else {
+                                        BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, repertoryBooks);
+                                        bookList.setAdapter(adapter);
+                                    }
                                 }
                             } else {
-                                useToast("网络异常！");
+                                useToast("获取失败！");
                             }
                         }
                     });
@@ -128,7 +130,7 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                     bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Books book = booksList.get(position);
+                            Books book = repertoryBooks.get(position);
                             bookIntent.putExtra("bookmessage", book);
                             startActivity(bookIntent);
                         }
@@ -151,17 +153,37 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
         super.onRestart();
         if (isQuery) {
             try {
-
-                bookName = queryName.getText().toString();
-                libraryDB.getBookMeassage(bookName, booksList);
-                BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, booksList);
                 bookList = (ListView) findViewById(R.id.list_query_book);
-                bookList.setAdapter(adapter);
+                BmobQuery<Books> pb = new BmobQuery<>();
+                pb.findObjects(new FindListener<Books>() {
+                    @Override
+                    public void done(List<Books> list, BmobException e) {
+                        if (e == null) {
+                            if (list.size() == 0) {
+                                useToast("没有该书籍！");
+                            } else {
+                                libraryDB.saveBookMeassage(list);
+                                libraryDB.getBookMeassage(bookName,repertoryBooks);
+                                if (repertoryBooks.size() == 0) {
+                                    useToast("没有该书籍！");
+                                } else {
+                                    BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, repertoryBooks);
+                                    bookList.setAdapter(adapter);
+                                }
+                            }
+                        } else {
+                            useToast("获取失败！");
+                        }
+                    }
+                });
                 final Intent bookIntent = new Intent(this, UpdateBook.class);
+                /**
+                 *点击查看每本书的信息
+                 */
                 bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Books book = booksList.get(position);
+                        Books book = repertoryBooks.get(position);
                         bookIntent.putExtra("bookmessage", book);
                         startActivity(bookIntent);
                     }

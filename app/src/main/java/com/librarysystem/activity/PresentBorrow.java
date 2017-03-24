@@ -15,7 +15,6 @@ import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.model.PresentAdapter;
 import com.librarysystem.model.PresentBooks;
-import com.librarysystem.sqlite.LibraryDB;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +31,8 @@ import cn.bmob.v3.listener.QueryListener;
 
 public class PresentBorrow extends Activity {
 
-    private LibraryDB libraryDB;
-    private String bookName;
+
+
     private ListView bookList;
     private List<PresentBooks> booksList = new ArrayList<PresentBooks>();
     private SharedPreferences pref;
@@ -46,7 +45,7 @@ public class PresentBorrow extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.listview_book);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        libraryDB = LibraryDB.getInstance(this);
+
         bookList = (ListView) findViewById(R.id.list_present_book);
         /**
          *  BmobQuery<PresentBooks> b = new BmobQuery<>();
@@ -68,7 +67,7 @@ public class PresentBorrow extends Activity {
                         useToast("当前没有借阅的书籍！");
                     }
                 } else {
-                    useToast("网络异常！");
+                    useToast("获取书籍异常！");
                 }
             }
         });
@@ -106,10 +105,9 @@ public class PresentBorrow extends Activity {
                             bookIntent.putExtra("person", ps);
                             startActivity(bookIntent);
                         } else {
-                            useToast("未联网！");
-
+                            useToast("获取个人信息失败！");
                         }
-                        startActivity(bookIntent);
+
                     }
                 });
             }
@@ -135,7 +133,7 @@ public class PresentBorrow extends Activity {
                         useToast("当前没有借阅的书籍！");
                     }
                 } else {
-                    useToast("网络异常！");
+                    useToast("获取书籍失败！");
                 }
             }
         });
@@ -173,7 +171,7 @@ public class PresentBorrow extends Activity {
                             bookIntent.putExtra("person", ps);
                             startActivity(bookIntent);
                         } else {
-                            useToast("未联网！");
+                            useToast("获取个人信息失败！");
 
                         }
                         startActivity(bookIntent);

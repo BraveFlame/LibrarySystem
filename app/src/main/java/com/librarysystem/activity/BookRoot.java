@@ -1,9 +1,7 @@
 package com.librarysystem.activity;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,7 +24,6 @@ public class BookRoot extends Activity {
     private EditText maxBooks, firstBook, thanBook;
     private Button set_Books;
     private Toast mToast;
-    private SharedPreferences pref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +31,6 @@ public class BookRoot extends Activity {
         maxBooks = (EditText) findViewById(R.id.max_eborrow);
         firstBook = (EditText) findViewById(R.id.first_eborrow);
         thanBook = (EditText) findViewById(R.id.than_eborrow);
-        pref = PreferenceManager.getDefaultSharedPreferences(BookRoot.this);
         BmobQuery<Rule> ruleBmobQuery = new BmobQuery<>();
         ruleBmobQuery.getObject("c9cf23b8fb", new QueryListener<Rule>() {
             @Override
@@ -44,7 +40,7 @@ public class BookRoot extends Activity {
                     firstBook.setText("" + rule.getFirstDay());
                     thanBook.setText("" + rule.getSecondDay());
                 } else {
-                    useToast("网络异常");
+                    useToast("获取失败");
                 }
             }
         });
@@ -65,7 +61,7 @@ public class BookRoot extends Activity {
                                 useToast("修改成功");
                                 finish();
                             } else {
-                                useToast("网络异常");
+                                useToast("修改失败");
                             }
                         }
                     });
