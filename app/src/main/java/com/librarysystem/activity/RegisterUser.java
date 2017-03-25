@@ -11,10 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
+import com.librarysystem.others.DialogMessage;
+import com.librarysystem.others.ToastMessage;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -34,11 +35,10 @@ public class RegisterUser extends Activity implements View.OnClickListener {
 
     private PersonMessage personMessage = new PersonMessage();
     private EditText userId, userPassword, userName, userprofession;
-    private EditText userDescription, userTel;
+    private EditText userDescription, userTel, secondpassword;
     private Button personSave, personSet;
     private RadioGroup groupSex;
-    private String  userSex;
-    private Toast mToast;
+    private String userSex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,12 +74,27 @@ public class RegisterUser extends Activity implements View.OnClickListener {
                 /**
                  * 账号不能相同，信息（除兴趣书籍外）不能空白，手机格式要正确
                  */
-                    try {
-                        personMessage.setUserId(Integer.valueOf(userId.getText().toString()));
-                        if (checkMobileNumber(userTel.getText().toString())) {
-                            if (!userName.getText().toString().equals("") && !userPassword.getText().toString().equals("") &&
-                                    !userSex.equals("") && !userprofession.getText().toString().equals("")
-                                    ) {
+                try {
+                    /**
+                     * 账号格式
+                     */
+                    personMessage.setUserId(Integer.valueOf(userId.getText().toString()));
+                    /**
+                     * 手机号格式
+                     */
+                    if (checkMobileNumber(userTel.getText().toString())) {
+
+
+                        /**
+                         * 不能为空
+                         */
+                        if (!userName.getText().toString().equals("") && !userPassword.getText().toString().equals("") &&
+                                !userSex.equals("") && !userprofession.getText().toString().equals("")
+                                && !secondpassword.getText().toString().equals("")) {
+                            /**
+                             * 两次密码一样
+                             */
+                            if (secondpassword.getText().toString().equals(userPassword.getText().toString())) {
                                 personMessage.setUserPassword(userPassword.getText().toString());
                                 personMessage.setUserName(userName.getText().toString());
                                 personMessage.setUserSex(userSex);
@@ -95,26 +110,28 @@ public class RegisterUser extends Activity implements View.OnClickListener {
                                 dialog.setTitle("用户注册").setMessage("是否确定注册？").setCancelable(false);
                                 dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                                    public void onClick(final DialogInterface dialog, int which) {
+                                        DialogMessage.showDialog(RegisterUser.this);
                                         BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<PersonMessage>();
                                         personMessageBmobQuery.addWhereEqualTo("userId", personMessage.getUserId());
                                         personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
                                             @Override
                                             public void done(List<PersonMessage> list, BmobException e) {
+                                                DialogMessage.closeDialog();
                                                 if (e == null) {
                                                     if (list.size() == 0) {
                                                         personMessage.save(new SaveListener<String>() {
                                                             @Override
                                                             public void done(String s, BmobException e) {
-                                                                useToast("注册成功！");
+                                                                ToastMessage.useToast(RegisterUser.this, "注册成功！");
                                                                 finish();
                                                             }
                                                         });
                                                     } else {
-                                                        useToast("该账户已存在！");
+                                                        ToastMessage.useToast(RegisterUser.this, "该账户已存在！");
                                                     }
                                                 } else {
-                                                    useToast("网络异常");
+                                                    ToastMessage.useToast(RegisterUser.this, "网络异常");
                                                 }
                                             }
                                         });
@@ -127,19 +144,28 @@ public class RegisterUser extends Activity implements View.OnClickListener {
                                     }
                                 });
                                 dialog.show();
+                            } else {
+                                ToastMessage.useToast(RegisterUser.this, "两次密码不一致");
+                                userPassword.setText("");
+                                secondpassword.setText("");
+
                             }
                         } else {
-                            useToast("手机格式错误！");
+                            ToastMessage.useToast(RegisterUser.this, "输入不能为空！");
+
                         }
-                    } catch (Exception e) {
-                        useToast("账号格式错误！");
+                    } else {
+                        ToastMessage.useToast(RegisterUser.this, "手机格式错误！");
                     }
+                } catch (Exception e) {
+                    ToastMessage.useToast(RegisterUser.this, "账号格式错误！");
+                }
 
                 break;
             case R.id.personset:
-                    startActivity(intentLogin);
-                    useToast("已取消注册！");
-                    finish();
+                startActivity(intentLogin);
+                ToastMessage.useToast(RegisterUser.this, "已取消注册！");
+                finish();
                 break;
             default:
                 break;
@@ -154,6 +180,7 @@ public class RegisterUser extends Activity implements View.OnClickListener {
         userprofession = (EditText) findViewById(R.id.userProfession);
         userDescription = (EditText) findViewById(R.id.userDescription);
         userTel = (EditText) findViewById(R.id.user_tel);
+        secondpassword = (EditText) findViewById(R.id.secondPassword);
 
     }
 
@@ -171,32 +198,16 @@ public class RegisterUser extends Activity implements View.OnClickListener {
             Matcher matcher = regex.matcher(mobileNumber);
             flag = matcher.matches();
         } catch (Exception e) {
-            useToast("手机格式错误！");
+            ToastMessage.useToast(RegisterUser.this, "手机格式错误！");
             flag = false;
 
         }
         return flag;
     }
 
-    public void useToast(String text) {
-        if (mToast == null) {
-            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        } else {
-            mToast.setText(text);
-            mToast.setDuration(Toast.LENGTH_SHORT);
-        }
-        mToast.show();
-    }
-
-    public void cancelToast() {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cancelToast();
+        ToastMessage.cancelToast();
     }
 }

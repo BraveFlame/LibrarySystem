@@ -48,9 +48,9 @@ public class PresentAdapter extends ArrayAdapter<PresentBooks> {
             if (days < 1) {
                 view.setBackgroundResource(R.drawable.selector);
             } else if (days >= 1 && days < 7) {
-                view.setBackgroundColor(Color.parseColor("#efc95b"));
+                view.setBackgroundColor(Color.parseColor("#f5dd96"));
             } else {
-                view.setBackgroundColor(Color.parseColor("#f2d47e"));
+                view.setBackgroundColor(Color.parseColor("#e2d3a7"));
             }
 
         } catch (Exception e) {

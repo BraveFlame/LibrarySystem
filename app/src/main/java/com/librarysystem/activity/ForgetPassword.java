@@ -9,10 +9,11 @@ import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
+import com.librarysystem.others.DialogMessage;
+import com.librarysystem.others.ToastMessage;
 
 import java.util.List;
 import java.util.Random;
@@ -33,7 +34,6 @@ public class ForgetPassword extends Activity implements View.OnClickListener, Ru
     private Button rePassword, getCode;
     private EditText inputId, intoCode;
     private int i = 0, randomcode = 0;
-    private Toast mToast;
     private static final int CODE1 = 1, CODE2 = 2;
     private Handler handler = new Handler() {
         @Override
@@ -88,7 +88,7 @@ public class ForgetPassword extends Activity implements View.OnClickListener, Ru
                                 NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                                 if (list.size() == 0) {
                                     inputId.setText("");
-                                    useToast("账号不存在或已被注销！");
+                                    ToastMessage.useToast(ForgetPassword.this, "账号不存在或已被注销！");
                                     intoCode.setText("");
                                     manager.cancel(2);
                                 } else {
@@ -101,21 +101,22 @@ public class ForgetPassword extends Activity implements View.OnClickListener, Ru
                                             intoCode.setText("");
                                         } else {
                                             i--;
-                                            useToast("验证码错误！");
+                                            ToastMessage.useToast(ForgetPassword.this, "验证码错误！");
                                             manager.cancel(2);
                                         }
                                     } else if (i == 2) {
+                                        DialogMessage.showDialog(ForgetPassword.this);
                                         personMessage.setUserPassword(code);
                                         personMessage.update(personMessage.getObjectId(), new UpdateListener() {
                                             @Override
                                             public void done(BmobException e) {
+                                                DialogMessage.closeDialog();
                                                 if (e == null) {
-                                                    useToast("密码修改成功！");
+                                                    ToastMessage.useToast(ForgetPassword.this, "密码修改成功！");
                                                     i = 0;
                                                     finish();
-
                                                 } else {
-                                                    useToast("修改失败");
+                                                    ToastMessage.useToast(ForgetPassword.this, "修改失败");
                                                 }
                                             }
                                         });
@@ -125,13 +126,13 @@ public class ForgetPassword extends Activity implements View.OnClickListener, Ru
                                     }
                                 }
                             } else {
-                                useToast("获取信息异常");
+                                ToastMessage.useToast(ForgetPassword.this, "获取信息异常");
                             }
                         }
                     });
 
                 } catch (Exception ee) {
-                    useToast("账号格式错误！");
+                    ToastMessage.useToast(ForgetPassword.this, "账号格式错误！");
                 }
                 break;
             case R.id.forgetgetcode:
@@ -143,26 +144,10 @@ public class ForgetPassword extends Activity implements View.OnClickListener, Ru
         }
     }
 
-    public void useToast(String text) {
-        if (mToast == null) {
-            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        } else {
-            mToast.setText(text);
-            mToast.setDuration(Toast.LENGTH_SHORT);
-        }
-        mToast.show();
-    }
-
-    public void cancelToast() {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cancelToast();
+        ToastMessage.cancelToast();
     }
 
     @Override

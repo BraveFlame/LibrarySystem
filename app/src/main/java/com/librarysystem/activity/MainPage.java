@@ -17,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.ActivityCollector;
@@ -25,6 +24,8 @@ import com.librarysystem.model.BookAdapter;
 import com.librarysystem.model.Books;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.model.PresentBooks;
+import com.librarysystem.others.DialogMessage;
+import com.librarysystem.others.ToastMessage;
 import com.librarysystem.sqlite.LibraryDB;
 
 import java.text.SimpleDateFormat;
@@ -58,7 +59,6 @@ public class MainPage extends Activity implements View.OnClickListener {
     private LibraryDB libraryDB;
     private boolean isSearch;
     private SharedPreferences pref;
-    private Toast mToast;
     private PersonMessage ps;
     private int j = 0, k = 0;
     private PersonMessage person;
@@ -130,10 +130,10 @@ public class MainPage extends Activity implements View.OnClickListener {
                                 break;
                             case 4:
                                 pref = PreferenceManager.getDefaultSharedPreferences(MainPage.this);
-                                if (pref.getInt("userId", 0) == 12345) {
+                                if (pref.getString("root", "").equals("管理员")) {
                                     startActivity(intentRoot);
                                 } else {
-                                    useToast("您不是管理员！");
+                                    ToastMessage.useToast(MainPage.this, "您不是管理员！");
                                 }
                                 break;
                             case 5:
@@ -176,63 +176,8 @@ public class MainPage extends Activity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.search_book:
                 isSearch = true;
-                bookList = (ListView) findViewById(R.id.list_search_book);
-                bookName = inputSearchBook.getText().toString();
-                BmobQuery<Books> bs = new BmobQuery<Books>();
-                bs.findObjects(new FindListener<Books>() {
-                    @Override
-                    public void done(List<Books> list, BmobException e) {
-                        if (e == null) {
-                            if (list.size() == 0) {
-                                useToast("没有该书籍！");
-                            } else {
-                                libraryDB.saveBookMeassage(list);
-                                libraryDB.getBookMeassage(bookName, repertoryBooks);
-                                if (repertoryBooks.size() == 0) {
-                                    useToast("没有该书籍！");
-                                } else {
-                                    //repertoryBooks=list;
-
-                                }
-                            }
-                            BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, repertoryBooks);
-                            bookList.setAdapter(adapter);
-                        } else useToast("获取失败！");
-                    }
-                });
-
-                /**
-                 *将搜索结果显示出来，查看每本书的信息
-                 */
-
-                final Intent bookIntent = new Intent(this, DetailedBook.class);
-
-                bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        //ea173120a2
-                        pref = PreferenceManager.getDefaultSharedPreferences(MainPage.this);
-                        Books book = repertoryBooks.get(position);
-                        bookIntent.putExtra("bookmessage", book);
-
-                        final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
-                        p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
-                            @Override
-                            public void done(PersonMessage personMessage, BmobException e) {
-                                if (e == null) {
-                                    ps = personMessage;
-                                    bookIntent.putExtra("person", ps);
-                                    startActivity(bookIntent);
-                                    startActivity(bookIntent);
-                                } else {
-                                    useToast("获取个人信息失败！");
-                                }
-                            }
-                        });
-
-
-                    }
-                });
+                DialogMessage.showDialog(MainPage.this);
+                searchBooks();
                 break;
             default:
                 break;
@@ -247,59 +192,9 @@ public class MainPage extends Activity implements View.OnClickListener {
         super.onRestart();
         impart();
         if (isSearch) {
-            bookName = inputSearchBook.getText().toString();
-            bookList = (ListView) findViewById(R.id.list_search_book);
-            BmobQuery<Books> b = new BmobQuery<Books>();
-            b.findObjects(new FindListener<Books>() {
-                @Override
-                public void done(List<Books> list, BmobException e) {
-                    if (e == null) {
-                        if (list.size() == 0) {
-                            useToast("没有该书籍！");
-                        } else {
-                            libraryDB.saveBookMeassage(list);
-                            libraryDB.getBookMeassage(bookName, repertoryBooks);
-                            if (repertoryBooks.size() == 0) {
-                                useToast("没有该书籍！");
-                            } else {
-                                //repertoryBooks=list;
-
-                            }
-                            BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, repertoryBooks);
-                            bookList.setAdapter(adapter);
-                        }
-                    } else useToast("网络异常！");
-                }
-            });
-            final Intent bookIntent = new Intent(this, DetailedBook.class);
-                /*
-                点击查看每本书的信息
-                 */
-            bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Books book = repertoryBooks.get(position);
-                    bookIntent.putExtra("bookmessage", book);
-
-                    final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
-                    p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
-                        @Override
-                        public void done(PersonMessage personMessage, BmobException e) {
-                            if (e == null) {
-                                ps = personMessage;
-                                bookIntent.putExtra("person", ps);
-                                startActivity(bookIntent);
-                                startActivity(bookIntent);
-                            } else {
-                                useToast("获取个人信息失败！");
-                            }
-                        }
-                    });
-
-
-                }
-            });
+            searchBooks();
         }
+
     }
 
     /**
@@ -310,7 +205,7 @@ public class MainPage extends Activity implements View.OnClickListener {
         BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<>();
         personMessageBmobQuery.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
             @Override
-            public void done(PersonMessage personMessage, BmobException e) {
+            public void done(final PersonMessage personMessage, BmobException e) {
                 person = personMessage;
                 BmobQuery<PresentBooks> pb = new BmobQuery<>();
                 pb.addWhereEqualTo("userId", pref.getInt("userId", 0));
@@ -336,39 +231,12 @@ public class MainPage extends Activity implements View.OnClickListener {
                                 } catch (Exception ee) {
                                 }
                             }
-                            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                            if (j > 0) {
-                                person.setWpastBooks(j);
-                                Notification.Builder notification = new Notification.Builder(MainPage.this).setTicker("图书通知！").setContentTitle("图书通知")
-                                        .setContentText("您有" + j + "本书将要过期！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
-                                manager.notify(3, notification.build());
-                                person.setWpastBooks(j);
-                            } else {
-                                person.setWpastBooks(0);
-                                manager.cancel(3);
-                            }
-                            if (k > 0) {
-                                person.setPastBooks(k);
-                                Notification.Builder notification = new Notification.Builder(MainPage.this).setTicker("图书通知！").setContentTitle("图书通知")
-                                        .setContentText("您有" + k + "本书已过期，请尽快归还！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
-                                manager.notify(4, notification.build());
-                                person.setPastBooks(k);
-                            } else {
-                                manager.cancel(4);
-                                person.setPastBooks(0);
+                            notifyBooks(k, j, person);
+                            k = 0;
+                            j = 0;
 
-                            }
-                            person.update(pref.getString("objectid", ""), new UpdateListener() {
-                                @Override
-                                public void done(BmobException e) {
-                                    if (e == null) {
-                                        j = 0;
-                                        k = 0;
-                                    } else useToast("个人更新失败！");
-                                }
-                            });
                         } else {
-                            useToast("获取更新异常");
+                            ToastMessage.useToast(MainPage.this, "网络异常");
                         }
                     }
                 });
@@ -378,27 +246,147 @@ public class MainPage extends Activity implements View.OnClickListener {
 
     }
 
-    public void useToast(String text) {
-        if (mToast == null) {
-            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+    public void notifyBooks(final int k, final int j, PersonMessage person) {
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (j > 0) {
+            person.setWpastBooks(j);
+            Notification.Builder notification = new Notification.Builder(MainPage.this).setTicker("图书通知！").setContentTitle("图书通知")
+                    .setContentText("您有" + j + "本书将要过期！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
+            manager.notify(3, notification.build());
+            person.setWpastBooks(j);
         } else {
-            mToast.setText(text);
-            mToast.setDuration(Toast.LENGTH_SHORT);
+            person.setWpastBooks(0);
+            manager.cancel(3);
         }
-        mToast.show();
+        if (k > 0) {
+            person.setPastBooks(k);
+            Notification.Builder notification = new Notification.Builder(MainPage.this).setTicker("图书通知！").setContentTitle("图书通知")
+                    .setContentText("您有" + k + "本书已过期，请尽快归还！").setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
+            manager.notify(4, notification.build());
+            person.setPastBooks(k);
+        } else {
+            manager.cancel(4);
+            person.setPastBooks(0);
+
+        }
+        person.update(pref.getString("objectid", ""), new UpdateListener() {
+            @Override
+            public void done(BmobException e) {
+
+                if (e == null) {
+
+                } else ToastMessage.useToast(MainPage.this, "个人更新失败！");
+            }
+        });
     }
 
-    public void cancelToast() {
-        if (mToast != null) {
-            mToast.cancel();
-        }
+    public void searchBooks() {
+        bookList = (ListView) findViewById(R.id.list_search_book);
+        bookName = inputSearchBook.getText().toString();
+        BmobQuery<Books> bs = new BmobQuery<Books>();
+        bs.findObjects(new FindListener<Books>() {
+            @Override
+            public void done(List<Books> list, BmobException e) {
+                DialogMessage.closeDialog();
+                if (e == null) {
+                    if (list.size() == 0) {
+                        //ToastMessage.useToast(MainPage.this, "没有该书籍！");
+                    } else {
+                        libraryDB.saveBookMeassage(list);
+                        libraryDB.getBookMeassage(bookName, repertoryBooks);
+                        if (repertoryBooks.size() == 0) {
+                            //ToastMessage.useToast(MainPage.this, "没有该书籍！");
+                        } else {
+                            //repertoryBooks=list;
+                        }
+                    }
+                    BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, repertoryBooks);
+                    bookList.setAdapter(adapter);
+                } else ToastMessage.useToast(MainPage.this, "网络异常！");
+            }
+        });
+
+        /**
+         *将搜索结果显示出来，查看每本书的信息
+         */
+
+        final Intent bookIntent = new Intent(this, DetailedBook.class);
+
+        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //ea173120a2
+                pref = PreferenceManager.getDefaultSharedPreferences(MainPage.this);
+                Books book = repertoryBooks.get(position);
+                bookIntent.putExtra("bookmessage", book);
+
+                final BmobQuery<PersonMessage> p = new BmobQuery<PersonMessage>();
+                p.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
+                    @Override
+                    public void done(PersonMessage personMessage, BmobException e) {
+                        if (e == null) {
+                            ps = personMessage;
+                            bookIntent.putExtra("person", ps);
+                            startActivity(bookIntent);
+                            startActivity(bookIntent);
+                        } else {
+                            ToastMessage.useToast(MainPage.this, "获取个人信息失败！");
+                        }
+                    }
+                });
+
+
+            }
+        });
     }
+//
+//    /**
+//     * 显示进度对话框
+//     */
+//    public void showDialog() {
+//        if (progressDialog == null) {
+//            progressDialog = new ProgressDialog(this);
+//            progressDialog.setMessage("正在加载...");
+//            progressDialog.setCanceledOnTouchOutside(false);
+//        }
+//    }
+
+//    /**
+//     * 取消进度对话框
+//     */
+//    public void closeDialog() {
+//        if (progressDialog != null) {
+//            progressDialog.dismiss();
+//        }
+//    }
+//
+//    /**
+//     * 解救Toast频繁显示
+//     *
+//     * @param text
+//     */
+//
+//    public void useToast(String text) {
+//        if (mToast == null) {
+//            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+//        } else {
+//            mToast.setText(text);
+//            mToast.setDuration(Toast.LENGTH_SHORT);
+//        }
+//        mToast.show();
+//    }
+//
+//    public void cancelToast() {
+//        if (mToast != null) {
+//            mToast.cancel();
+//        }
+//    }
 
     @Override
     public void onBackPressed() {
         moveTaskToBack(true);
         super.onBackPressed();
-        cancelToast();
+        ToastMessage.cancelToast();
     }
 
     /**

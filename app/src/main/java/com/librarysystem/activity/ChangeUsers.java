@@ -15,6 +15,7 @@ import com.librarysystem.model.PastBooks;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.model.PresentBooks;
 import com.librarysystem.model.Rule;
+import com.librarysystem.others.DialogMessage;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class ChangeUsers extends Activity {
         deleteUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DialogMessage.showDialog(ChangeUsers.this);
                 AlertDialog.Builder dialog = new AlertDialog.Builder(ChangeUsers.this);
                 dialog.setTitle("注销").setMessage("是否删除用户？").setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
@@ -76,6 +78,7 @@ public class ChangeUsers extends Activity {
                         pastBooksBmobQuery.findObjects(new FindListener<PastBooks>() {
                             @Override
                             public void done(List<PastBooks> list, BmobException e) {
+                                DialogMessage.closeDialog();
                                 if (e == null) {
                                     List<BmobObject> bmobObjectList = new ArrayList<BmobObject>();
                                     for (int i = 0; i < list.size(); i++) {
@@ -107,6 +110,7 @@ public class ChangeUsers extends Activity {
                         booksBmobQuery.findObjects(new FindListener<Books>() {
                             @Override
                             public void done(List<Books> list, BmobException e) {
+                                DialogMessage.closeDialog();
                                 if (e == null) {
                                     List<BmobObject> bmobObjectList = new ArrayList<BmobObject>();
                                     for (int i = 0; i < list.size(); i++) {
@@ -135,7 +139,9 @@ public class ChangeUsers extends Activity {
                         personMessage.delete(personMessage.getObjectId(), new UpdateListener() {
                             @Override
                             public void done(BmobException e) {
+                                DialogMessage.closeDialog();
                                 if (e == null) {
+
 
                                 } else {
                                     useToast("删除人失败");
@@ -150,6 +156,7 @@ public class ChangeUsers extends Activity {
                         presentBooksBmobQuery.findObjects(new FindListener<PresentBooks>() {
                             @Override
                             public void done(List<PresentBooks> list, BmobException e) {
+                                DialogMessage.closeDialog();
                                 if (e == null) {
                                     for (int i = 0; i < list.size(); i++) {
                                         book = list.get(i);
@@ -164,6 +171,7 @@ public class ChangeUsers extends Activity {
                                         b.findObjects(new FindListener<Books>() {
                                             @Override
                                             public void done(List<Books> list, BmobException e) {
+                                                DialogMessage.closeDialog();
                                                 if (e == null) {
                                                     books = list.get(0);
                                                     /**
@@ -178,7 +186,7 @@ public class ChangeUsers extends Activity {
                                                         books.update(books.getObjectId(), new UpdateListener() {
                                                             @Override
                                                             public void done(BmobException e) {
-
+                                                                DialogMessage.closeDialog();
                                                                 if (e == null) {
                                                                 } else {
                                                                     useToast("返回书库失败！");
@@ -188,6 +196,7 @@ public class ChangeUsers extends Activity {
                                                         book.delete(book.getObjectId(), new UpdateListener() {
                                                             @Override
                                                             public void done(BmobException e) {
+                                                                DialogMessage.closeDialog();
                                                                 if (e == null) {
 
                                                                 } else {
@@ -210,8 +219,9 @@ public class ChangeUsers extends Activity {
                                                         personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
                                                             @Override
                                                             public void done(List<PersonMessage> list, BmobException e) {
+                                                                DialogMessage.closeDialog();
                                                                 if (e == null) {
-                                                                    personMessage=list.get(0);
+                                                                    personMessage = list.get(0);
                                                                     BmobQuery<Rule> ruleBmobQuery = new BmobQuery<Rule>();
                                                                     ruleBmobQuery.getObject("c9cf23b8fb", new QueryListener<Rule>() {
                                                                         @Override
@@ -237,6 +247,7 @@ public class ChangeUsers extends Activity {
                                                                                 books.update(books.getObjectId(), new UpdateListener() {
                                                                                     @Override
                                                                                     public void done(BmobException e) {
+                                                                                        DialogMessage.closeDialog();
                                                                                         if (e == null) {
 
                                                                                         } else {
@@ -256,6 +267,7 @@ public class ChangeUsers extends Activity {
                                                                                 book.update(book.getObjectId(), new UpdateListener() {
                                                                                     @Override
                                                                                     public void done(BmobException e) {
+                                                                                        DialogMessage.closeDialog();
                                                                                         if (e == null) {
 
                                                                                         } else {
@@ -271,7 +283,7 @@ public class ChangeUsers extends Activity {
                                                                                 personMessage.update(personMessage.getObjectId(), new UpdateListener() {
                                                                                     @Override
                                                                                     public void done(BmobException e) {
-
+                                                                                        DialogMessage.closeDialog();
                                                                                         if (e != null)
                                                                                             useToast("预约者信息更改失败！");
                                                                                     }

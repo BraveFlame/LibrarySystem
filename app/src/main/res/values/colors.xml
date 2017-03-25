@@ -2,8 +2,11 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#484641</color>
-    <color name="colorAccent">#e78787</color>
+    <color name="colorAccent">#3f8ae4</color>
     <color name="light_blue">#303F9F</color>
-    <color name="sgray">#de899d</color>
+    <color name="sgray">#e4a6b5</color>
     <color name="sgrasy">#e78787</color>
+    <color name="wpast">#f5dd96</color>
+    <color name="npast">#e6dcc2</color>
+
 </resources>

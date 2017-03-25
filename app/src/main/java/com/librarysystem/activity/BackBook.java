@@ -15,6 +15,8 @@ import com.librarysystem.model.PastBooks;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.model.PresentBooks;
 import com.librarysystem.model.Rule;
+import com.librarysystem.others.DialogMessage;
+import com.librarysystem.others.ToastMessage;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -73,6 +75,8 @@ public class BackBook extends Activity {
 /**
  * 改变用户
  */
+                        DialogMessage.showDialog(BackBook.this);
+                        back_continue.setEnabled(false);
                         detailed_button.setEnabled(false);
                         person.setNowBorrow(person.getNowBorrow() - 1);
                         person.setUserLevel(person.getUserLevel() + 1);
@@ -82,7 +86,7 @@ public class BackBook extends Activity {
                                 if (e == null) {
 
                                 } else {
-                                    useToast("网络异常！");
+                                    ToastMessage.useToast(BackBook.this,"网络异常！");
                                 }
                             }
                         });
@@ -106,6 +110,7 @@ public class BackBook extends Activity {
                         psb.save(new SaveListener<String>() {
                             @Override
                             public void done(String s, BmobException e) {
+                                DialogMessage.closeDialog();
                                 if (e == null) {
 
                                 } else {
@@ -121,7 +126,9 @@ public class BackBook extends Activity {
                         b.findObjects(new FindListener<Books>() {
                             @Override
                             public void done(List<Books> list, BmobException e) {
+                                DialogMessage.closeDialog();
                                 if (e == null) {
+
                                     books = list.get(0);
                                     String s = book.getBookName();
 
@@ -138,6 +145,7 @@ public class BackBook extends Activity {
                                         books.update(books.getObjectId(), new UpdateListener() {
                                             @Override
                                             public void done(BmobException e) {
+                                                DialogMessage.closeDialog();
                                                 if (e == null) {
 
                                                 } else {
@@ -148,6 +156,7 @@ public class BackBook extends Activity {
                                         book.delete(book.getObjectId(), new UpdateListener() {
                                             @Override
                                             public void done(BmobException e) {
+                                                DialogMessage.closeDialog();
                                                 if (e == null) {
 
 
@@ -182,6 +191,7 @@ public class BackBook extends Activity {
                                                     ruleBmobQuery.getObject("c9cf23b8fb", new QueryListener<Rule>() {
                                                         @Override
                                                         public void done(Rule rule, BmobException e) {
+                                                            DialogMessage.closeDialog();
                                                             if (e == null) {
                                                                 books.setIsContinue("无");
                                                                 books.setIsSubscribe("无");
@@ -204,6 +214,7 @@ public class BackBook extends Activity {
                                                                 books.update(books.getObjectId(), new UpdateListener() {
                                                                     @Override
                                                                     public void done(BmobException e) {
+                                                                        DialogMessage.closeDialog();
                                                                         if (e == null) {
 
                                                                         } else {
@@ -223,6 +234,7 @@ public class BackBook extends Activity {
                                                                 book.update(book.getObjectId(), new UpdateListener() {
                                                                     @Override
                                                                     public void done(BmobException e) {
+                                                                        DialogMessage.closeDialog();
                                                                         if (e == null) {
 
                                                                         } else {
@@ -238,6 +250,7 @@ public class BackBook extends Activity {
                                                                 person.update(person.getObjectId(), new UpdateListener() {
                                                                     @Override
                                                                     public void done(BmobException e) {
+                                                                        DialogMessage.closeDialog();
                                                                         if (e == null)
                                                                             finish();
                                                                         else
@@ -288,10 +301,12 @@ public class BackBook extends Activity {
             public void onClick(View v) {
                 if (book.getIsContinue().equals("无")) {
                     if (impart(book.getBackTime())) {
+                        DialogMessage.showDialog(BackBook.this);
                         BmobQuery<Rule> r = new BmobQuery<>();
                         r.getObject("c9cf23b8fb", new QueryListener<Rule>() {
                             @Override
                             public void done(Rule rule, BmobException e) {
+                                DialogMessage.closeDialog();
                                 if (e == null) {
                                     book.setIsContinue("续借");
                                     sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -305,6 +320,7 @@ public class BackBook extends Activity {
                                         book.update(book.getObjectId(), new UpdateListener() {
                                             @Override
                                             public void done(BmobException e) {
+                                                DialogMessage.closeDialog();
                                                 if (e == null) {
                                                     back_date.setText("应还日期：" + book.getBackTime());
                                                     useToast("续借成功！");
@@ -317,6 +333,7 @@ public class BackBook extends Activity {
                                         b.findObjects(new FindListener<Books>() {
                                             @Override
                                             public void done(List<Books> list, BmobException e) {
+                                                DialogMessage.closeDialog();
                                                 if (e == null) {
                                                     books = list.get(0);
                                                     sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -417,6 +434,7 @@ public class BackBook extends Activity {
     public void onBackPressed() {
         super.onBackPressed();
         BackBook.this.finish();
+        DialogMessage.closeDialog();
         cancelToast();
     }
 

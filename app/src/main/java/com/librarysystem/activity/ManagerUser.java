@@ -8,11 +8,12 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.model.UserAdapter;
+import com.librarysystem.others.DialogMessage;
+import com.librarysystem.others.ToastMessage;
 import com.librarysystem.sqlite.LibraryDB;
 
 import java.util.ArrayList;
@@ -31,50 +32,52 @@ public class ManagerUser extends Activity {
     private EditText searchUser;
     private Button searchButton;
     private ListView userListView;
-    private List<PersonMessage> usersList= new ArrayList<PersonMessage>();
+    private List<PersonMessage> usersList = new ArrayList<PersonMessage>();
     private LibraryDB libraryDB;
     private boolean isSearch;
-    private Toast mToast;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manager_users);
         libraryDB = LibraryDB.getInstance(this);
-        searchUser=(EditText)findViewById(R.id.manager_search_user);
-        searchButton=(Button)findViewById(R.id.manager_searchuser_button);
-        userListView=(ListView)findViewById(R.id.manager_user_list);
+        searchUser = (EditText) findViewById(R.id.manager_search_user);
+        searchButton = (Button) findViewById(R.id.manager_searchuser_button);
+        userListView = (ListView) findViewById(R.id.manager_user_list);
 /**
  * 从账户和姓名两重搜索
  */
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isSearch=true;
-                userListView=(ListView) findViewById(R.id.manager_user_list);
-                final String input=searchUser.getText().toString();
-                BmobQuery<PersonMessage>personMessageBmobQuery=new BmobQuery<PersonMessage>();
-                personMessageBmobQuery.addWhereNotEqualTo("userId",12345);
+                isSearch = true;
+                userListView = (ListView) findViewById(R.id.manager_user_list);
+                final String input = searchUser.getText().toString();
+                DialogMessage.showDialog(ManagerUser.this);
+                BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<PersonMessage>();
+                personMessageBmobQuery.addWhereNotEqualTo("isRootManager", "管理员");
                 personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
                     @Override
                     public void done(List<PersonMessage> list, BmobException e) {
-                        if(e==null){
-                            if(list.size()==0){
-                                useToast("没有符合搜索要求的用户！");
-                            }else {
+                        DialogMessage.closeDialog();
+                        if (e == null) {
+                            if (list.size() == 0) {
+                                ToastMessage.useToast(ManagerUser.this, "没有符合搜索要求的用户！");
+                            } else {
                                 libraryDB.savePersonalMeassage(list);
-                                libraryDB.getUsers(input,usersList);
-                                if(usersList.size()>0) {
+                                libraryDB.getUsers(input, usersList);
+                                if (usersList.size() > 0) {
 
-                                }else {
-                                    useToast("没有该用户");
+                                } else {
+                                    ToastMessage.useToast(ManagerUser.this, "没有该用户");
                                 }
-                                usersList=list;
+                                usersList = list;
                                 UserAdapter userAdapter = new UserAdapter(ManagerUser.this, R.layout.user_item, usersList);
                                 userListView.setAdapter(userAdapter);
 
                             }
-                        }else {
-                            useToast("获取失败");
+                        } else {
+                            ToastMessage.useToast(ManagerUser.this, "获取失败");
                         }
                     }
                 });
@@ -82,9 +85,9 @@ public class ManagerUser extends Activity {
                 userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        final Intent changeUserIntent=new Intent(ManagerUser.this,ChangeUsers.class);
-                        PersonMessage personMessage=usersList.get(position);
-                        changeUserIntent.putExtra("user_id",personMessage);
+                        final Intent changeUserIntent = new Intent(ManagerUser.this, ChangeUsers.class);
+                        PersonMessage personMessage = usersList.get(position);
+                        changeUserIntent.putExtra("user_id", personMessage);
                         startActivity(changeUserIntent);
                     }
                 });
@@ -95,74 +98,60 @@ public class ManagerUser extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(isSearch){
-            try{
-                final String input=searchUser.getText().toString();
-                userListView=(ListView) findViewById(R.id.manager_user_list);
-                BmobQuery<PersonMessage>personMessageBmobQuery=new BmobQuery<PersonMessage>();
-                personMessageBmobQuery.addWhereNotEqualTo("userId",12345);
+        if (isSearch) {
+            try {
+                final String input = searchUser.getText().toString();
+                userListView = (ListView) findViewById(R.id.manager_user_list);
+                BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<PersonMessage>();
+                personMessageBmobQuery.addWhereNotEqualTo("userId", 12345);
                 personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
                     @Override
                     public void done(List<PersonMessage> list, BmobException e) {
-                        if(e==null){
+                        if (e == null) {
 
-                            if(list.size()==0){
-                                useToast("没有符合搜索要求的用户！");
-                            }else {
+                            if (list.size() == 0) {
+                                ToastMessage.useToast(ManagerUser.this, "没有符合搜索要求的用户！");
+                            } else {
 
                                 libraryDB.savePersonalMeassage(list);
-                                libraryDB.getUsers(input,usersList);
-                                if(usersList.size()>0) {
+                                libraryDB.getUsers(input, usersList);
+                                if (usersList.size() > 0) {
 
 
-                                }else {
-                                    useToast("没有该用户");
+                                } else {
+                                    ToastMessage.useToast(ManagerUser.this, "没有该用户");
                                 }
 
                             }
-                            usersList=list;
+                            usersList = list;
                             UserAdapter userAdapter = new UserAdapter(ManagerUser.this, R.layout.user_item, usersList);
                             userListView.setAdapter(userAdapter);
-                        }else {
-                            useToast("获取异常");
+                        } else {
+                            ToastMessage.useToast(ManagerUser.this, "获取异常");
                         }
                     }
                 });
                 userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                       Intent changeUserIntent=new Intent(ManagerUser.this,ChangeUsers.class);
-                        PersonMessage personMessage=usersList.get(position);
-                        changeUserIntent.putExtra("user_id",personMessage);
+                        Intent changeUserIntent = new Intent(ManagerUser.this, ChangeUsers.class);
+                        PersonMessage personMessage = usersList.get(position);
+                        changeUserIntent.putExtra("user_id", personMessage);
                         startActivity(changeUserIntent);
                     }
                 });
 
-            }catch (Exception e){
+            } catch (Exception e) {
 
             }
 
 
+        }
+    }
 
-        }
-    }
-    public void useToast(String text){
-        if(mToast == null) {
-            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        } else {
-            mToast.setText(text);
-            mToast.setDuration(Toast.LENGTH_SHORT);
-        }
-        mToast.show();
-    }
-    public void cancelToast(){
-        if(mToast!=null){
-            mToast.cancel();
-        }
-    }
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cancelToast();
+        ToastMessage.cancelToast();
     }
 }

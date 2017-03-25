@@ -19,6 +19,8 @@ import com.librarysystem.R;
 import com.librarysystem.model.ActivityCollector;
 import com.librarysystem.model.LoginView;
 import com.librarysystem.model.PersonMessage;
+import com.librarysystem.others.DialogMessage;
+import com.librarysystem.others.ToastMessage;
 
 import java.util.List;
 
@@ -74,8 +76,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
              *
              */
             if (!change_user) {
-                lv = new LoginView(Login.this);
-                setContentView(lv);
+                userLogin();
             }
 
         }
@@ -124,8 +125,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
      * @return
      */
     public void userLogin() {
+
         if (userEdit.getText().toString().equals("")) {
-            useToast("用户名或密码错误！");
+            ToastMessage.useToast(Login.this, "用户名或密码错误！");
         }
         try {
             userInput = Integer.valueOf(userEdit.getText().toString());
@@ -133,11 +135,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             /**
              *
              */
+            DialogMessage.showDialog(Login.this);
             BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<PersonMessage>();
             personMessageBmobQuery.addWhereEqualTo("userId", userInput);
             personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
                 @Override
                 public void done(List<PersonMessage> list, BmobException e) {
+                    DialogMessage.closeDialog();
                     if (e == null) {
                         if (list.size() == 1) {
                             PersonMessage personMessage = list.get(0);
@@ -158,6 +162,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                 editor.commit();
                                 editor.putString("objectid", personMessage.getObjectId());
                                 editor.putInt("userId", userInput);
+                                editor.putString("root", personMessage.getIsRootManager());
                                 editor.commit();
                                 /**
                                  * 登陆时轮播两张图共1.2秒
@@ -171,44 +176,28 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
                             } else {
 
-                                useToast("用户名或密码错误！");
+                                ToastMessage.useToast(Login.this, "用户名或密码错误！");
                             }
 
                         } else {
-                            useToast("用户不存在");
+                            ToastMessage.useToast(Login.this, "用户不存在");
 
                         }
 
 
                     } else {
-                        useToast("网络异常！");
+                        ToastMessage.useToast(Login.this, "网络异常！");
                     }
                 }
             });
         } catch (Exception e) {
-            useToast("格式错误！");
-        }
-    }
-
-    public void useToast(String text) {
-        if (mToast == null) {
-            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        } else {
-            mToast.setText(text);
-            mToast.setDuration(Toast.LENGTH_SHORT);
-        }
-        mToast.show();
-    }
-
-    public void cancelToast() {
-        if (mToast != null) {
-            mToast.cancel();
+            ToastMessage.useToast(Login.this, "格式错误！");
         }
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cancelToast();
+        ToastMessage.cancelToast();
     }
 }

@@ -13,6 +13,8 @@ import android.widget.Toast;
 import com.librarysystem.R;
 import com.librarysystem.model.BookAdapter;
 import com.librarysystem.model.Books;
+import com.librarysystem.others.DialogMessage;
+import com.librarysystem.others.ToastMessage;
 import com.librarysystem.sqlite.LibraryDB;
 
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
         Books books = new Books();
         switch (v.getId()) {
             case R.id.bsave:
+                DialogMessage.showDialog(ChangeBooks.this);
                 try {
                     books.setBookId(Integer.valueOf(bId.getText().toString()));
                     books.setBookName(bName.getText().toString());
@@ -64,32 +67,33 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
                     books.setIsContinue("无");
                     books.setBackTime("");
                     books.setIsLent("可借");
-                    if(!books.getBookName().equals("")&& !books.getBookAuthor().equals("")&& !books.getPress().equals("")
-                            &&!books.getVersion().equals("")){
-                    /**
-                     Bmob
-                     */
-                    books.save(new SaveListener<String>() {
-                        @Override
-                        public void done(String s, BmobException e) {
-                            if (e == null) {
-                                useToast("增加成功");
-                                bName.setText("");
-                                bId.setText("");
-                                bAuthor.setText("");
-                                bDes.setText("");
-                                bPress.setText("");
-                                bVersion.setText("");
-                            } else {
-                                useToast("已存在或网络异常");
+                    if (!books.getBookName().equals("") && !books.getBookAuthor().equals("") && !books.getPress().equals("")
+                            && !books.getVersion().equals("")) {
+                        /**
+                         Bmob
+                         */
+                        books.save(new SaveListener<String>() {
+                            @Override
+                            public void done(String s, BmobException e) {
+                                DialogMessage.closeDialog();
+                                if (e == null) {
+                                    ToastMessage.useToast(ChangeBooks.this, "增加成功");
+                                    bName.setText("");
+                                    bId.setText("");
+                                    bAuthor.setText("");
+                                    bDes.setText("");
+                                    bPress.setText("");
+                                    bVersion.setText("");
+                                } else {
+                                    ToastMessage.useToast(ChangeBooks.this, "已存在或网络异常");
+                                }
                             }
-                        }
-                    });
-                    }else {
-                        useToast("输入书名");
+                        });
+                    } else {
+                        ToastMessage.useToast(ChangeBooks.this, "输入书名");
                     }
                 } catch (Exception e) {
-                    useToast("编号格式错误！");
+                    ToastMessage.useToast(ChangeBooks.this, "编号格式错误！");
                 }
                 break;
 
@@ -97,47 +101,8 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
  *查询书库的书
  */
             case R.id.bquery:
-                try {
-                    isQuery = true;
-                   bookName = queryName.getText().toString();
-                    bookList = (ListView) findViewById(R.id.list_query_book);
-                    BmobQuery<Books> pb = new BmobQuery<>();
-                    pb.findObjects(new FindListener<Books>() {
-                        @Override
-                        public void done(List<Books> list, BmobException e) {
-                            if (e == null) {
-                                if (list.size() == 0) {
-                                    useToast("没有该书籍！");
-                                } else {
-                                    libraryDB.saveBookMeassage(list);
-                                    libraryDB.getBookMeassage(bookName, repertoryBooks);
-                                    if (repertoryBooks.size() == 0) {
-                                        useToast("没有该书籍！");
-                                    } else {
-                                        BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, repertoryBooks);
-                                        bookList.setAdapter(adapter);
-                                    }
-                                }
-                            } else {
-                                useToast("获取失败！");
-                            }
-                        }
-                    });
-                    final Intent bookIntent = new Intent(this, UpdateBook.class);
-                    /**
-                     *点击查看每本书的信息
-                     */
-                    bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Books book = repertoryBooks.get(position);
-                            bookIntent.putExtra("bookmessage", book);
-                            startActivity(bookIntent);
-                        }
-                    });
-                } catch (Exception e) {
-                    useToast("编号格式错误！");
-                }
+                isQuery = true;
+                queryBooks();
                 break;
 
             default:
@@ -152,45 +117,7 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
     protected void onRestart() {
         super.onRestart();
         if (isQuery) {
-            try {
-                bookList = (ListView) findViewById(R.id.list_query_book);
-                BmobQuery<Books> pb = new BmobQuery<>();
-                pb.findObjects(new FindListener<Books>() {
-                    @Override
-                    public void done(List<Books> list, BmobException e) {
-                        if (e == null) {
-                            if (list.size() == 0) {
-                                useToast("没有该书籍！");
-                            } else {
-                                libraryDB.saveBookMeassage(list);
-                                libraryDB.getBookMeassage(bookName,repertoryBooks);
-                                if (repertoryBooks.size() == 0) {
-                                    useToast("没有该书籍！");
-                                } else {
-                                    BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, repertoryBooks);
-                                    bookList.setAdapter(adapter);
-                                }
-                            }
-                        } else {
-                            useToast("获取失败！");
-                        }
-                    }
-                });
-                final Intent bookIntent = new Intent(this, UpdateBook.class);
-                /**
-                 *点击查看每本书的信息
-                 */
-                bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Books book = repertoryBooks.get(position);
-                        bookIntent.putExtra("bookmessage", book);
-                        startActivity(bookIntent);
-                    }
-                });
-            } catch (Exception e) {
-                useToast("编号格式错误！");
-            }
+            queryBooks();
         }
     }
 
@@ -206,25 +133,54 @@ public class ChangeBooks extends Activity implements View.OnClickListener {
         bquery = (Button) findViewById(R.id.bquery);
     }
 
-    public void useToast(String text) {
-        if (mToast == null) {
-            mToast = Toast.makeText(ChangeBooks.this, text, Toast.LENGTH_SHORT);
-        } else {
-            mToast.setText(text);
-            mToast.setDuration(Toast.LENGTH_SHORT);
-        }
-        mToast.show();
-    }
-
-    public void cancelToast() {
-        if (mToast != null) {
-            mToast.cancel();
+    public void queryBooks() {
+        try {
+            DialogMessage.showDialog(ChangeBooks.this);
+            bookName = queryName.getText().toString();
+            bookList = (ListView) findViewById(R.id.list_query_book);
+            BmobQuery<Books> pb = new BmobQuery<>();
+            pb.findObjects(new FindListener<Books>() {
+                @Override
+                public void done(List<Books> list, BmobException e) {
+                    DialogMessage.closeDialog();
+                    if (e == null) {
+                        if (list.size() == 0) {
+                            ToastMessage.useToast(ChangeBooks.this, "没有该书籍！");
+                        } else {
+                            libraryDB.saveBookMeassage(list);
+                            libraryDB.getBookMeassage(bookName, repertoryBooks);
+                            if (repertoryBooks.size() == 0) {
+                                ToastMessage.useToast(ChangeBooks.this, "没有该书籍！");
+                            } else {
+                                BookAdapter adapter = new BookAdapter(ChangeBooks.this, R.layout.book_item, repertoryBooks);
+                                bookList.setAdapter(adapter);
+                            }
+                        }
+                    } else {
+                        ToastMessage.useToast(ChangeBooks.this, "获取失败！");
+                    }
+                }
+            });
+            final Intent bookIntent = new Intent(this, UpdateBook.class);
+            /**
+             *点击查看每本书的信息
+             */
+            bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Books book = repertoryBooks.get(position);
+                    bookIntent.putExtra("bookmessage", book);
+                    startActivity(bookIntent);
+                }
+            });
+        } catch (Exception e) {
+            ToastMessage.useToast(ChangeBooks.this, "编号格式错误！");
         }
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cancelToast();
+        ToastMessage.cancelToast();
     }
 }

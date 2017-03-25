@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
+import com.librarysystem.others.DialogMessage;
+import com.librarysystem.others.ToastMessage;
 
 import java.util.Random;
 
@@ -64,11 +66,11 @@ public class AlterPassword extends Activity implements Runnable {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alter_password);
         init();
-         personMessage=(PersonMessage)getIntent().getSerializableExtra("alterpassword");
+        personMessage = (PersonMessage) getIntent().getSerializableExtra("alterpassword");
         /**
          *更改密码
          */
-                rePassword.setOnClickListener(new View.OnClickListener() {
+        rePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //i作为标志，判断第几次输入，第一次为原密码或验证码，第二次为新密码。
@@ -83,22 +85,24 @@ public class AlterPassword extends Activity implements Runnable {
                     } else {
                         //原密码或验证码不对时i要减掉1
                         i--;
-                        useToast("密码或验证码错误！");
+                        ToastMessage.useToast(AlterPassword.this, "密码或验证码错误！");
                     }
                 } else if (i == 2) {
                     //第二次为新密码
                     personMessage.setUserPassword(code);
+                    DialogMessage.showDialog(AlterPassword.this);
                     personMessage.update(pref.getString("objectid", ""), new UpdateListener() {
                         @Override
                         public void done(BmobException e) {
-                            if(e==null) {
-                               useToast("修改成功");
+                            DialogMessage.closeDialog();
+                            if (e == null) {
+                                ToastMessage.useToast(AlterPassword.this, "修改成功");
                                 editor = pref.edit();
                                 editor.putBoolean("remember_password", false);
                                 editor.commit();
                                 finish();
-                            }else {
-                                useToast("修改失败");
+                            } else {
+                                ToastMessage.useToast(AlterPassword.this, "修改失败");
 
                             }
                         }
@@ -150,7 +154,7 @@ public class AlterPassword extends Activity implements Runnable {
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {
-
+                ToastMessage.useToast(AlterPassword.this, "计时异常");
             }
         }
     }
@@ -162,29 +166,10 @@ public class AlterPassword extends Activity implements Runnable {
         pref = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
-    /**
-     * 解决Toast频繁显示
-     */
-    public void useToast(String text) {
-        if (mToast == null) {
-            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        } else {
-            mToast.setText(text);
-            mToast.setDuration(Toast.LENGTH_SHORT);
-        }
-        mToast.show();
-    }
-
-    public void cancelToast() {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cancelToast();
+        ToastMessage.cancelToast();
     }
 
 }

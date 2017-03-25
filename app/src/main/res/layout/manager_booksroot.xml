@@ -45,14 +45,28 @@
         android:layout_height="wrap_content"
         android:textSize="30sp" />
 
-    <Button
-        android:id="@+id/max_borrow"
-        android:layout_width="120dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:layout_marginLeft="30dp"
-        android:text="确定"
-        android:textSize="25sp" />
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/max_borrow"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:text="确定"
+            android:textSize="25sp" />
+
+        <ImageView
+            android:id="@+id/renew_rule"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
+            android:background="@mipmap/renew" />
+
+
+    </LinearLayout>
 
 
 </LinearLayout>

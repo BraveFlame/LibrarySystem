@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.Rule;
+import com.librarysystem.others.DialogMessage;
+import com.librarysystem.others.ToastMessage;
 
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
@@ -24,6 +27,8 @@ public class BookRoot extends Activity {
     private EditText maxBooks, firstBook, thanBook;
     private Button set_Books;
     private Toast mToast;
+    private ImageView rerule;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,17 +36,12 @@ public class BookRoot extends Activity {
         maxBooks = (EditText) findViewById(R.id.max_eborrow);
         firstBook = (EditText) findViewById(R.id.first_eborrow);
         thanBook = (EditText) findViewById(R.id.than_eborrow);
-        BmobQuery<Rule> ruleBmobQuery = new BmobQuery<>();
-        ruleBmobQuery.getObject("c9cf23b8fb", new QueryListener<Rule>() {
+        rerule = (ImageView) findViewById(R.id.renew_rule);
+        getRule();
+        rerule.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void done(Rule rule, BmobException e) {
-                if (e == null) {
-                    maxBooks.setText("" + rule.getMaxBooks());
-                    firstBook.setText("" + rule.getFirstDay());
-                    thanBook.setText("" + rule.getSecondDay());
-                } else {
-                    useToast("获取失败");
-                }
+            public void onClick(View v) {
+                getRule();
             }
         });
 
@@ -49,6 +49,7 @@ public class BookRoot extends Activity {
         set_Books.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DialogMessage.showDialog(BookRoot.this);
                 try {
                     Rule rule = new Rule();
                     rule.setMaxBooks(Integer.valueOf(maxBooks.getText().toString()));
@@ -57,41 +58,46 @@ public class BookRoot extends Activity {
                     rule.update("c9cf23b8fb", new UpdateListener() {
                         @Override
                         public void done(BmobException e) {
+                            DialogMessage.closeDialog();
                             if (e == null) {
-                                useToast("修改成功");
+                                ToastMessage.useToast(BookRoot.this, "修改成功");
                                 finish();
                             } else {
-                                useToast("修改失败");
+                                ToastMessage.useToast(BookRoot.this, "修改失败");
                             }
                         }
                     });
                 } catch (Exception e) {
-                    useToast("格式错误！");
+                    ToastMessage.useToast(BookRoot.this, "格式错误！");
                 }
             }
         });
     }
 
-    public void useToast(String text) {
-        if (mToast == null) {
-            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        } else {
-            mToast.setText(text);
-            mToast.setDuration(Toast.LENGTH_SHORT);
-        }
-        mToast.show();
+    public void getRule() {
+        DialogMessage.showDialog(BookRoot.this);
+        BmobQuery<Rule> ruleBmobQuery = new BmobQuery<>();
+        ruleBmobQuery.getObject("c9cf23b8fb", new QueryListener<Rule>() {
+            @Override
+            public void done(Rule rule, BmobException e) {
+                DialogMessage.closeDialog();
+                if (e == null) {
+                    maxBooks.setText("" + rule.getMaxBooks());
+                    firstBook.setText("" + rule.getFirstDay());
+                    thanBook.setText("" + rule.getSecondDay());
+                } else {
+                    ToastMessage.useToast(BookRoot.this, "获取失败");
+                }
+            }
+        });
+
     }
 
-    public void cancelToast() {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-    }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cancelToast();
+        ToastMessage.cancelToast();
     }
 
 }

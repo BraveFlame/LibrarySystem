@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
+import com.librarysystem.others.DialogMessage;
+import com.librarysystem.others.ToastMessage;
 
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
@@ -24,11 +26,11 @@ import cn.bmob.v3.listener.QueryListener;
  */
 
 public class UserCcount extends Activity {
-    private Toast mToast;
     private SharedPreferences pref;
     private TextView accountId, accountName, accountSex, accountpro, accounthobby, accounttel,
             accountlevel, accountpast, accountwpast, userProperty;
     private Button alterPassword;
+    private ImageView renew;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,43 +39,57 @@ public class UserCcount extends Activity {
         alterPassword = (Button) findViewById(R.id.usercpassword);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         init();
-        BmobQuery<PersonMessage>personMessage=new BmobQuery<PersonMessage>();
+        renew();
+        renew.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renew();
+            }
+        });
+
+    }
+
+    private void renew() {
+        DialogMessage.showDialog(UserCcount.this);
+        BmobQuery<PersonMessage> personMessage = new BmobQuery<PersonMessage>();
         personMessage.getObject(pref.getString("objectid", ""), new QueryListener<PersonMessage>() {
             @Override
             public void done(PersonMessage personMessage, BmobException e) {
-                if(e==null){
+                DialogMessage.closeDialog();
+                if (e == null) {
                     accountName.setText("姓名：" + personMessage.getUserName().toString());
                     accountSex.setText("性别：" + personMessage.getUserSex().toString());
                     accountId.setText("账户：" + String.valueOf(personMessage.getUserId()));
                     accounthobby.setText("书籍爱好：" + personMessage.getUserDescription().toString());
                     accountpro.setText("专业：" + personMessage.getUserProfession().toString());
                     accountlevel.setText("借阅等级：" + String.valueOf(personMessage.getUserLevel()));
-                            accountpast.setText("逾期书本：" + String.valueOf(personMessage.getPastBooks()));
-                         accountwpast.setText("即将到期：" + String.valueOf(personMessage.getWpastBooks()));
-                   accountlevel.setText("借阅等级：" + personMessage.getUserLevel().toString());
+                    accountpast.setText("逾期书本：" + String.valueOf(personMessage.getPastBooks()));
+                    accountwpast.setText("即将到期：" + String.valueOf(personMessage.getWpastBooks()));
+                    accountlevel.setText("借阅等级：" + personMessage.getUserLevel().toString());
                     accountpast.setText("逾期书本：" + personMessage.getPastBooks().toString());
                     accountwpast.setText("即将到期：" + personMessage.getWpastBooks().toString());
                     accounttel.setText("联系方式：" + personMessage.getUserTel().toString());
                     userProperty.setText("属性：" + personMessage.getIsRootManager().toString());
                     final Intent alterpassword = new Intent(UserCcount.this, AlterPassword.class);
-                    alterpassword.putExtra("alterpassword",personMessage);
+                    alterpassword.putExtra("alterpassword", personMessage);
                     alterPassword.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             startActivity(alterpassword);
                         }
                     });
-                }else{
-                    useToast("未联网！");
+                } else {
+                    ToastMessage.useToast(UserCcount.this, "未联网！");
                     alterPassword.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            useToast("请先联网！");
+                            ToastMessage.useToast(UserCcount.this, "请先联网！");
                         }
                     });
                 }
             }
         });
+
 
     }
 
@@ -88,31 +104,14 @@ public class UserCcount extends Activity {
         accountpast = (TextView) findViewById(R.id.userclate);
         accountwpast = (TextView) findViewById(R.id.usercwpastbook);
         userProperty = (TextView) findViewById(R.id.user_property);
+        renew = (ImageView) findViewById(R.id.renew_ccount);
 
     }
 
-
-
-    public void useToast(String text) {
-
-        if (mToast == null) {
-            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        } else {
-            mToast.setText(text);
-            mToast.setDuration(Toast.LENGTH_SHORT);
-        }
-        mToast.show();
-    }
-
-    public void cancelToast() {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-    }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cancelToast();
+        ToastMessage.cancelToast();
     }
 }

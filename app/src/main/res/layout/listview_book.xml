@@ -16,14 +16,19 @@
             android:layout_centerInParent="true"
             android:text="当前借阅"
             android:textSize="25sp" />
+        <ImageView
+            android:id="@+id/renew_prebook"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@mipmap/reprebook" />
     </RelativeLayout>
 
     <ListView
-        android:background="#f2d47e"
+        android:background="#e2d3a7"
         android:id="@+id/list_present_book"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
     </ListView>
 
 </LinearLayout>
