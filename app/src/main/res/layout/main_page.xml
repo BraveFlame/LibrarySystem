@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_centerInParent="true"
-        android:textCursorDrawable="@color/colorAccent"
+        android:textCursorDrawable="@drawable/color_cursor"
         android:hint="搜索图书(书名)"/>
     <Button
         android:id="@+id/search_book"

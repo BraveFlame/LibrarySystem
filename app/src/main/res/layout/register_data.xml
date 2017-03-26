@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#54afe2"
-    android:orientation="vertical">
+    android:background="#7dbfe4"
+    android:orientation="vertical"
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -32,10 +33,12 @@
 
         <EditText
             android:id="@+id/userId"
-            android:layout_width="290dp"
+            android:layout_width="260dp"
             android:layout_height="wrap_content"
             android:background="@drawable/edit_bg"
-            android:textSize="23sp" />
+            android:textCursorDrawable="@drawable/color_cursor"
+            android:textSize="23sp"
+           />
     </LinearLayout>
 
     <LinearLayout
@@ -52,26 +55,24 @@
 
         <EditText
             android:id="@+id/userPassword"
-            android:layout_width="150dp"
+            android:layout_width="130dp"
             android:layout_height="wrap_content"
             android:background="@drawable/edit_bg"
             android:inputType="textPassword"
-            android:textSize="23sp" />
+            android:textSize="23sp"
+            android:textCursorDrawable="@drawable/color_cursor"/>
+
         <EditText
             android:id="@+id/secondPassword"
-            android:layout_width="150dp"
+            android:layout_width="130dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:hint="再输入密码"
             android:background="@drawable/edit_bg"
+            android:textCursorDrawable="@drawable/color_cursor"
+            android:hint="再输入密码"
             android:inputType="textPassword"
             android:textSize="23sp" />
-
-
-
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -88,22 +89,17 @@
 
         <EditText
             android:id="@+id/userName"
-            android:layout_width="290dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
+            android:textCursorDrawable="@drawable/color_cursor"
             android:background="@drawable/edit_bg"
             android:textSize="23sp" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
         <TextView
+            android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
             android:text="性别："
             android:textSize="23sp" />
 
@@ -130,6 +126,7 @@
 
     </LinearLayout>
 
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -147,6 +144,7 @@
             android:layout_width="290dp"
             android:layout_height="wrap_content"
             android:background="@drawable/edit_bg"
+            android:textCursorDrawable="@drawable/color_cursor"
             android:textSize="23sp" />
     </LinearLayout>
 
@@ -167,6 +165,7 @@
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:background="@drawable/edit_bg"
+            android:textCursorDrawable="@drawable/color_cursor"
             android:textSize="23sp" />
 
     </LinearLayout>
@@ -178,7 +177,6 @@
         android:orientation="horizontal">
 
         <TextView
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="联系方式："
@@ -188,27 +186,52 @@
             android:id="@+id/user_tel"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
+            android:textCursorDrawable="@drawable/color_cursor"
             android:background="@drawable/edit_bg"
             android:textSize="23sp" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="验证码："
+            android:textSize="23sp" />
+        <EditText
+            android:id="@+id/sms_code"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_bg"
+            android:inputType="textPassword"
+            android:layout_marginLeft="10dp"
+            android:textCursorDrawable="@drawable/color_cursor"
+            android:textSize="23sp" />
+        <Button
+            android:id="@+id/get_smscode"
+            android:layout_width="155dp"
+            android:layout_height="41dp"
+            android:layout_marginLeft="10dp"
+            android:text="获取"
+            android:textSize="20sp" />
 
+    </LinearLayout>
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="10dp">
 
         <Button
             android:id="@+id/personset"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="48dp"
             android:text="取消"
             android:textSize="23sp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="48dp" />
+            android:layout_marginLeft="70dp"
+             />
 
         <Button
             android:id="@+id/personsave"

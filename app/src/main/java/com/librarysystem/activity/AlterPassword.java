@@ -1,8 +1,6 @@
 package com.librarysystem.activity;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,16 +9,15 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.others.DialogMessage;
 import com.librarysystem.others.ToastMessage;
 
-import java.util.Random;
-
+import cn.bmob.v3.BmobSMS;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 
 /**
@@ -34,25 +31,21 @@ public class AlterPassword extends Activity implements Runnable {
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
     private PersonMessage personMessage = new PersonMessage();
-    private Button rePassword, getCode;
-    private EditText intoCode;
-    private int i = 0, randomcode = 0;
-    private Toast mToast;
+    private Button rePassword, alter_code, alter_sure;
+    private EditText intoCode, preTel, getCode;
+    private int i = 0, a = 61, j = 0;
     private static final int CODE1 = 1, CODE2 = 2;
-    /**
-     * 由于线程无法处理UI，故用Handler类进行处理，以实现验证码获取时间间隔
-     */
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
                 case CODE1:
-                    getCode.setText(msg.arg1 + "秒后重获");
+                    alter_code.setText(msg.arg1 + "秒后重获");
                     break;
                 case CODE2:
-                    getCode.setText("获取验证码");
-                    getCode.setEnabled(true);
+                    alter_code.setText("获取验证码");
+                    alter_code.setEnabled(true);
                     break;
                 default:
                     break;
@@ -74,18 +67,16 @@ public class AlterPassword extends Activity implements Runnable {
             @Override
             public void onClick(View v) {
                 //i作为标志，判断第几次输入，第一次为原密码或验证码，第二次为新密码。
-                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 i++;
                 String code = intoCode.getText().toString();
                 if (i == 1) {
-                    if (code.equals(personMessage.getUserPassword()) || code.equals(String.valueOf(randomcode))) {
+                    if (code.equals(personMessage.getUserPassword())) {
                         intoCode.setHint("请输入新密码");
                         intoCode.setText("");
-                        manager.cancel(1);
                     } else {
-                        //原密码或验证码不对时i要减掉1
+                        //原密码不对时i要减掉1
                         i--;
-                        ToastMessage.useToast(AlterPassword.this, "密码或验证码错误！");
+                        ToastMessage.useToast(AlterPassword.this, "密码错误！");
                     }
                 } else if (i == 2) {
                     //第二次为新密码
@@ -107,62 +98,110 @@ public class AlterPassword extends Activity implements Runnable {
                             }
                         }
                     });
-
-
                 } else {
                     //改完重新为0，以便再改
                     i = 0;
                 }
             }
         });
-          /*
-          忘记密码时，用验证码
-           */
-        getCode.setOnClickListener(new View.OnClickListener() {
+        /**
+         *更改手机号时，原手机号的验证码
+         */
+        alter_code.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
-                getCode.setEnabled(false);
-                new Thread(AlterPassword.this).start();
+                DialogMessage.showDialog(AlterPassword.this);
+                alter_code.setEnabled(false);
+                BmobSMS.requestSMSCode(preTel.getText().toString(), "注册模板", new QueryListener<Integer>() {
+                    @Override
+                    public void done(Integer integer, BmobException e) {
+                        DialogMessage.closeDialog();
+                        if (e == null) {
+                            ToastMessage.useToast(AlterPassword.this, "验证码发送成功！");
+                            new Thread(AlterPassword.this).start();
+                        } else {
+                            ToastMessage.useToast(AlterPassword.this, "验证码发送失败！");
+                            alter_code.setEnabled(true);
+                        }
+                    }
+                });
             }
         });
-    }
 
-    @Override
-    public void run() {
-        //停止的秒数
-        int a = 11;
-        Random random = new Random();
-        randomcode = random.nextInt(9000) + 1000;
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        Notification.Builder notification = new Notification.Builder(AlterPassword.this).setTicker("收到验证码").setContentTitle("验证码")
-                .setContentText("" + randomcode).setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.ic_launcher);
-        manager.notify(1, notification.build());
+        /**
+         *确定更改手机号按键
+         */
 
-        while (true) {
-            a--;
-            //小于等于0时解除按键禁止
-            Message message = new Message();
-            if (a <= 0) {
-                message.what = CODE2;
-                handler.sendMessage(message);
-                break;
-            } else {
-                //否则显示秒数
-                message.arg1 = a;
-                message.what = CODE1;
-                handler.sendMessage(message);
+        alter_sure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (j == 0) {
+                    if (!personMessage.getUserTel().equals(preTel.getText().toString())) {
+                        ToastMessage.useToast(AlterPassword.this, "手机号不是原来手机号！");
+                    } else {
+                        DialogMessage.showDialog(AlterPassword.this);
+                        BmobSMS.verifySmsCode(preTel.getText().toString(), getCode.getText().toString(), new UpdateListener() {
+                            @Override
+                            public void done(BmobException e) {
+                                DialogMessage.closeDialog();
+                                if (e == null) {
+                                    preTel.setHint("请输新手机号！");
+                                    preTel.setText("");
+                                    getCode.setText("");
+                                    a = 0;
+                                    getCode.setHint("新手机号验证码！");
+                                    j++;
+                                } else {
+                                    ToastMessage.useToast(AlterPassword.this, "验证码错误！");
+                                }
+                            }
+                        });
+                    }
+                } else if (j == 1) {
+                    if (preTel.getText().toString().equals(personMessage.getUserTel())) {
+                        ToastMessage.useToast(AlterPassword.this, "手机号未改变！");
+                    } else {
+                        DialogMessage.showDialog(AlterPassword.this);
+                        BmobSMS.verifySmsCode(preTel.getText().toString(), getCode.getText().toString(), new UpdateListener() {
+                            @Override
+                            public void done(BmobException e) {
+                                if (e == null) {
+                                    personMessage.setUserTel(preTel.getText().toString());
+                                    personMessage.update(new UpdateListener() {
+                                        @Override
+                                        public void done(BmobException e) {
+                                            DialogMessage.closeDialog();
+                                            if (e == null) {
+                                                j = 0;
+                                                ToastMessage.useToast(AlterPassword.this, "手机号修改成功！");
+                                                finish();
+                                            } else {
+                                                ToastMessage.useToast(AlterPassword.this, "手机号修改失败！");
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    DialogMessage.closeDialog();
+                                    ToastMessage.useToast(AlterPassword.this, "手机号或验证码错误！");
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    j = 0;
+                }
             }
-            try {
-                Thread.sleep(1000);
-            } catch (Exception e) {
-                ToastMessage.useToast(AlterPassword.this, "计时异常");
-            }
-        }
+        });
+
     }
 
     public void init() {
         rePassword = (Button) findViewById(R.id.repassword);
-        getCode = (Button) findViewById(R.id.getcode);
         intoCode = (EditText) findViewById(R.id.intocode);
+        preTel = (EditText) findViewById(R.id.pre_tel);
+        getCode = (EditText) findViewById(R.id.tel_getcode);
+        alter_code = (Button) findViewById(R.id.alter_tel_code);
+        alter_sure = (Button) findViewById(R.id.sure_later_tel);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
@@ -170,6 +209,28 @@ public class AlterPassword extends Activity implements Runnable {
     public void onBackPressed() {
         super.onBackPressed();
         ToastMessage.cancelToast();
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            a--;
+            Message message = new Message();
+            if (a <= 0) {
+                message.what = CODE2;
+                handler.sendMessage(message);
+                break;
+            } else {
+                message.arg1 = a;
+                message.what = CODE1;
+                handler.sendMessage(message);
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+
+            }
+        }
     }
 
 }

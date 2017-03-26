@@ -13,13 +13,11 @@ private static ProgressDialog progressDialog;
      * 显示进度对话框
      */
     public static void showDialog(Context context) {
-
             progressDialog = new ProgressDialog(context);
             progressDialog.setMessage("正在加载...");
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
     }
-
     /**
      * 取消进度对话框
      */

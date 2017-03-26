@@ -18,7 +18,6 @@ public class BmobApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Bmob.initialize(this,APPID,"demo");
         BmobConfig config =new BmobConfig.Builder(this)
         //设置appkey
         .setApplicationId(APPID)

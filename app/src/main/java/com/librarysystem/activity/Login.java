@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.librarysystem.R;
 import com.librarysystem.model.ActivityCollector;
@@ -37,16 +36,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private EditText userEdit, passwordEdit;
     private CheckBox rememberPassword;
     private Button register, login;
-    private TextView forgetPassword;
+    private TextView forgetPassword,userKnow;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
-    private int i = 0;
     private int userInput;
     private String passwordInput;
     public static float ScreenW, ScreenH;
     public static Login instans;
     private LoginView lv;
-    private Toast mToast;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,7 +74,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
              *
              */
             if (!change_user) {
-                userLogin();
+                lv = new LoginView(Login.this);
+                setContentView(lv);
             }
 
         }
@@ -89,9 +88,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         register = (Button) findViewById(R.id.register_button);
         login = (Button) findViewById(R.id.login_button);
         forgetPassword = (TextView) findViewById(R.id.forget_password);
+        userKnow=(TextView)findViewById(R.id.user_know);
         register.setOnClickListener(this);
         login.setOnClickListener(this);
         forgetPassword.setOnClickListener(this);
+        userKnow.setOnClickListener(this);
     }
 
     @Override
@@ -102,12 +103,19 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 startActivity(registerIntent);
                 break;
             case R.id.login_button:
-                userLogin();
+                if (userEdit.getText().toString().equals("")) {
+                    ToastMessage.useToast(Login.this, "用户名或密码错误！");
+                }else{
+                DialogMessage.showDialog(Login.this);
+                userLogin();}
                 break;
             case R.id.forget_password:
                 Intent alterpassword = new Intent(this, ForgetPassword.class);
                 startActivity(alterpassword);
                 break;
+            case R.id.user_know:
+                Intent knowIntent=new Intent(this,UsersKnow.class);
+                startActivity(knowIntent);
             default:
                 break;
         }
@@ -125,17 +133,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
      * @return
      */
     public void userLogin() {
-
-        if (userEdit.getText().toString().equals("")) {
-            ToastMessage.useToast(Login.this, "用户名或密码错误！");
-        }
         try {
             userInput = Integer.valueOf(userEdit.getText().toString());
             passwordInput = passwordEdit.getText().toString();
             /**
              *
              */
-            DialogMessage.showDialog(Login.this);
             BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<PersonMessage>();
             personMessageBmobQuery.addWhereEqualTo("userId", userInput);
             personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
@@ -191,6 +194,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 }
             });
         } catch (Exception e) {
+            DialogMessage.closeDialog();
             ToastMessage.useToast(Login.this, "格式错误！");
         }
     }
