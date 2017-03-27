@@ -31,7 +31,6 @@ import cn.bmob.v3.datatype.BatchResult;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListListener;
-import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 
 /**
@@ -42,18 +41,20 @@ import cn.bmob.v3.listener.UpdateListener;
 public class ChangeUsers extends Activity {
 
     private TextView accountId, accountName, accountSex, accountpro, accounthobby, accounttel,
-            accountlevel, accountpast, accountwpast, accountProperty;
+            accountlevel, accountpast, accountwpast, accountProperty,accountprebook;
     private Button deleteUser;
     private PersonMessage personMessage;
     private Toast mToast;
-    private PresentBooks book;
-    private Books books;
-
+    private List<BmobObject> bookslist = new ArrayList<>();
+    private List<BmobObject> deprelist = new ArrayList<>();
+    private List<BmobObject> upprelist = new ArrayList<>();
+    private Rule rule;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.change_users);
         personMessage = (PersonMessage) getIntent().getSerializableExtra("user_id");
+        rule = (Rule) getIntent().getSerializableExtra("rule");
         init();
         deleteUser.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,252 +68,25 @@ public class ChangeUsers extends Activity {
                          * 用户注销时需同时将其借阅的书籍归还（若有人预约其书籍，需要及时转接预约者），以及将其预约的书籍取消预约
                          * 然后删除其过去借阅，最后删除个人信息
                          */
-
                         deleteUser.setEnabled(false);
+                        deleteUser();
                         /**
                          * 删除该用户的过去借阅
                          */
-                        BmobQuery<PastBooks> pastBooksBmobQuery = new BmobQuery<PastBooks>();
-                        pastBooksBmobQuery.setLimit(100);
-                        pastBooksBmobQuery.addWhereEqualTo("userId", personMessage.getUserId());
-                        pastBooksBmobQuery.findObjects(new FindListener<PastBooks>() {
-                            @Override
-                            public void done(List<PastBooks> list, BmobException e) {
-                                DialogMessage.closeDialog();
-                                if (e == null) {
-                                    List<BmobObject> bmobObjectList = new ArrayList<BmobObject>();
-                                    for (int i = 0; i < list.size(); i++) {
-                                        bmobObjectList.add(list.get(i));
-                                    }
-                                    new BmobBatch().deleteBatch(bmobObjectList).doBatch(new QueryListListener<BatchResult>() {
-                                        @Override
-                                        public void done(List<BatchResult> list, BmobException e) {
-                                            if (e == null) {
-
-                                            } else {
-                                                useToast("删除过去失败");
-                                            }
-                                        }
-                                    });
-
-                                } else {
-                                    useToast("获取过去异常");
-                                }
-                            }
-                        });
-
+                        deletePastBooks();
+                        /**
+                         * 改掉该用户的预约
+                         */
+                        changSub();
+                        /**
+                         * 更新书库
+                         */
+                        updateBooksShop();
 
                         /**
-                         *将预约改掉
+                         *更新当前借阅
                          */
-                        BmobQuery<Books> booksBmobQuery = new BmobQuery<Books>();
-                        booksBmobQuery.addWhereEqualTo("isSubscribe", "" + personMessage.getUserId() + "预约");
-                        booksBmobQuery.findObjects(new FindListener<Books>() {
-                            @Override
-                            public void done(List<Books> list, BmobException e) {
-                                DialogMessage.closeDialog();
-                                if (e == null) {
-                                    List<BmobObject> bmobObjectList = new ArrayList<BmobObject>();
-                                    for (int i = 0; i < list.size(); i++) {
-                                        list.get(i).setIsSubscribe("无");
-                                        bmobObjectList.add(list.get(i));
-                                    }
-                                    new BmobBatch().updateBatch(bmobObjectList).doBatch(new QueryListListener<BatchResult>() {
-                                        @Override
-                                        public void done(List<BatchResult> list, BmobException e) {
-                                            if (e == null) {
-
-                                            } else {
-                                                useToast("改预约失败");
-                                            }
-                                        }
-                                    });
-                                } else {
-                                    useToast("获取当前预约失败");
-                                }
-                            }
-                        });
-
-                        BmobQuery<PresentBooks> presentBooksBmobQuery = new BmobQuery<PresentBooks>();
-                        presentBooksBmobQuery.addWhereEqualTo("userId", personMessage.getUserId());
-
-                        personMessage.delete(personMessage.getObjectId(), new UpdateListener() {
-                            @Override
-                            public void done(BmobException e) {
-                                DialogMessage.closeDialog();
-                                if (e == null) {
-
-
-                                } else {
-                                    useToast("删除人失败");
-                                }
-                            }
-                        });
-
-                        /**
-                         *将借的退掉，并给有预约的
-                         */
-
-                        presentBooksBmobQuery.findObjects(new FindListener<PresentBooks>() {
-                            @Override
-                            public void done(List<PresentBooks> list, BmobException e) {
-                                DialogMessage.closeDialog();
-                                if (e == null) {
-                                    for (int i = 0; i < list.size(); i++) {
-                                        book = list.get(i);
-                                        /**
-                                         ***********
-                                         */
-                                        /**
-                                         * 将书还回或给预约者
-                                         */
-                                        final BmobQuery<Books> b = new BmobQuery<Books>();
-                                        b.addWhereEqualTo("bookId", book.getBookId());
-                                        b.findObjects(new FindListener<Books>() {
-                                            @Override
-                                            public void done(List<Books> list, BmobException e) {
-                                                DialogMessage.closeDialog();
-                                                if (e == null) {
-                                                    books = list.get(0);
-                                                    /**
-                                                     * 如果没有预约则返回书库
-                                                     */
-                                                    if (books.getIsSubscribe().equals("无")) {
-                                                        books.setIsSubscribe("无");
-                                                        books.setIsContinue("无");
-                                                        books.setBackTime("");
-                                                        books.setLentTime("");
-                                                        books.setIsLent("可借");
-                                                        books.update(books.getObjectId(), new UpdateListener() {
-                                                            @Override
-                                                            public void done(BmobException e) {
-                                                                DialogMessage.closeDialog();
-                                                                if (e == null) {
-                                                                } else {
-                                                                    useToast("返回书库失败！");
-                                                                }
-                                                            }
-                                                        });
-                                                        book.delete(book.getObjectId(), new UpdateListener() {
-                                                            @Override
-                                                            public void done(BmobException e) {
-                                                                DialogMessage.closeDialog();
-                                                                if (e == null) {
-
-                                                                } else {
-                                                                    useToast("当前书籍删除失败！");
-                                                                }
-                                                            }
-                                                        });
-                                                    }
-                                                    /**
-                                                     * 有预约则给预约者借
-                                                     */
-                                                    else {
-                                                        String ss = books.getIsSubscribe().substring(0, books.getIsSubscribe().length() - 2);
-                                                        final int userId = Integer.valueOf(ss);
-                                                        BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<PersonMessage>();
-                                                        /**
-                                                         * 获取借阅规则信息
-                                                         */
-                                                        personMessageBmobQuery.addWhereEqualTo("userId", userId);
-                                                        personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
-                                                            @Override
-                                                            public void done(List<PersonMessage> list, BmobException e) {
-                                                                DialogMessage.closeDialog();
-                                                                if (e == null) {
-                                                                    personMessage = list.get(0);
-                                                                    BmobQuery<Rule> ruleBmobQuery = new BmobQuery<Rule>();
-                                                                    ruleBmobQuery.getObject("c9cf23b8fb", new QueryListener<Rule>() {
-                                                                        @Override
-                                                                        public void done(Rule rule, BmobException e) {
-                                                                            if (e == null) {
-                                                                                books.setIsContinue("无");
-                                                                                books.setIsSubscribe("无");
-                                                                                books.setIsLent(personMessage.getUserName() + "借出");
-                                                                                Date date1 = new Date();
-                                                                                Date date2 = new Date();
-                                                                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                                                                final String borrowdate = sdf.format(date1);
-                                                                                Calendar calendar = new GregorianCalendar();
-                                                                                calendar.setTime(date2);
-                                                                                calendar.add(calendar.DATE, rule.getFirstDay());//把日期往后增加60天整数往后推,负数往前移动
-                                                                                date2 = calendar.getTime();   //这个时间就是日期往后推60天的结果
-                                                                                final String backdate = sdf.format(date2);
-                                                                                books.setLentTime(borrowdate);
-                                                                                books.setBackTime(backdate);
-                                                                                /**
-                                                                                 *预约者得借
-                                                                                 */
-                                                                                books.update(books.getObjectId(), new UpdateListener() {
-                                                                                    @Override
-                                                                                    public void done(BmobException e) {
-                                                                                        DialogMessage.closeDialog();
-                                                                                        if (e == null) {
-
-                                                                                        } else {
-                                                                                            useToast("预约者得借失败！");
-                                                                                        }
-                                                                                    }
-                                                                                });
-                                                                                /**
-                                                                                 * 预约者当前借阅书籍表增加
-                                                                                 */
-                                                                                book.setUserId(personMessage.getUserId());
-                                                                                book.setUserName(personMessage.getUserName());
-                                                                                book.setIsSubscribe("无");
-                                                                                book.setIsContinue("无");
-                                                                                book.setLentTime(borrowdate);
-                                                                                book.setBackTime(backdate);
-                                                                                book.update(book.getObjectId(), new UpdateListener() {
-                                                                                    @Override
-                                                                                    public void done(BmobException e) {
-                                                                                        DialogMessage.closeDialog();
-                                                                                        if (e == null) {
-
-                                                                                        } else {
-                                                                                            useToast("预约者当前书籍增加失败！");
-
-                                                                                        }
-                                                                                    }
-                                                                                });
-                                                                                /**
-                                                                                 * 预约者信息表当前借阅数量增加
-                                                                                 */
-                                                                                personMessage.setNowBorrow(personMessage.getNowBorrow() + 1);
-                                                                                personMessage.update(personMessage.getObjectId(), new UpdateListener() {
-                                                                                    @Override
-                                                                                    public void done(BmobException e) {
-                                                                                        DialogMessage.closeDialog();
-                                                                                        if (e != null)
-                                                                                            useToast("预约者信息更改失败！");
-                                                                                    }
-                                                                                });
-                                                                            } else {
-                                                                                useToast("获取规则失败！");
-                                                                            }
-                                                                        }
-                                                                    });
-                                                                } else {
-                                                                    useToast("获取预约者信息失败！");
-                                                                }
-                                                            }
-                                                        });
-                                                    }
-                                                } else {
-                                                    useToast("获取当前对应的书库失败！");
-                                                }
-
-                                            }
-                                        });
-
-                                    }
-
-                                } else {
-                                    useToast("当前借阅获取失败");
-                                }
-                            }
-                        });
+                        updatePresentBS();
                     }
                 })
                         .setNegativeButton("否", new DialogInterface.OnClickListener() {
@@ -322,7 +96,203 @@ public class ChangeUsers extends Activity {
                             }
                         }).show();
             }
+
+
         });
+    }
+    public void updatePresentBS() {
+        BmobQuery<PresentBooks> presentBooksBmobQuery = new BmobQuery<PresentBooks>();
+        presentBooksBmobQuery.addWhereEqualTo("userId", personMessage.getUserId());
+        presentBooksBmobQuery.findObjects(new FindListener<PresentBooks>() {
+            @Override
+            public void done(List<PresentBooks> list, BmobException e) {
+                DialogMessage.closeDialog();
+                if (e == null && list.size() > 0) {
+                    BmobBatch batch = new BmobBatch();
+                    for (int i = 0; i < list.size(); i++) {
+                        list.get(i).setObjectId(list.get(i).getObjectId());
+                        if (list.get(i).getIsSubscribe().equals("无")) {
+                            deprelist.add(list.get(i));
+                        } else {
+                            String ss = list.get(i).getIsSubscribe().substring(0, list.get(i).getIsSubscribe().length() - 2);
+                            final int userId = Integer.valueOf(ss);
+                            list.get(i).setUserId(userId);
+                            list.get(i).setIsSubscribe("无");
+                            list.get(i).setIsContinue("无");
+                            Date date1 = new Date();
+                            Date date2 = new Date();
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            final String borrowdate = sdf.format(date1);
+                            Calendar calendar = new GregorianCalendar();
+                            calendar.setTime(date2);
+                            calendar.add(calendar.DATE, rule.getFirstDay());//把日期往后增加60天整数往后推,负数往前移动
+                            date2 = calendar.getTime();   //这个时间就是日期往后推60天的结果
+                            final String backdate = sdf.format(date2);
+                            list.get(i).setLentTime(borrowdate);
+                            list.get(i).setBackTime(backdate);
+                            upprelist.add(list.get(i));
+                        }
+                    }
+                    if (deprelist.size() > 0)
+                        batch.deleteBatch(deprelist);
+                    if (upprelist.size() > 0)
+                        batch.updateBatch(upprelist);
+                    batch.doBatch(new QueryListListener<BatchResult>() {
+                        @Override
+                        public void done(List<BatchResult> list, BmobException e) {
+                            if (e == null) {
+
+                            } else {
+                                DialogMessage.closeDialog();
+                            }
+                        }
+                    });
+                } else {
+
+                }
+
+            }
+        });
+
+    }
+
+    public void deleteUser() {
+        personMessage.delete(personMessage.getObjectId(), new UpdateListener() {
+            @Override
+            public void done(BmobException e) {
+                if (e == null) {
+
+                } else {
+                    DialogMessage.closeDialog();
+                }
+            }
+        });
+
+
+    }
+
+
+    public void deletePastBooks() {
+        BmobQuery<PastBooks> pastBooksBmobQuery = new BmobQuery<PastBooks>();
+        pastBooksBmobQuery.setLimit(100);
+        pastBooksBmobQuery.addWhereEqualTo("userId", personMessage.getUserId());
+        pastBooksBmobQuery.findObjects(new FindListener<PastBooks>() {
+            @Override
+            public void done(List<PastBooks> list, BmobException e) {
+                if (e == null && list.size() > 0) {
+                    List<BmobObject> bmobObjectList = new ArrayList<BmobObject>();
+                    for (int i = 0; i < list.size(); i++) {
+                        bmobObjectList.add(list.get(i));
+                    }
+                    new BmobBatch().deleteBatch(bmobObjectList).doBatch(new QueryListListener<BatchResult>() {
+                        @Override
+                        public void done(List<BatchResult> list, BmobException e) {
+                            if (e == null) {
+                            } else {
+                                useToast("删除过去失败");
+                                DialogMessage.closeDialog();
+                            }
+                        }
+                    });
+                } else {
+                    //useToast("获取过去异常");
+                    DialogMessage.closeDialog();
+                }
+            }
+        });
+    }
+
+
+    public void changSub() {
+        /**
+         *将预约改掉
+         */
+        BmobQuery<Books> booksBmobQuery = new BmobQuery<Books>();
+        booksBmobQuery.addWhereEqualTo("isSubscribe", "" + personMessage.getUserId() + "预约");
+        booksBmobQuery.findObjects(new FindListener<Books>() {
+            @Override
+            public void done(List<Books> list, BmobException e) {
+                if (e == null) {
+                    List<BmobObject> bmobObjectList = new ArrayList<BmobObject>();
+                    for (int i = 0; i < list.size(); i++) {
+                        list.get(i).setIsSubscribe("无");
+                        bmobObjectList.add(list.get(i));
+                    }
+                    new BmobBatch().updateBatch(bmobObjectList).doBatch(new QueryListListener<BatchResult>() {
+                        @Override
+                        public void done(List<BatchResult> list, BmobException e) {
+                            if (e == null) {
+
+                            } else {
+                                useToast("改预约失败");
+                                DialogMessage.closeDialog();
+                            }
+                        }
+                    });
+                } else {
+                    useToast("获取当前预约失败");
+                    DialogMessage.closeDialog();
+                }
+            }
+        });
+    }
+
+    private void updateBooksShop() {
+        BmobQuery<Books> booksBmobQuery = new BmobQuery<Books>();
+        booksBmobQuery.addWhereEqualTo("isLent", "" + personMessage.getUserId() + "借出");
+        booksBmobQuery.findObjects(new FindListener<Books>() {
+            @Override
+            public void done(List<Books> list, BmobException e) {
+                DialogMessage.closeDialog();
+                if (e == null && list.size() > 0) {
+                    for (int i = 0; i < list.size(); i++) {
+                        list.get(i).setObjectId(list.get(i).getObjectId());
+                        if (list.get(i).getIsSubscribe().equals("无")) {
+                            list.get(i).setBackTime("");
+                            list.get(i).setLentTime("");
+                            list.get(i).setIsLent("可借");
+                            list.get(i).setIsContinue("无");
+                            bookslist.add(list.get(i));
+                        } else {
+                            String ss = list.get(i).getIsSubscribe().substring(0, list.get(i).getIsSubscribe().length() - 2);
+                            final int userId = Integer.valueOf(ss);
+                            list.get(i).setIsLent(userId + "借出");
+                            list.get(i).setIsContinue("无");
+                            list.get(i).setIsSubscribe("无");
+                            Date date1 = new Date();
+                            Date date2 = new Date();
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            final String borrowdate = sdf.format(date1);
+                            Calendar calendar = new GregorianCalendar();
+                            calendar.setTime(date2);
+                            calendar.add(calendar.DATE, rule.getFirstDay());//把日期往后增加60天整数往后推,负数往前移动
+                            date2 = calendar.getTime();   //这个时间就是日期往后推60天的结果
+                            final String backdate = sdf.format(date2);
+                            list.get(i).setLentTime(borrowdate);
+                            list.get(i).setBackTime(backdate);
+                            bookslist.add(list.get(i));
+
+                        }
+                    }
+                    new BmobBatch().updateBatch(bookslist).doBatch(new QueryListListener<BatchResult>() {
+                        @Override
+                        public void done(List<BatchResult> list, BmobException e) {
+                            if (e == null) {
+
+                            } else {
+                                DialogMessage.closeDialog();
+                            }
+                        }
+                    });
+
+
+                }else {
+
+                }
+            }
+        });
+
+
     }
 
     public void init() {
@@ -337,6 +307,7 @@ public class ChangeUsers extends Activity {
         accountwpast = (TextView) findViewById(R.id.userchwpastbook);
         deleteUser = (Button) findViewById(R.id.user_delete);
         accountProperty = (TextView) findViewById(R.id.user_chproperty);
+        accountprebook=(TextView)findViewById(R.id.userchprebook);
 
         accountName.setText("姓名：" + personMessage.getUserName().toString());
         accountSex.setText("性别：" + personMessage.getUserSex().toString());
@@ -347,6 +318,7 @@ public class ChangeUsers extends Activity {
         accountpast.setText("逾期书本：" + personMessage.getPastBooks().toString());
         accountwpast.setText("即将到期：" + personMessage.getWpastBooks().toString());
         accounttel.setText("联系方式：" + personMessage.getUserTel().toString());
+        accountprebook.setText("当前借阅："+personMessage.getNowBorrow().toString());
         accountProperty.setText("属性：" + personMessage.getIsRootManager().toString());
 
 

@@ -48,20 +48,16 @@ public class LibraryDB {
     }
 
 
-
-
-
     /**
      * 将PersonalMessage存入数据库
      */
-    public boolean savePersonalMeassage(List<PersonMessage> ps) {
+    public void savePersonalMeassage(List<PersonMessage> ps) {
         /**
          * 清空用户
          *
          * @return
          */
-       db.execSQL("delete from PersonalMessages");
-        if (ps.size() > 0) {
+        db.execSQL("delete from PersonalMessages");
             for (PersonMessage personMessage : ps) {
                 ContentValues values = new ContentValues();
                 values.put("user_id", personMessage.getUserId());
@@ -71,14 +67,13 @@ public class LibraryDB {
                 values.put("user_profession", personMessage.getUserProfession());
                 values.put("user_description", personMessage.getUserDescription());
                 values.put("user_tel", personMessage.getUserTel());
+                values.put("now_borrow", personMessage.getNowBorrow());
                 values.put("user_level", personMessage.getUserLevel());
                 values.put("user_pastbooks", personMessage.getPastBooks());
                 values.put("user_wpastbooks", personMessage.getWpastBooks());
                 values.put("rootmanager", personMessage.getIsRootManager());
                 db.insert("PersonalMessages", null, values);
             }
-            return true;
-        } else return false;
     }
 
 
@@ -89,11 +84,10 @@ public class LibraryDB {
         usersList.clear();
         try {
             int userId = Integer.valueOf(input);
-            Cursor cursor = db.rawQuery("select * from PersonalMessages where user_id!=12345 and user_id like '%" + userId + "%' order by user_id", null);
+            Cursor cursor = db.rawQuery("select * from PersonalMessages where user_id like '%" + userId + "%' order by user_id", null);
             if (cursor.moveToFirst()) {
                 do {
                     PersonMessage personMessage = new PersonMessage();
-
                     personMessage.setUserId(cursor.getInt(cursor.getColumnIndex("user_id")));
                     personMessage.setUserPassword(cursor.getString(cursor.getColumnIndex("user_password")));
                     personMessage.setUserName(cursor.getString(cursor.getColumnIndex("user_name")));
@@ -102,8 +96,7 @@ public class LibraryDB {
                     personMessage.setUserDescription(cursor.getString(cursor.getColumnIndex("user_description")));
                     personMessage.setUserTel(cursor.getString(cursor.getColumnIndex("user_tel")));
                     personMessage.setObjectId(cursor.getString(cursor.getColumnIndex("user_object")));
-
-                    personMessage.setNowBorrow(cursor.getInt(cursor.getColumnIndex("now_borrow ")));
+                    personMessage.setNowBorrow(cursor.getInt(cursor.getColumnIndex("now_borrow")));
                     personMessage.setUserLevel(cursor.getInt(cursor.getColumnIndex("user_level")));
                     personMessage.setPastBooks(cursor.getInt(cursor.getColumnIndex("user_pastbooks")));
                     personMessage.setWpastBooks(cursor.getInt(cursor.getColumnIndex("user_wpastbooks")));
@@ -113,12 +106,15 @@ public class LibraryDB {
                     usersList.add(personMessage);
                 } while (cursor.moveToNext());
             }
+            if (usersList.size() == 0) {
+                int i = Integer.valueOf("sdsdf");
+            }
             cursor.close();
             return usersList;
         } catch (Exception e) {
             try {
                 usersList.clear();
-                Cursor cursor = db.rawQuery("select * from PersonalMessages where user_id!=12345 and user_name like '%" + input + "%' COLLATE NOCASE order by user_id", null);
+                Cursor cursor = db.rawQuery("select * from PersonalMessages where user_name like '%" + input + "%' COLLATE NOCASE order by user_id", null);
                 if (cursor.moveToFirst()) {
                     do {
                         PersonMessage personMessage = new PersonMessage();
@@ -143,9 +139,11 @@ public class LibraryDB {
                     } while (cursor.moveToNext());
                 }
                 cursor.close();
+                return usersList;
             } catch (Exception a) {
+                return usersList;
             }
-            return usersList;
+
         }
     }
 
@@ -183,12 +181,11 @@ public class LibraryDB {
     /**
      * 管理员保存图书
      */
-    public boolean saveBookMeassage(List<Books> book) {
+    public void saveBookMeassage(List<Books> book) {
         /**
          * 管理员清空图书
          */
-       db.execSQL("delete from BookRepertory");
-        if (book.size() > 0) {
+        db.execSQL("delete from BookRepertory");
             for (Books books : book) {
                 ContentValues values = new ContentValues();
                 values.put("book_id", books.getBookId());
@@ -198,22 +195,16 @@ public class LibraryDB {
                 values.put("book_press", books.getPress());
                 values.put("book_description", books.getUserDescription());
 
-                values.put("book_object",books.getObjectId());
+                values.put("book_object", books.getObjectId());
                 values.put("book_subscribe", books.getIsSubscribe());
                 values.put("book_continue", books.getIsContinue());
                 values.put("book_status", books.getIsLent());
                 values.put("lent_time", books.getLentTime());
                 values.put("back_time", books.getBackTime());
-
                 db.insert("BookRepertory", null, values);
             }
-            return true;
-        } else return false;
-
 
     }
-
-
 
 
 }

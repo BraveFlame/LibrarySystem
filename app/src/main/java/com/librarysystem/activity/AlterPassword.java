@@ -79,7 +79,9 @@ public class AlterPassword extends Activity implements Runnable {
                         ToastMessage.useToast(AlterPassword.this, "密码错误！");
                     }
                 } else if (i == 2) {
-                    //第二次为新密码
+                    /**
+                     * 第二次为新密码
+                     */
                     personMessage.setUserPassword(code);
                     DialogMessage.showDialog(AlterPassword.this);
                     personMessage.update(pref.getString("objectid", ""), new UpdateListener() {
@@ -94,7 +96,6 @@ public class AlterPassword extends Activity implements Runnable {
                                 finish();
                             } else {
                                 ToastMessage.useToast(AlterPassword.this, "修改失败");
-
                             }
                         }
                     });

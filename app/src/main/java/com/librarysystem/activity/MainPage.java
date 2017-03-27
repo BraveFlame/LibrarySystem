@@ -207,12 +207,17 @@ public class MainPage extends Activity implements View.OnClickListener {
             @Override
             public void done(final PersonMessage personMessage, BmobException e) {
                 person = personMessage;
-                BmobQuery<PresentBooks> pb = new BmobQuery<>();
+                final BmobQuery<PresentBooks> pb = new BmobQuery<>();
                 pb.addWhereEqualTo("userId", pref.getInt("userId", 0));
                 pb.findObjects(new FindListener<PresentBooks>() {
                     @Override
                     public void done(List<PresentBooks> list, BmobException e) {
                         if (e == null) {
+                            if(list.size()>0){
+                                personMessage.setNowBorrow(list.size());
+                            }else{
+                                personMessage.setNowBorrow(0);
+                            }
                             presentBooks = list;
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                             Date date1;
@@ -242,8 +247,6 @@ public class MainPage extends Activity implements View.OnClickListener {
                 });
             }
         });
-
-
     }
 
     public void notifyBooks(final int k, final int j, PersonMessage person) {
@@ -269,6 +272,7 @@ public class MainPage extends Activity implements View.OnClickListener {
             person.setPastBooks(0);
 
         }
+
         person.update(pref.getString("objectid", ""), new UpdateListener() {
             @Override
             public void done(BmobException e) {
@@ -289,15 +293,13 @@ public class MainPage extends Activity implements View.OnClickListener {
             public void done(List<Books> list, BmobException e) {
                 DialogMessage.closeDialog();
                 if (e == null) {
-                    if (list.size() == 0) {
-                        //ToastMessage.useToast(MainPage.this, "没有该书籍！");
+                    if (list.size() <= 0) {
+                        ToastMessage.useToast(MainPage.this, "没有该书籍！");
                     } else {
                         libraryDB.saveBookMeassage(list);
                         libraryDB.getBookMeassage(bookName, repertoryBooks);
                         if (repertoryBooks.size() == 0) {
-                            //ToastMessage.useToast(MainPage.this, "没有该书籍！");
-                        } else {
-                            //repertoryBooks=list;
+                            ToastMessage.useToast(MainPage.this, "没有该书籍！");
                         }
                     }
                     BookAdapter adapter = new BookAdapter(MainPage.this, R.layout.book_item, repertoryBooks);

@@ -93,7 +93,6 @@ public class BackBook extends Activity {
                         /**
                          * 改变该用户过去借阅
                          */
-
                         PastBooks psb = new PastBooks();
                         psb.setBookId(book.getBookId());
                         psb.setBookAuthor(book.getBookAuthor());
@@ -130,7 +129,6 @@ public class BackBook extends Activity {
                                 if (e == null) {
 
                                     books = list.get(0);
-                                    String s = book.getBookName();
 
                                     /**
                                      * 如果没有预约则返回书库
@@ -195,14 +193,13 @@ public class BackBook extends Activity {
                                                             if (e == null) {
                                                                 books.setIsContinue("无");
                                                                 books.setIsSubscribe("无");
-                                                                books.setIsLent(person.getUserName() + "借出");
+                                                                books.setIsLent(""+person.getUserId() + "借出");
                                                                 Date date1 = new Date();
                                                                 Date date2 = new Date();
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                                                 final String borrowdate = sdf.format(date1);
                                                                 Calendar calendar = new GregorianCalendar();
                                                                 calendar.setTime(date2);
-                                                                //pref.getInt("firstborrow", 30)
                                                                 calendar.add(calendar.DATE, rule.getFirstDay());//把日期往后增加60天整数往后推,负数往前移动
                                                                 date2 = calendar.getTime();   //这个时间就是日期往后推60天的结果
                                                                 final String backdate = sdf.format(date2);
@@ -226,7 +223,6 @@ public class BackBook extends Activity {
                                                                  * 预约者当前借阅增加
                                                                  */
                                                                 book.setUserId(person.getUserId());
-                                                                book.setUserName(person.getUserName());
                                                                 book.setIsSubscribe("无");
                                                                 book.setIsContinue("无");
                                                                 book.setLentTime(borrowdate);
@@ -336,6 +332,7 @@ public class BackBook extends Activity {
                                                 DialogMessage.closeDialog();
                                                 if (e == null) {
                                                     books = list.get(0);
+                                                    books.setIsContinue("续借");
                                                     sdf = new SimpleDateFormat("yyyy-MM-dd");
                                                     books.setBackTime(sdf.format(date1));
                                                     books.update(books.getObjectId(), new UpdateListener() {

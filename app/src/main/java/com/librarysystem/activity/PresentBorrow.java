@@ -10,7 +10,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.librarysystem.R;
 import com.librarysystem.model.PersonMessage;
@@ -36,9 +36,9 @@ public class PresentBorrow extends Activity {
     private ListView bookList;
     private List<PresentBooks> booksList = new ArrayList<PresentBooks>();
     private SharedPreferences pref;
-    private Toast mToast;
     private PersonMessage ps;
     private ImageView rebook;
+    private TextView num;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +48,7 @@ public class PresentBorrow extends Activity {
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         rebook = (ImageView) findViewById(R.id.renew_prebook);
         bookList = (ListView) findViewById(R.id.list_present_book);
+        num=(TextView)findViewById(R.id.title);
         rebooks();
         rebook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,6 +89,8 @@ public class PresentBorrow extends Activity {
                     bookList.setAdapter(adapter);
                     if (booksList.size() == 0) {
                         ToastMessage.useToast(PresentBorrow.this, "当前没有借阅的书籍！");
+                    }else {
+                        num.setText("当前借阅"+list.size());
                     }
                 } else {
                     ToastMessage.useToast(PresentBorrow.this, "获取书籍异常！");

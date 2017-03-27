@@ -77,24 +77,14 @@
         android:text="书籍爱好："
         android:layout_marginLeft="10dp"
         android:textSize="25sp" />
-
-
     <TextView
-        android:id="@+id/userctel"
+        android:id="@+id/usercprebook"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="联系方式："
+        android:text="当前借阅："
         android:layout_marginLeft="10dp"
         android:textSize="25sp" />
 
-
-    <TextView
-        android:id="@+id/userclate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="逾期书本："
-        android:layout_marginLeft="10dp"
-        android:textSize="25sp" />
 
     <TextView
         android:id="@+id/usercwpastbook"
@@ -103,6 +93,15 @@
         android:text="即将到期："
         android:layout_marginLeft="10dp"
         android:textSize="25sp" />
+    <TextView
+        android:id="@+id/userclate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="逾期书本："
+        android:layout_marginLeft="10dp"
+        android:textSize="25sp" />
+
+
 
 
     <TextView
@@ -113,7 +112,17 @@
         android:layout_marginLeft="10dp"
         android:textSize="25sp" />
 
-        <Button
+    <TextView
+        android:id="@+id/userctel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="联系方式："
+        android:layout_marginLeft="10dp"
+        android:textSize="25sp" />
+
+
+
+    <Button
             android:id="@+id/usercpassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

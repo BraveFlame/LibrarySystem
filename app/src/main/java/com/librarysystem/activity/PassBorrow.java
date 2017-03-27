@@ -69,6 +69,8 @@ public class PassBorrow extends Activity {
                     bookList.setAdapter(adapter);
                     if (booksList.size() == 0) {
                         ToastMessage.useToast(PassBorrow.this,"暂无历史借阅！");
+                    }else {
+                        title.setText("历史借阅"+list.size());
                     }
                 } else {
                     ToastMessage.useToast(PassBorrow.this,"获取异常！");

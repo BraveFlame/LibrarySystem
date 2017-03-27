@@ -28,7 +28,7 @@ import cn.bmob.v3.listener.QueryListener;
 public class UserCcount extends Activity {
     private SharedPreferences pref;
     private TextView accountId, accountName, accountSex, accountpro, accounthobby, accounttel,
-            accountlevel, accountpast, accountwpast, userProperty;
+            accountlevel, accountpast, accountwpast, userProperty,accountprebook;
     private Button alterPassword;
     private ImageView renew;
 
@@ -62,9 +62,7 @@ public class UserCcount extends Activity {
                     accountId.setText("账户：" + String.valueOf(personMessage.getUserId()));
                     accounthobby.setText("书籍爱好：" + personMessage.getUserDescription().toString());
                     accountpro.setText("专业：" + personMessage.getUserProfession().toString());
-                    accountlevel.setText("借阅等级：" + String.valueOf(personMessage.getUserLevel()));
-                    accountpast.setText("逾期书本：" + String.valueOf(personMessage.getPastBooks()));
-                    accountwpast.setText("即将到期：" + String.valueOf(personMessage.getWpastBooks()));
+                   accountprebook.setText("当前借阅："+personMessage.getNowBorrow().toString());
                     accountlevel.setText("借阅等级：" + personMessage.getUserLevel().toString());
                     accountpast.setText("逾期书本：" + personMessage.getPastBooks().toString());
                     accountwpast.setText("即将到期：" + personMessage.getWpastBooks().toString());
@@ -104,6 +102,7 @@ public class UserCcount extends Activity {
         accountpast = (TextView) findViewById(R.id.userclate);
         accountwpast = (TextView) findViewById(R.id.usercwpastbook);
         userProperty = (TextView) findViewById(R.id.user_property);
+        accountprebook=(TextView)findViewById(R.id.usercprebook);
         renew = (ImageView) findViewById(R.id.renew_ccount);
 
     }

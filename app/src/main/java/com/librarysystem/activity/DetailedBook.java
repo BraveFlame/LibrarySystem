@@ -20,9 +20,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
@@ -58,7 +60,7 @@ public class DetailedBook extends Activity {
         if (book.getIsLent().equals("可借"))
             detailed_status.setText("状态：" + book.getIsLent());
         else {
-            detailed_status.setText("状态：" + book.getIsLent().substring(2, book.getIsLent().length()));
+            detailed_status.setText("状态：" + book.getIsLent().substring(book.getIsLent().length()-2, book.getIsLent().length()));
         }
         detailed_subscribe = (Button) findViewById(R.id.book_subscribe);
         detailed_button = (Button) findViewById(R.id.detailed_button);
@@ -115,7 +117,7 @@ public class DetailedBook extends Activity {
                             if (e == null) {
                                 if (personMessage.getNowBorrow() < rule.getMaxBooks() && personMessage.getPastBooks() == 0) {
                                     personMessage.setNowBorrow(personMessage.getNowBorrow() + 1);
-                                    book.setIsLent(personMessage.getUserName() + "借出");
+                                    book.setIsLent(personMessage.getUserId() + "借出");
                                     Date date1 = new Date();
                                     Date date2 = new Date();
                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -153,7 +155,6 @@ public class DetailedBook extends Activity {
                                     pb.setLentTime(book.getLentTime());
                                     pb.setUserDescription(book.getUserDescription());
                                     pb.setUserId(personMessage.getUserId());
-                                    pb.setUserName(personMessage.getUserName());
                                     pb.save(new SaveListener<String>() {
                                         @Override
                                         public void done(String s, BmobException e) {
@@ -175,11 +176,14 @@ public class DetailedBook extends Activity {
 
                                 } else if (personMessage.getNowBorrow() >= rule.getMaxBooks()) {
                                     ToastMessage.useToast(DetailedBook.this, "已达最大续借量！");
+                                    DialogMessage.closeDialog();
                                 } else if (personMessage.getPastBooks() > 0) {
                                     ToastMessage.useToast(DetailedBook.this, "请先归还过期图书！");
+                                    DialogMessage.closeDialog();
                                 }
 
                             } else {
+                                DialogMessage.closeDialog();
                                 ToastMessage.useToast(DetailedBook.this, "获取规则异常");
                             }
                         }
@@ -192,31 +196,55 @@ public class DetailedBook extends Activity {
         detailed_subscribe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /**
+                 * 获取借阅规则以便判断是否有资格预约
+                 */
                 DialogMessage.showDialog(DetailedBook.this);
                 BmobQuery<Rule> r = new BmobQuery<>();
                 r.getObject("c9cf23b8fb", new QueryListener<Rule>() {
                     @Override
                     public void done(Rule rule, BmobException e) {
-                        DialogMessage.closeDialog();
+
                         if (e == null) {
                             String userName = book.getIsLent().substring(0, book.getIsLent().length() - 2);
                             if (userName.equals(personMessage.getUserName())) {
+                                DialogMessage.closeDialog();
                                 ToastMessage.useToast(DetailedBook.this, "借阅者不得预约！");
                             } else if (personMessage.getNowBorrow() > rule.getMaxBooks()) {
+                                DialogMessage.closeDialog();
                                 ToastMessage.useToast(DetailedBook.this, "最大借阅时不可预约");
                             } else if (personMessage.getPastBooks() > 0) {
+                                DialogMessage.closeDialog();
                                 ToastMessage.useToast(DetailedBook.this, "有未归还图书无法预约！");
                             } else {
                                 book.setIsSubscribe(pref.getInt("userId", 0) + "预约");
                                 book.update(book.getObjectId(), new UpdateListener() {
                                     @Override
                                     public void done(BmobException e) {
+                                        DialogMessage.closeDialog();
                                         detailed_subscribe.setEnabled(false);
                                         detailed_subscribe.setText("吾约");
                                     }
                                 });
+                                BmobQuery<PresentBooks>bs=new BmobQuery<PresentBooks>();
+                                bs.addWhereEqualTo("bookId",book.getBookId());
+                                bs.findObjects(new FindListener<PresentBooks>() {
+                                    @Override
+                                    public void done(List<PresentBooks> list, BmobException e) {
+                                        if(e==null){
+                                            list.get(0).setIsSubscribe(pref.getInt("userId", 0) + "预约");
+                                            list.get(0).update(list.get(0).getObjectId(), new UpdateListener() {
+                                                @Override
+                                                public void done(BmobException e) {
+                                                    DialogMessage.closeDialog();
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
                             }
                         } else {
+                            DialogMessage.closeDialog();
                             ToastMessage.useToast(DetailedBook.this, "获取规则异常");
                         }
                     }
