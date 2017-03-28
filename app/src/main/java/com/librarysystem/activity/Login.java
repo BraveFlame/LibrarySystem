@@ -36,7 +36,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private EditText userEdit, passwordEdit;
     private CheckBox rememberPassword;
     private Button register, login;
-    private TextView forgetPassword,userKnow;
+    private TextView forgetPassword, userKnow;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
     private int userInput;
@@ -47,7 +47,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.login_main);
@@ -64,8 +64,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
  * 如果记住密码则判断是否正确再决定自动登录与否
  */
         if (isRemember) {
-            int user = pref.getInt("user", 0);
-            String password = pref.getString("password", "");
+            final int user = pref.getInt("user", 0);
+            final String password = pref.getString("password", "");
             userEdit.setText("" + user);
             passwordEdit.setText(password);
             rememberPassword.setChecked(true);
@@ -74,8 +74,30 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
              *
              */
             if (!change_user) {
-                lv = new LoginView(Login.this);
-                setContentView(lv);
+                BmobQuery<PersonMessage> personMessageBmobQuery = new BmobQuery<PersonMessage>();
+                personMessageBmobQuery.addWhereEqualTo("userId", user);
+                DialogMessage.showDialog(Login.this);
+                personMessageBmobQuery.findObjects(new FindListener<PersonMessage>() {
+                    @Override
+                    public void done(List<PersonMessage> list, BmobException e) {
+                        DialogMessage.closeDialog();
+                        if (e == null) {
+                            if (list.size() == 1) {
+                                PersonMessage personMessage = list.get(0);
+                                if ((user == personMessage.getUserId()) && password.equals(personMessage.getUserPassword())) {
+                                    gotoMain();
+                                } else {
+                                    ToastMessage.useToast(Login.this, "密码已更改！");
+
+                                }
+                            } else {
+                                ToastMessage.useToast(Login.this, "用户不存在！");
+                            }
+                        } else {
+                            ToastMessage.useToast(Login.this, "网络异常！");
+                        }
+                    }
+                });
             }
 
         }
@@ -88,7 +110,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         register = (Button) findViewById(R.id.register_button);
         login = (Button) findViewById(R.id.login_button);
         forgetPassword = (TextView) findViewById(R.id.forget_password);
-        userKnow=(TextView)findViewById(R.id.user_know);
+        userKnow = (TextView) findViewById(R.id.user_know);
         register.setOnClickListener(this);
         login.setOnClickListener(this);
         forgetPassword.setOnClickListener(this);
@@ -105,16 +127,17 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             case R.id.login_button:
                 if (userEdit.getText().toString().equals("")) {
                     ToastMessage.useToast(Login.this, "用户名或密码错误！");
-                }else{
-                DialogMessage.showDialog(Login.this);
-                userLogin();}
+                } else {
+                    DialogMessage.showDialog(Login.this);
+                    userLogin();
+                }
                 break;
             case R.id.forget_password:
                 Intent alterpassword = new Intent(this, ForgetPassword.class);
                 startActivity(alterpassword);
                 break;
             case R.id.user_know:
-                Intent knowIntent=new Intent(this,UsersKnow.class);
+                Intent knowIntent = new Intent(this, UsersKnow.class);
                 startActivity(knowIntent);
             default:
                 break;

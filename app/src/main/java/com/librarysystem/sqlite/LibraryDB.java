@@ -62,6 +62,7 @@ public class LibraryDB {
                 ContentValues values = new ContentValues();
                 values.put("user_id", personMessage.getUserId());
                 values.put("user_password", personMessage.getUserPassword());
+                values.put("user_object",personMessage.getObjectId());
                 values.put("user_name", personMessage.getUserName());
                 values.put("user_sex", personMessage.getUserSex());
                 values.put("user_profession", personMessage.getUserProfession());

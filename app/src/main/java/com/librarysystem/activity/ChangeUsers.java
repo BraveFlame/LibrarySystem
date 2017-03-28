@@ -107,7 +107,8 @@ public class ChangeUsers extends Activity {
             @Override
             public void done(List<PresentBooks> list, BmobException e) {
                 DialogMessage.closeDialog();
-                if (e == null && list.size() > 0) {
+                if (e == null ) {
+                    if( list.size() > 0){
                     BmobBatch batch = new BmobBatch();
                     for (int i = 0; i < list.size(); i++) {
                         list.get(i).setObjectId(list.get(i).getObjectId());
@@ -144,11 +145,12 @@ public class ChangeUsers extends Activity {
 
                             } else {
                                 DialogMessage.closeDialog();
+                                useToast("更改当前借阅失败");
                             }
                         }
-                    });
+                    });}
                 } else {
-
+                    useToast("获取当前借阅失败失败");
                 }
 
             }
@@ -164,6 +166,8 @@ public class ChangeUsers extends Activity {
 
                 } else {
                     DialogMessage.closeDialog();
+                    useToast("删除用户失败");
+
                 }
             }
         });
@@ -179,7 +183,8 @@ public class ChangeUsers extends Activity {
         pastBooksBmobQuery.findObjects(new FindListener<PastBooks>() {
             @Override
             public void done(List<PastBooks> list, BmobException e) {
-                if (e == null && list.size() > 0) {
+                if (e == null ) {
+                    if(list.size() > 0){
                     List<BmobObject> bmobObjectList = new ArrayList<BmobObject>();
                     for (int i = 0; i < list.size(); i++) {
                         bmobObjectList.add(list.get(i));
@@ -193,9 +198,9 @@ public class ChangeUsers extends Activity {
                                 DialogMessage.closeDialog();
                             }
                         }
-                    });
+                    });}
                 } else {
-                    //useToast("获取过去异常");
+                    useToast("获取过去异常");
                     DialogMessage.closeDialog();
                 }
             }
@@ -213,6 +218,7 @@ public class ChangeUsers extends Activity {
             @Override
             public void done(List<Books> list, BmobException e) {
                 if (e == null) {
+                    if(list.size()>0){
                     List<BmobObject> bmobObjectList = new ArrayList<BmobObject>();
                     for (int i = 0; i < list.size(); i++) {
                         list.get(i).setIsSubscribe("无");
@@ -228,7 +234,7 @@ public class ChangeUsers extends Activity {
                                 DialogMessage.closeDialog();
                             }
                         }
-                    });
+                    });}
                 } else {
                     useToast("获取当前预约失败");
                     DialogMessage.closeDialog();
@@ -244,50 +250,53 @@ public class ChangeUsers extends Activity {
             @Override
             public void done(List<Books> list, BmobException e) {
                 DialogMessage.closeDialog();
-                if (e == null && list.size() > 0) {
-                    for (int i = 0; i < list.size(); i++) {
-                        list.get(i).setObjectId(list.get(i).getObjectId());
-                        if (list.get(i).getIsSubscribe().equals("无")) {
-                            list.get(i).setBackTime("");
-                            list.get(i).setLentTime("");
-                            list.get(i).setIsLent("可借");
-                            list.get(i).setIsContinue("无");
-                            bookslist.add(list.get(i));
-                        } else {
-                            String ss = list.get(i).getIsSubscribe().substring(0, list.get(i).getIsSubscribe().length() - 2);
-                            final int userId = Integer.valueOf(ss);
-                            list.get(i).setIsLent(userId + "借出");
-                            list.get(i).setIsContinue("无");
-                            list.get(i).setIsSubscribe("无");
-                            Date date1 = new Date();
-                            Date date2 = new Date();
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                            final String borrowdate = sdf.format(date1);
-                            Calendar calendar = new GregorianCalendar();
-                            calendar.setTime(date2);
-                            calendar.add(calendar.DATE, rule.getFirstDay());//把日期往后增加60天整数往后推,负数往前移动
-                            date2 = calendar.getTime();   //这个时间就是日期往后推60天的结果
-                            final String backdate = sdf.format(date2);
-                            list.get(i).setLentTime(borrowdate);
-                            list.get(i).setBackTime(backdate);
-                            bookslist.add(list.get(i));
-
-                        }
-                    }
-                    new BmobBatch().updateBatch(bookslist).doBatch(new QueryListListener<BatchResult>() {
-                        @Override
-                        public void done(List<BatchResult> list, BmobException e) {
-                            if (e == null) {
-
+                if (e == null ) {
+                    if(list.size() > 0) {
+                        for (int i = 0; i < list.size(); i++) {
+                            list.get(i).setObjectId(list.get(i).getObjectId());
+                            if (list.get(i).getIsSubscribe().equals("无")) {
+                                list.get(i).setBackTime("");
+                                list.get(i).setLentTime("");
+                                list.get(i).setIsLent("可借");
+                                list.get(i).setIsContinue("无");
+                                bookslist.add(list.get(i));
                             } else {
-                                DialogMessage.closeDialog();
+                                String ss = list.get(i).getIsSubscribe().substring(0, list.get(i).getIsSubscribe().length() - 2);
+                                final int userId = Integer.valueOf(ss);
+                                list.get(i).setIsLent(userId + "借出");
+                                list.get(i).setIsContinue("无");
+                                list.get(i).setIsSubscribe("无");
+                                Date date1 = new Date();
+                                Date date2 = new Date();
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                final String borrowdate = sdf.format(date1);
+                                Calendar calendar = new GregorianCalendar();
+                                calendar.setTime(date2);
+                                calendar.add(calendar.DATE, rule.getFirstDay());//把日期往后增加60天整数往后推,负数往前移动
+                                date2 = calendar.getTime();   //这个时间就是日期往后推60天的结果
+                                final String backdate = sdf.format(date2);
+                                list.get(i).setLentTime(borrowdate);
+                                list.get(i).setBackTime(backdate);
+                                bookslist.add(list.get(i));
+
                             }
                         }
-                    });
+                        new BmobBatch().updateBatch(bookslist).doBatch(new QueryListListener<BatchResult>() {
+                            @Override
+                            public void done(List<BatchResult> list, BmobException e) {
+                                if (e == null) {
 
+                                } else {
+                                    DialogMessage.closeDialog();
+                                    useToast("更新书库失败");
+                                }
+                            }
+                        });
 
+                    }
                 }else {
-
+                    DialogMessage.closeDialog();
+                    useToast("更新书库失败");
                 }
             }
         });
