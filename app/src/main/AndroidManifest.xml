@@ -62,6 +62,10 @@
         <activity
             android:name=".activity.PassBorrow"
             android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".activity.ShowSuggestion"
+            android:windowSoftInputMode="adjustPan"/>
+        <activity android:name=".activity.ResponSuggest"
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".activity.DetailedBook"
             android:launchMode="singleTask"

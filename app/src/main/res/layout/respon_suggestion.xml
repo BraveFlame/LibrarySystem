@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#f49166">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="反馈详情"
+            android:textSize="25sp" />
+    </RelativeLayout>
+
+<TextView
+    android:id="@+id/suggest_detail"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="25sp"
+    android:text="反馈详情"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#f49166">
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/sug_det_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:text="反馈账号："/>
+    <TextView
+        android:id="@+id/sug_det_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:text="反馈姓名："/>
+    <TextView
+        android:id="@+id/sug_det_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:text="反馈时间："
+        />
+    <TextView
+        android:id="@+id/sug_det_restime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:text="回复时间："
+        />
+    <TextView
+        android:id="@+id/sug_det_cont"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:hint="回复内容："
+        />
+    <Button
+        android:id="@+id/respon_suggest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:text="确认"/>
+</LinearLayout>

@@ -61,9 +61,9 @@ public class BackBook extends Activity {
         back_date.setText("应还日期：" + book.getBackTime());
         book_press.setText("出版社：" + book.getPress());
         book_version.setText("版本：" + book.getVersion());
-        /**
-         *  还书按键
-         */
+/**
+ *  还书按键
+ */
         detailed_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +86,7 @@ public class BackBook extends Activity {
                                 if (e == null) {
 
                                 } else {
-                                    ToastMessage.useToast(BackBook.this,"网络异常！");
+                                    ToastMessage.useToast(BackBook.this, "网络异常！");
                                 }
                             }
                         });
@@ -193,7 +193,7 @@ public class BackBook extends Activity {
                                                             if (e == null) {
                                                                 books.setIsContinue("无");
                                                                 books.setIsSubscribe("无");
-                                                                books.setIsLent(""+person.getUserId() + "借出");
+                                                                books.setIsLent("" + person.getUserId() + "借出");
                                                                 Date date1 = new Date();
                                                                 Date date2 = new Date();
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

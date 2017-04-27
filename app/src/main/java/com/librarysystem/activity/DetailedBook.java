@@ -49,7 +49,6 @@ public class DetailedBook extends Activity {
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         personMessage = (PersonMessage) getIntent().getSerializableExtra("person");
         book = (Books) getIntent().getSerializableExtra("bookmessage");
-
         init();
         detailed_id.setText("编号：" + book.getBookId());
         detailed_name.setText("书名：" + book.getBookName());
@@ -60,15 +59,15 @@ public class DetailedBook extends Activity {
         if (book.getIsLent().equals("可借"))
             detailed_status.setText("状态：" + book.getIsLent());
         else {
-            detailed_status.setText("状态：" + book.getIsLent().substring(book.getIsLent().length()-2, book.getIsLent().length()));
+            detailed_status.setText("状态：" + book.getIsLent().substring(book.getIsLent().length() - 2, book.getIsLent().length()));
         }
         detailed_subscribe = (Button) findViewById(R.id.book_subscribe);
         detailed_button = (Button) findViewById(R.id.detailed_button);
 
 
-        /**
-         * 可借时不需要预约，而且借此书者不得预约该书
-         */
+/**
+ * 可借时不需要预约，而且借此书者不得预约该书
+ */
 
 
         if (book.getIsLent().equals("可借")) {
@@ -82,9 +81,9 @@ public class DetailedBook extends Activity {
             detailed_button.setEnabled(false);
             detailed_date.setText("应还日期：" + book.getBackTime());
         }
-        /**
-         *   有人预约时不得预约（预约时以“预约者ID号+预约”存储）
-         */
+/**
+ *   有人预约时不得预约（预约时以“预约者ID号+预约”存储）
+ */
 
         if (book.getIsSubscribe().length() > 2) {
             String userSub = book.getIsSubscribe().substring(0, book.getIsSubscribe().length() - 2);
@@ -97,14 +96,14 @@ public class DetailedBook extends Activity {
         }
 
 
-        /**
-         * 借此书者不得预约该书
-         */
+/**
+ * 借此书者不得预约该书
+ */
 
 
-        /**
-         * 借书时需满足无过期图书和未达最大借阅量
-         */
+/**
+ * 借书时需满足无过期图书和未达最大借阅量
+ */
         detailed_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -226,12 +225,12 @@ public class DetailedBook extends Activity {
                                         detailed_subscribe.setText("吾约");
                                     }
                                 });
-                                BmobQuery<PresentBooks>bs=new BmobQuery<PresentBooks>();
-                                bs.addWhereEqualTo("bookId",book.getBookId());
+                                BmobQuery<PresentBooks> bs = new BmobQuery<PresentBooks>();
+                                bs.addWhereEqualTo("bookId", book.getBookId());
                                 bs.findObjects(new FindListener<PresentBooks>() {
                                     @Override
                                     public void done(List<PresentBooks> list, BmobException e) {
-                                        if(e==null){
+                                        if (e == null) {
                                             list.get(0).setIsSubscribe(pref.getInt("userId", 0) + "预约");
                                             list.get(0).update(list.get(0).getObjectId(), new UpdateListener() {
                                                 @Override

@@ -216,7 +216,7 @@
             android:layout_height="41dp"
             android:layout_marginLeft="10dp"
             android:text="获取"
-            android:textSize="20sp" />
+            android:textSize="15sp" />
 
     </LinearLayout>
     <RelativeLayout

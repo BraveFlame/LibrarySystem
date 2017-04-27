@@ -188,6 +188,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                 editor.commit();
                                 editor.putString("objectid", personMessage.getObjectId());
                                 editor.putInt("userId", userInput);
+                                editor.putString("userName",personMessage.getUserName());
                                 editor.putString("root", personMessage.getIsRootManager());
                                 editor.commit();
                                 /**

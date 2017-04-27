@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,6 +25,7 @@ import com.librarysystem.model.BookAdapter;
 import com.librarysystem.model.Books;
 import com.librarysystem.model.PersonMessage;
 import com.librarysystem.model.PresentBooks;
+import com.librarysystem.model.USerSuggest;
 import com.librarysystem.others.DialogMessage;
 import com.librarysystem.others.ToastMessage;
 import com.librarysystem.sqlite.LibraryDB;
@@ -80,6 +82,7 @@ public class MainPage extends Activity implements View.OnClickListener {
         searchButton = (Button) findViewById(R.id.search_book);
         inputSearchBook = (EditText) findViewById(R.id.book_search_name);
         impart();
+        getsuggestion();
         selectButton.setOnClickListener(this);
         searchButton.setOnClickListener(this);
         View.OnClickListener listener = new View.OnClickListener() {
@@ -109,6 +112,7 @@ public class MainPage extends Activity implements View.OnClickListener {
                 final Intent intentRoot = new Intent(this, ManagerRoot.class);
                 final Intent intentPresent = new Intent(this, PresentBorrow.class);
                 final Intent intentPass = new Intent(this, PassBorrow.class);
+                final Intent intentSuggest = new Intent(this, ShowSuggestion.class);
                 DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -136,7 +140,7 @@ public class MainPage extends Activity implements View.OnClickListener {
                                     ToastMessage.useToast(MainPage.this, "您不是管理员！");
                                 }
                                 break;
-                            case 5:
+                            case 6:
                                 AlertDialog.Builder dialog2 = new AlertDialog.Builder(MainPage.this);
                                 dialog2.setTitle("退出").setMessage("是否退出程序？")
                                         .setPositiveButton("是", new DialogInterface.OnClickListener() {
@@ -154,6 +158,10 @@ public class MainPage extends Activity implements View.OnClickListener {
                                 dialog2.show();
 
                                 break;
+                            case 5:
+                                startActivity(intentSuggest);
+                                break;
+
                             default:
                                 break;
                         }
@@ -191,12 +199,60 @@ public class MainPage extends Activity implements View.OnClickListener {
     protected void onRestart() {
         super.onRestart();
         impart();
+        getsuggestion();
         if (isSearch) {
             searchBooks();
         }
 
     }
+public void getsuggestion(){
+    BmobQuery<USerSuggest>uSerSuggestBmobQuery=new BmobQuery<>();
+    if(pref.getString("root","Root").equals("管理员")){
+        uSerSuggestBmobQuery.addWhereEqualTo("isAnswer","否");
+        uSerSuggestBmobQuery.findObjects(new FindListener<USerSuggest>() {
+            @Override
+            public void done(List<USerSuggest> list, BmobException e) {
+                if(e==null){
+                    if(list.size()>0){
+                        Intent intents=new Intent(MainPage.this, ShowSuggestion.class);
+                        PendingIntent pi=PendingIntent.getActivity(MainPage.this,0,intents,PendingIntent.FLAG_CANCEL_CURRENT);
+                        NotificationManager manager = (NotificationManager) MainPage.this.getSystemService(NOTIFICATION_SERVICE);
+                        Notification.Builder notification = new Notification.Builder(MainPage.this).setTicker("反馈通知").setContentTitle("反馈新信息通知！")
+                                .setContentText(list.size()+"条反馈新信息通知！")
+                                .setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.feedback)
+                                .setContentIntent(pi);
+                        notification.setDefaults(Notification.DEFAULT_ALL);
+                        manager.notify(19, notification.build());
+                    }
+                }
+            }
+        });
+    }
+    else {
+     uSerSuggestBmobQuery.addWhereEqualTo("isAnswer","是");
+        uSerSuggestBmobQuery.addWhereEqualTo("userId",pref.getInt("userId",0));
+        uSerSuggestBmobQuery.addWhereEqualTo("isSee","否");
+        uSerSuggestBmobQuery.findObjects(new FindListener<USerSuggest>() {
+            @Override
+            public void done(List<USerSuggest> list, BmobException e) {
+                if(e==null){
+                    if(list.size()>0){
+                        Intent intents=new Intent(MainPage.this, ShowSuggestion.class);
+                        PendingIntent pi=PendingIntent.getActivity(MainPage.this,0,intents,PendingIntent.FLAG_CANCEL_CURRENT);
+                        NotificationManager manager = (NotificationManager) MainPage.this.getSystemService(NOTIFICATION_SERVICE);
+                        Notification.Builder notification = new Notification.Builder(MainPage.this).setTicker("反馈").setContentTitle("反馈信息通知！")
+                                .setContentText(list.size()+"条反馈信息更新！")
+                                .setWhen(System.currentTimeMillis()).setSmallIcon(R.mipmap.feedback)
+                                .setContentIntent(pi);
+                        notification.setDefaults(Notification.DEFAULT_ALL);
+                        manager.notify(19, notification.build());
+                    }
+                }
+            }
+        });
+    }
 
+}
     /**
      * 有过期，将要过期的书时，notification通知
      */
@@ -213,9 +269,9 @@ public class MainPage extends Activity implements View.OnClickListener {
                     @Override
                     public void done(List<PresentBooks> list, BmobException e) {
                         if (e == null) {
-                            if(list.size()>0){
+                            if (list.size() > 0) {
                                 personMessage.setNowBorrow(list.size());
-                            }else{
+                            } else {
                                 personMessage.setNowBorrow(0);
                             }
                             presentBooks = list;
@@ -276,9 +332,7 @@ public class MainPage extends Activity implements View.OnClickListener {
         person.update(pref.getString("objectid", ""), new UpdateListener() {
             @Override
             public void done(BmobException e) {
-
                 if (e == null) {
-
                 } else ToastMessage.useToast(MainPage.this, "个人更新失败！");
             }
         });
@@ -330,7 +384,7 @@ public class MainPage extends Activity implements View.OnClickListener {
                             ps = personMessage;
                             bookIntent.putExtra("person", ps);
                             startActivity(bookIntent);
-                            startActivity(bookIntent);
+
                         } else {
                             ToastMessage.useToast(MainPage.this, "获取个人信息失败！");
                         }
@@ -341,48 +395,7 @@ public class MainPage extends Activity implements View.OnClickListener {
             }
         });
     }
-//
-//    /**
-//     * 显示进度对话框
-//     */
-//    public void showDialog() {
-//        if (progressDialog == null) {
-//            progressDialog = new ProgressDialog(this);
-//            progressDialog.setMessage("正在加载...");
-//            progressDialog.setCanceledOnTouchOutside(false);
-//        }
-//    }
 
-//    /**
-//     * 取消进度对话框
-//     */
-//    public void closeDialog() {
-//        if (progressDialog != null) {
-//            progressDialog.dismiss();
-//        }
-//    }
-//
-//    /**
-//     * 解救Toast频繁显示
-//     *
-//     * @param text
-//     */
-//
-//    public void useToast(String text) {
-//        if (mToast == null) {
-//            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-//        } else {
-//            mToast.setText(text);
-//            mToast.setDuration(Toast.LENGTH_SHORT);
-//        }
-//        mToast.show();
-//    }
-//
-//    public void cancelToast() {
-//        if (mToast != null) {
-//            mToast.cancel();
-//        }
-//    }
 
     @Override
     public void onBackPressed() {
